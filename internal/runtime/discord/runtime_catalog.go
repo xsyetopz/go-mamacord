@@ -5,12 +5,12 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/commands"
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/catalog"
-	discordplugin "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/plugin"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/commands"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog"
+	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func (b *Bot) refreshRuntimeCatalog(ctx context.Context) error {

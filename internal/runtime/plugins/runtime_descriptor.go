@@ -1,6 +1,6 @@
 package pluginhost
 
-import "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
+import luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 
 func commandsFromDefinition(def luaplugin.Definition) []Command {
 	out := make([]Command, 0, len(def.Commands)+len(def.UserCommands)+len(def.MessageCommands))

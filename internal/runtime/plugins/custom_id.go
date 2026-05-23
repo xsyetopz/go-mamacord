@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	customIDPrefix = "mamusiabtw:pl:"
+	customIDPrefix = "mamacord:pl:"
 	maxCustomIDLen = 100
 	customIDParts  = 2
 )

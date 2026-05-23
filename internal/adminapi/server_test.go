@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
-	"github.com/xsyetopz/go-mamusiabtw/internal/ops"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/ops"
 )
 
 func optionalUint64(value uint64) *uint64 {

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"time"
 
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 func (b *Bot) commandCooldown(cmdName string) time.Duration {
@@ -67,8 +67,8 @@ func componentCooldownKey(customID string) string {
 	if pid, _, ok := pluginhost.ParseCustomID(cid); ok {
 		return "component:" + pid
 	}
-	if strings.HasPrefix(cid, "mamusiabtw:") {
-		return "component:mamusiabtw"
+	if strings.HasPrefix(cid, "mamacord:") {
+		return "component:mamacord"
 	}
 	return "component:other"
 }
@@ -81,8 +81,8 @@ func modalCooldownKey(customID string) string {
 	if pid, _, ok := pluginhost.ParseCustomID(cid); ok {
 		return "modal:" + pid
 	}
-	if strings.HasPrefix(cid, "mamusiabtw:") {
-		return "modal:mamusiabtw"
+	if strings.HasPrefix(cid, "mamacord:") {
+		return "modal:mamacord"
 	}
 	return "modal:other"
 }

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/scheduling"
+	"github.com/xsyetopz/go-mamacord/internal/scheduling"
 )
 
 func TestParseScheduleAndNext(t *testing.T) {

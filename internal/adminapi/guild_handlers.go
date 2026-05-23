@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/guildconfig"
-	pluginhostlua "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
+	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
+	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 func (s *Server) handleGuildConfig(w http.ResponseWriter, r *http.Request, sess session) {

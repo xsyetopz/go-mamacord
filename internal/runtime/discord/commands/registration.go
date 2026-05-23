@@ -9,10 +9,10 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/catalog"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 type Registrar struct {

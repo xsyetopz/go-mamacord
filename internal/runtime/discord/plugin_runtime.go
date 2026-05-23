@@ -3,8 +3,8 @@ package discordruntime
 import (
 	"strings"
 
-	discordplugin "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/plugin"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 func (b *Bot) enabledPluginIDsForHost(host *pluginhost.Host) map[string]struct{} {

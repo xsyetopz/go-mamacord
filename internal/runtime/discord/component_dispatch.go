@@ -8,11 +8,11 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/interactions"
-	discordplugin "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/plugin"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/router"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
+	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 func (b *Bot) onComponent(e *events.ComponentInteractionCreate) {

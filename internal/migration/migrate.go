@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
 )
 
 type Kind string

@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 	lua "github.com/yuin/gopher-lua"
 
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const defaultPluginWarningListLimit = 25

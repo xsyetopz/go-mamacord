@@ -12,12 +12,12 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/google/uuid"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/interactions"
-	"github.com/xsyetopz/go-mamusiabtw/internal/scheduling"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
-	"github.com/xsyetopz/go-mamusiabtw/internal/timezone"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
+	"github.com/xsyetopz/go-mamacord/internal/scheduling"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
 const (

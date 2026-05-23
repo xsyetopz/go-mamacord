@@ -9,11 +9,11 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/interactions"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Runtime struct {

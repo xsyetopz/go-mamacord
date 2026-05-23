@@ -3,7 +3,7 @@ package discordruntime
 import (
 	"github.com/disgoorg/disgo/events"
 
-	discordgateway "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/gateway"
+	discordgateway "github.com/xsyetopz/go-mamacord/internal/runtime/discord/gateway"
 )
 
 func (b *Bot) onGuildJoin(e *events.GuildJoin) {

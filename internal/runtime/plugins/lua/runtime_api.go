@@ -1,7 +1,7 @@
 package luaplugin
 
 import (
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
 	lua "github.com/yuin/gopher-lua"
 )
 

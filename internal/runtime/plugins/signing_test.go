@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func TestReadTrustedKeysFileAndLoadTrustedKeys(t *testing.T) {

@@ -1,10 +1,10 @@
 package commands
 
 import (
-	cmdadmin "github.com/xsyetopz/go-mamusiabtw/internal/commands/admin"
-	cmdcore "github.com/xsyetopz/go-mamusiabtw/internal/commands/core"
+	cmdadmin "github.com/xsyetopz/go-mamacord/internal/commands/admin"
+	cmdcore "github.com/xsyetopz/go-mamacord/internal/commands/core"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
 )
 
 type ModuleDescriptor struct {

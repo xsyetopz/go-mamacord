@@ -17,9 +17,9 @@ import (
 	"github.com/disgoorg/disgo/rest"
 	"github.com/disgoorg/snowflake/v2"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/cdn"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/parse"
-	pluginhostlua "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/cdn"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/parse"
+	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 const (

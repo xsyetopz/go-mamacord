@@ -3,7 +3,7 @@ package parse_test
 import (
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/parse"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/parse"
 )
 
 func TestParseEmojiID(t *testing.T) {

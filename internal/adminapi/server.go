@@ -19,15 +19,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
-	"github.com/xsyetopz/go-mamusiabtw/internal/marketplace"
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/marketplace"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const (
-	sessionCookieName = "mamusiabtw_admin_session"
-	stateCookieName   = "mamusiabtw_admin_state"
+	sessionCookieName = "mamacord_admin_session"
+	stateCookieName   = "mamacord_admin_state"
 	sessionTTL        = 12 * time.Hour
 )
 

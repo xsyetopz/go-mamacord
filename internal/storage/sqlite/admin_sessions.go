@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type adminSessionStore struct {

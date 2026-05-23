@@ -13,8 +13,8 @@ import (
 	"strings"
 )
 
-const SignatureSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/signature.schema.v1.json"
-const TrustedKeysSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/trusted_keys.schema.v1.json"
+const SignatureSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json"
+const TrustedKeysSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/trusted_keys.schema.v1.json"
 
 func GenerateEd25519Key() (ed25519.PublicKey, ed25519.PrivateKey, error) {
 	return ed25519.GenerateKey(rand.Reader)

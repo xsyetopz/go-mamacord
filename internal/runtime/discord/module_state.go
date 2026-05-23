@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func (b *Bot) loadModuleStates(ctx context.Context) (map[string]store.ModuleState, error) {

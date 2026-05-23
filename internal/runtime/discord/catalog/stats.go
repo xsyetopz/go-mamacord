@@ -1,6 +1,6 @@
 package catalog
 
-import commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
+import commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
 
 type Stats struct {
 	Ready               bool

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
 )
 
 func TestLoadPluginLocales_OnlyLoadsSupportedDiscordLocales(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/ops"
+	"github.com/xsyetopz/go-mamacord/internal/ops"
 )
 
 func TestNewHandler_HealthAndReadiness(t *testing.T) {
@@ -72,12 +72,12 @@ func TestNewHandler_Metrics(t *testing.T) {
 	}
 	text := string(body)
 	for _, want := range []string{
-		"mamusiabtw_ready 1",
-		"mamusiabtw_interactions_total 1",
-		"mamusiabtw_interaction_failures_total 1",
-		"mamusiabtw_plugin_failures_total 1",
-		"mamusiabtw_plugin_automation_failures_total 1",
-		"mamusiabtw_reminder_failures_total 1",
+		"mamacord_ready 1",
+		"mamacord_interactions_total 1",
+		"mamacord_interaction_failures_total 1",
+		"mamacord_plugin_failures_total 1",
+		"mamacord_plugin_automation_failures_total 1",
+		"mamacord_reminder_failures_total 1",
 	} {
 		if !strings.Contains(text, want) {
 			t.Fatalf("metrics missing %q in %q", want, text)

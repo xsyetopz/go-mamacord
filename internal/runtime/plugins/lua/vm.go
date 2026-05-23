@@ -17,10 +17,10 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	lua "github.com/yuin/gopher-lua"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
-	"github.com/xsyetopz/go-mamusiabtw/internal/persona"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	"github.com/xsyetopz/go-mamacord/internal/persona"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const defaultCallTimeout = 2 * time.Second
@@ -628,7 +628,7 @@ func (v *VM) registerHostAPI() {
 	legacy.RawSetString("kv_put_json", storeTable.RawGetString("put_json"))
 
 	v.L.SetGlobal("bot", bot)
-	v.L.SetGlobal("mamusiabtw", legacy)
+	v.L.SetGlobal("mamacord", legacy)
 }
 
 func (v *VM) payloadToLua(p Payload) (*lua.LTable, error) {

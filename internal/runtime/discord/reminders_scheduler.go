@@ -5,7 +5,7 @@ import (
 
 	"github.com/disgoorg/snowflake/v2"
 
-	discordautomation "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/automation"
+	discordautomation "github.com/xsyetopz/go-mamacord/internal/runtime/discord/automation"
 )
 
 func (b *Bot) startReminderScheduler(ctx context.Context) {

@@ -12,10 +12,10 @@ import (
 	"github.com/disgoorg/disgo/rest"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	discordplugin "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/plugin"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	pluginhostlua "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 type GuildChannelInfo struct {

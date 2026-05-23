@@ -3,7 +3,7 @@ package discordruntime
 import (
 	"context"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/guildconfig"
+	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
 )
 
 func (b *Bot) guildCommandEnabled(ctx context.Context, guildID uint64, pluginID, commandName string) (bool, error) {

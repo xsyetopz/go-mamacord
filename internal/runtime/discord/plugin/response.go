@@ -9,8 +9,8 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/interactions"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 type ResponseMode int

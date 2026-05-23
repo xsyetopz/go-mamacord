@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamusiabtw/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/marketplace"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
+	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
 )
 
 func TestManagerInstallAndForceUpdate(t *testing.T) {

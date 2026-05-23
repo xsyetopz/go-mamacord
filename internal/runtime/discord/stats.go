@@ -1,6 +1,6 @@
 package discordruntime
 
-import "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/catalog"
+import "github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog"
 
 type Stats = catalog.Stats
 

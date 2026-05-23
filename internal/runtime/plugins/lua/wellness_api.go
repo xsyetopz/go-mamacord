@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	lua "github.com/yuin/gopher-lua"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/scheduling"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
-	"github.com/xsyetopz/go-mamusiabtw/internal/timezone"
+	"github.com/xsyetopz/go-mamacord/internal/scheduling"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
 const defaultPluginListLimit = 25

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 type pluginAdmin struct{ b *Bot }

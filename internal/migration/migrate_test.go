@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
 )
 
 func TestRunnerUpIdempotent(t *testing.T) {

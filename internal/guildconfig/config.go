@@ -6,7 +6,7 @@ import (
 	"errors"
 	"sort"
 
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
 )
 
 const KVKey = "__guild_config"

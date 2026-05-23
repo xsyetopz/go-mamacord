@@ -17,10 +17,10 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/omit"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Host struct {

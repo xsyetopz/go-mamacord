@@ -7,8 +7,8 @@ import (
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/gateway"
 
-	discordplugin "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/plugin"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
+	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 const (

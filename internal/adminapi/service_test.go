@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/config"
 )
 
 func TestScaffoldPluginCreatesExpectedFiles(t *testing.T) {

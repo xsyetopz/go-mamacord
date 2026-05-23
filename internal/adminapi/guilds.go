@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/guildconfig"
-	pluginhostlua "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
+	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var ErrGuildNotAccessible = errors.New("guild is not accessible to this user")

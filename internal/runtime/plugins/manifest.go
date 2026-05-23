@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
 )
 
 type Manifest struct {

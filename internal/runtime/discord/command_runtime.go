@@ -7,8 +7,8 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 
-	discordcommands "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/commands"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord/router"
+	discordcommands "github.com/xsyetopz/go-mamacord/internal/runtime/discord/commands"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
 )
 
 func (b *Bot) commandRegistrar() discordcommands.Registrar {

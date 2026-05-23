@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/timezone"
+	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
 func TestLoadLocation(t *testing.T) {
