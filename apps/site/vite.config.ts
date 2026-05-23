@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-const base = process.env["MAMUSIABTW_SITE_BASE"] ?? "/";
+const base = process.env["MAMACORD_SITE_BASE"] ?? "/";
 
 export default defineConfig({
 	base,

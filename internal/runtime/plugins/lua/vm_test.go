@@ -14,12 +14,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
-	"github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamusiabtw/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
+	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
 )
 
 type roundTripperFunc func(*http.Request) (*http.Response, error)
@@ -69,8 +69,8 @@ type fakeDiscordExecutor struct {
 func (f *fakeDiscordExecutor) SelfUser(context.Context) (luaplugin.UserResult, error) {
 	return luaplugin.UserResult{
 		ID:          999,
-		Username:    "MamusiaBtw",
-		DisplayName: "MamusiaBtw",
+		Username:    "MamaCord",
+		DisplayName: "MamaCord",
 		Mention:     "<@999>",
 		AvatarURL:   "https://example.com/self.png",
 		CreatedAt:   time.Unix(1_700_000_000, 0).Unix(),

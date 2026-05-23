@@ -1,16 +1,16 @@
 services:
-  mamusiabtw:
+  mamacord:
     build:
       context: .
     restart: unless-stopped
     env_file:
       - .env.prod
     environment:
-      SQLITE_PATH: /data/mamusiabtw.sqlite
+      SQLITE_PATH: /data/mamacord.sqlite
       MIGRATIONS_DIR: /app/migrations/sqlite
       LOCALES_DIR: /app/locales
       PLUGINS_DIR: /app/plugins
-      MAMUSIABTW_PERMISSIONS_FILE: /app/config/permissions.json
+      MAMACORD_PERMISSIONS_FILE: /app/config/permissions.json
     volumes:
       - ./data:/data
       - ./plugins:/app/plugins

@@ -1,41 +1,45 @@
 :root {
-  --webui-bg: #f4f4f4;
-  --webui-text: #161616;
-  --webui-border: rgba(22, 22, 22, 0.12);
-  --webui-surface: rgba(255, 255, 255, 0.92);
-  --webui-muted: #525252;
+	--webui-bg: #f4f4f4;
+	--webui-text: #161616;
+	--webui-border: rgba(22, 22, 22, 0.12);
+	--webui-surface: rgba(255, 255, 255, 0.92);
+	--webui-muted: #525252;
 }
 
 html[data-mantine-color-scheme="dark"] {
-  --webui-bg: #0f0f0f;
-  --webui-text: #f4f4f4;
-  --webui-border: rgba(244, 244, 244, 0.18);
-  --webui-surface: rgba(22, 22, 22, 0.92);
-  --webui-muted: rgba(244, 244, 244, 0.72);
+	--webui-bg: #0f0f0f;
+	--webui-text: #f4f4f4;
+	--webui-border: rgba(244, 244, 244, 0.18);
+	--webui-surface: rgba(22, 22, 22, 0.92);
+	--webui-muted: rgba(244, 244, 244, 0.72);
 }
 
 body {
-  margin: 0;
-  background: var(--webui-bg);
-  color: var(--webui-text);
-  font-family:
-    "Iosevka Aile", "IBM Plex Sans", "Segoe UI", -apple-system, BlinkMacSystemFont,
-    sans-serif;
+	margin: 0;
+	background: var(--webui-bg);
+	color: var(--webui-text);
+	font-family:
+		"Iosevka Aile", "IBM Plex Sans", "Segoe UI", -apple-system,
+		BlinkMacSystemFont, sans-serif;
 }
 
 #root {
-  min-height: 100vh;
+	min-height: 100vh;
 }
 
 .webui-shell {
-  min-height: 100vh;
-  background:
-    radial-gradient(900px 420px at 8% 0%, rgba(15, 98, 254, 0.12), rgba(15, 98, 254, 0)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
-    var(--webui-bg);
+	min-height: 100vh;
+	background:
+		radial-gradient(
+			900px 420px at 8% 0%,
+			rgba(15, 98, 254, 0.12),
+			rgba(15, 98, 254, 0)
+		),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+		var(--webui-bg);
 }
 
 .webui-card {
-  background: var(--webui-surface);
-  border-color: var(--webui-border);
+	background: var(--webui-surface);
+	border-color: var(--webui-border);
 }

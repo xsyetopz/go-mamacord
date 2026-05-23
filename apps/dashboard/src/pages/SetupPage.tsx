@@ -247,7 +247,7 @@ function LocalSetupCard({ setupStatus }: { setupStatus: SetupStatus | null }) {
 				<Text size="sm">Use these values for a normal local run:</Text>
 				<Code
 					block={true}
-				>{`MAMUSIABTW_ADMIN_ADDR=${localSetup.adminAddr}`}</Code>
+				>{`MAMACORD_ADMIN_ADDR=${localSetup.adminAddr}`}</Code>
 				{hints.length > 0 ? (
 					<Stack gap="xs">
 						<Text size="sm" fw={600}>

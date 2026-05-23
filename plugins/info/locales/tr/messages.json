@@ -169,7 +169,7 @@
   },
   {
     "id": "info.about.title",
-    "translation": "mamusiabtw {{.Version}}"
+    "translation": "mamacord {{.Version}}"
   },
   {
     "id": "info.lookup.user.error",

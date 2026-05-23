@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/trusted_keys.schema.v1.json",
-  "title": "mamusiabtw trusted signer keys",
+  "$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/trusted_keys.schema.v1.json",
+  "title": "mamacord trusted signer keys",
   "type": "object",
   "additionalProperties": false,
   "properties": {

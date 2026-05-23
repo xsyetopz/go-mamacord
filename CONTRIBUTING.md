@@ -1,8 +1,8 @@
-# Contributing to go-mamusiabtw
+# Contributing to go-mamacord
 
 This project is a Go Discord bot with a Lua plugin host. Keep changes small, readable, and easy to review.
 
-The stable internal name is `mamusiabtw`. It appears in environment variables, database paths, plugin IDs, and Discord `custom_id` prefixes. Do not rename it casually.
+The stable internal name is `mamacord`. It appears in environment variables, database paths, plugin IDs, and Discord `custom_id` prefixes. Do not rename it casually.
 
 ## Before Starting
 
@@ -14,7 +14,7 @@ The stable internal name is `mamusiabtw`. It appears in environment variables, d
 ## Standard Workflow
 
 1. Fork the repository.
-2. Clone your fork: `git clone https://github.com/<your-user>/go-mamusiabtw.git`
+2. Clone your fork: `git clone https://github.com/<your-user>/go-mamacord.git`
 3. Create a focused branch: `git checkout -b feat/<short-description>`
 4. Make the smallest change that solves the problem.
 5. Format and test the affected code.
@@ -25,7 +25,7 @@ The stable internal name is `mamusiabtw`. It appears in environment variables, d
 
 The main code paths are:
 
-- `cmd/mamusiabtw/` for the process entrypoint.
+- `cmd/mamacord/` for the process entrypoint.
 - `internal/app/` for application wiring.
 - `internal/runtime/discord/` for Discord transport and runtime behavior.
 - `internal/commands/` for built-in kernel commands and shared command contracts.
@@ -119,7 +119,7 @@ For plugin issues, include the relevant `plugin.json`, the route being exercised
 
 ### Prerequisites
 
-- Go 1.26.2 or newer
+- Go 1.26.3 or newer
 - Git
 - A Discord bot token for local runtime testing
 
@@ -127,7 +127,7 @@ For plugin issues, include the relevant `plugin.json`, the route being exercised
 
 ```bash
 # Run the bot locally
-go run ./cmd/mamusiabtw
+go run ./cmd/mamacord
 
 # Run with Docker
 docker compose up --build

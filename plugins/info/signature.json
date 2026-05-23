@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/signature.schema.v1.json",
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json",
   "algorithm": "ed25519-sha256",
   "hash_b64": "BIPgvXDSujsUdzajwYPS4V3X5A7ZYpYYM+ekaBF6D1w=",
   "key_id": "official-release-2026-04",

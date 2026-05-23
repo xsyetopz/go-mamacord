@@ -67,7 +67,7 @@ public dashboard host.
 1. Copy `.env.prod.example` to `.env.prod`.
 2. Fill in at least `DISCORD_TOKEN`.
 3. If you want the admin API in Docker, also fill in the required
-   `MAMUSIABTW_DASHBOARD_*` and public origin vars.
+   `MAMACORD_DASHBOARD_*` and public origin vars.
 4. Start: `docker compose up --build`
 
 `compose.yml` now reads `.env.prod` and bind-mounts `./data`, `./plugins`, and
@@ -91,7 +91,7 @@ Optional first-party plugins live in `plugins/` too:
 
 ## Modules
 
-mamusiabtw treats built-ins and plugins as modules.
+mamacord treats built-ins and plugins as modules.
 
 Default module seeds: `config/modules.json`
 Runtime overrides: stored in SQLite.
@@ -113,7 +113,7 @@ Plugins are sandboxed:
 Any plugin capability must be both:
 
 1. requested in `plugin.json`, and
-2. granted by the host in `config/permissions.json` (default `MAMUSIABTW_PERMISSIONS_FILE`).
+2. granted by the host in `config/permissions.json` (default `MAMACORD_PERMISSIONS_FILE`).
 
 The host injects a namespaced global `bot` into plugin scripts (see `sdk/lua/bot_api.lua:1`).
 
@@ -132,7 +132,7 @@ The host injects a namespaced global `bot` into plugin scripts (see `sdk/lua/bot
 
 ### Signing (prod)
 
-When `MAMUSIABTW_PROD_MODE=1`, plugins must be signed.
+When `MAMACORD_PROD_MODE=1`, plugins must be signed.
 
 Fast rules:
 
@@ -142,14 +142,14 @@ Fast rules:
 
 Stock bundled plugins:
 
-- keep `MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0`
+- keep `MAMACORD_ALLOW_UNSIGNED_PLUGINS=0`
 - make sure `config/trusted_keys.json` is present on the installed machine
-- default trusted key path is `./config/trusted_keys.json` unless you override `MAMUSIABTW_TRUSTED_KEYS_FILE`
+- default trusted key path is `./config/trusted_keys.json` unless you override `MAMACORD_TRUSTED_KEYS_FILE`
 
 Generate your own signer:
 
 ```bash
-go run ./cmd/mamusiabtw gen-signing-key --key-id your-key-id
+go run ./cmd/mamacord gen-signing-key --key-id your-key-id
 ```
 
 That creates:
@@ -160,7 +160,7 @@ That creates:
 Sign a plugin directory:
 
 ```bash
-go run ./cmd/mamusiabtw sign-plugin --dir ./plugins/<id> --key-id your-key-id --private-key-file ./data/keys/your-key-id.key
+go run ./cmd/mamacord sign-plugin --dir ./plugins/<id> --key-id your-key-id --private-key-file ./data/keys/your-key-id.key
 ```
 
 That writes:
@@ -169,8 +169,8 @@ That writes:
 
 If you want the dashboard to sign scaffolded plugins too, set:
 
-- `MAMUSIABTW_DASHBOARD_SIGNING_KEY_ID=your-key-id`
-- `MAMUSIABTW_DASHBOARD_SIGNING_KEY_FILE=./data/keys/your-key-id.key`
+- `MAMACORD_DASHBOARD_SIGNING_KEY_ID=your-key-id`
+- `MAMACORD_DASHBOARD_SIGNING_KEY_FILE=./data/keys/your-key-id.key`
 
 Additional trusted keys can also live in SQLite (`trusted_signers`), but file-based trusted keys are the simplest first-boot path.
 
@@ -182,13 +182,13 @@ For SBC/self-hosted production setup, see:
 
 ### Cooldowns
 
-- Global: `MAMUSIABTW_SLASH_COOLDOWN_MS`
-- Overrides: `MAMUSIABTW_SLASH_COOLDOWN_OVERRIDES_MS` (comma-separated `name=ms`)
+- Global: `MAMACORD_SLASH_COOLDOWN_MS`
+- Overrides: `MAMACORD_SLASH_COOLDOWN_OVERRIDES_MS` (comma-separated `name=ms`)
 
 ### Command Registration
 
-By default, mamusiabtw registers slash commands globally (unless `DISCORD_DEV_GUILD_ID` is set).
+By default, mamacord registers slash commands globally (unless `DISCORD_DEV_GUILD_ID` is set).
 
-- `MAMUSIABTW_COMMAND_REGISTRATION_MODE=global|guilds|hybrid`
-- `MAMUSIABTW_COMMAND_GUILD_IDS=...`
-- `MAMUSIABTW_COMMAND_REGISTER_ALL_GUILDS=1`
+- `MAMACORD_COMMAND_REGISTRATION_MODE=global|guilds|hybrid`
+- `MAMACORD_COMMAND_GUILD_IDS=...`
+- `MAMACORD_COMMAND_REGISTER_ALL_GUILDS=1`

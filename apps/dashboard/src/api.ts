@@ -98,7 +98,7 @@ async function parseJSONResponse<T>(response: Response): Promise<T> {
 		}
 		if (looksLikeHTML(body)) {
 			throw new APIError(
-				"This URL is returning HTML for an API request. You are not talking to the mamusiabtw admin API. Start `go run ./cmd/mamusiabtw dev`. Then either open the admin dashboard at `http://127.0.0.1:8081/` (recommended) or run the Vite dev server (`cd apps/dashboard && bun run dev`) and open `http://127.0.0.1:5173/`.",
+				"This URL is returning HTML for an API request. You are not talking to the mamacord admin API. Start `go run ./cmd/mamacord dev`. Then either open the admin dashboard at `http://127.0.0.1:8081/` (recommended) or run the Vite dev server (`cd apps/dashboard && bun run dev`) and open `http://127.0.0.1:5173/`.",
 				-1,
 			);
 		}

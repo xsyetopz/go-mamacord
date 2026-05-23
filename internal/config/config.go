@@ -66,7 +66,7 @@ type Config struct {
 }
 
 const (
-	defaultSQLitePath          = "./data/mamusiabtw.sqlite"
+	defaultSQLitePath          = "./data/mamacord.sqlite"
 	defaultMigrationsDir       = "./migrations/sqlite"
 	defaultMigrationBackups    = "./data/migration_backups"
 	defaultOpsAddr             = ""
@@ -116,29 +116,29 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 
 	sqlitePath := envDefault("SQLITE_PATH", defaultSQLitePath)
 	migrations := envDefault("MIGRATIONS_DIR", defaultMigrationsDir)
-	migrationBackups := envDefault("MAMUSIABTW_MIGRATION_BACKUPS_DIR", defaultMigrationBackups)
-	opsAddr := envDefault("MAMUSIABTW_OPS_ADDR", defaultOpsAddr)
-	adminAddr := envDefault("MAMUSIABTW_ADMIN_ADDR", defaultAdminAddr)
+	migrationBackups := envDefault("MAMACORD_MIGRATION_BACKUPS_DIR", defaultMigrationBackups)
+	opsAddr := envDefault("MAMACORD_OPS_ADDR", defaultOpsAddr)
+	adminAddr := envDefault("MAMACORD_ADMIN_ADDR", defaultAdminAddr)
 	localesDir := envDefault("LOCALES_DIR", defaultLocalesDir)
-	bundledPluginsDir := envDefault("MAMUSIABTW_BUNDLED_PLUGINS_DIR", defaultBundledPluginsDir)
-	userPluginsDir := envDefault("MAMUSIABTW_USER_PLUGINS_DIR", envDefault("PLUGINS_DIR", defaultUserPluginsDir))
-	marketplaceCacheDir := envDefault("MAMUSIABTW_MARKETPLACE_CACHE_DIR", defaultMarketplaceCacheDir)
-	permissionsFile := envDefault("MAMUSIABTW_PERMISSIONS_FILE", defaultPermissionsFile)
-	modulesFile := envDefault("MAMUSIABTW_MODULES_FILE", defaultModulesFile)
+	bundledPluginsDir := envDefault("MAMACORD_BUNDLED_PLUGINS_DIR", defaultBundledPluginsDir)
+	userPluginsDir := envDefault("MAMACORD_USER_PLUGINS_DIR", envDefault("PLUGINS_DIR", defaultUserPluginsDir))
+	marketplaceCacheDir := envDefault("MAMACORD_MARKETPLACE_CACHE_DIR", defaultMarketplaceCacheDir)
+	permissionsFile := envDefault("MAMACORD_PERMISSIONS_FILE", defaultPermissionsFile)
+	modulesFile := envDefault("MAMACORD_MODULES_FILE", defaultModulesFile)
 	logLevel := envDefault("LOG_LEVEL", defaultLogLevel)
 
-	prodMode := envBool1("MAMUSIABTW_PROD_MODE")
-	allowUnsigned := envBool1("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS")
-	trustedKeysFile := envDefault("MAMUSIABTW_TRUSTED_KEYS_FILE", defaultTrustedKeysFile)
-	dashboardClientID := envDefault("MAMUSIABTW_DASHBOARD_CLIENT_ID", "")
-	dashboardClientSecret := envDefault("MAMUSIABTW_DASHBOARD_CLIENT_SECRET", "")
-	dashboardSessionSecret := envDefault("MAMUSIABTW_DASHBOARD_SESSION_SECRET", "")
-	dashboardSigningKeyID := envDefault("MAMUSIABTW_DASHBOARD_SIGNING_KEY_ID", "")
-	dashboardSigningKeyFile := envDefault("MAMUSIABTW_DASHBOARD_SIGNING_KEY_FILE", "")
+	prodMode := envBool1("MAMACORD_PROD_MODE")
+	allowUnsigned := envBool1("MAMACORD_ALLOW_UNSIGNED_PLUGINS")
+	trustedKeysFile := envDefault("MAMACORD_TRUSTED_KEYS_FILE", defaultTrustedKeysFile)
+	dashboardClientID := envDefault("MAMACORD_DASHBOARD_CLIENT_ID", "")
+	dashboardClientSecret := envDefault("MAMACORD_DASHBOARD_CLIENT_SECRET", "")
+	dashboardSessionSecret := envDefault("MAMACORD_DASHBOARD_SESSION_SECRET", "")
+	dashboardSigningKeyID := envDefault("MAMACORD_DASHBOARD_SIGNING_KEY_ID", "")
+	dashboardSigningKeyFile := envDefault("MAMACORD_DASHBOARD_SIGNING_KEY_FILE", "")
 	dashboardSessionSecretGenerated := false
-	publicDashboardOrigin := envDefault("MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN", "")
-	publicAPIOrigin := envDefault("MAMUSIABTW_PUBLIC_API_ORIGIN", "")
-	dashboardAllowedOrigins := parseCSV(os.Getenv("MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS"))
+	publicDashboardOrigin := envDefault("MAMACORD_PUBLIC_DASHBOARD_ORIGIN", "")
+	publicAPIOrigin := envDefault("MAMACORD_PUBLIC_API_ORIGIN", "")
+	dashboardAllowedOrigins := parseCSV(os.Getenv("MAMACORD_DASHBOARD_ALLOWED_ORIGINS"))
 
 	ownerUserID, err := parseOwnerID(os.Getenv("OWNER_USER_ID"))
 	if err != nil {
@@ -156,36 +156,36 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 		devGuildID = &v
 	}
 
-	cmdRegMode := strings.ToLower(envDefault("MAMUSIABTW_COMMAND_REGISTRATION_MODE", defaultCommandRegMode))
+	cmdRegMode := strings.ToLower(envDefault("MAMACORD_COMMAND_REGISTRATION_MODE", defaultCommandRegMode))
 	switch cmdRegMode {
 	case "global", "guilds", "hybrid":
 	default:
-		return Config{}, fmt.Errorf("invalid MAMUSIABTW_COMMAND_REGISTRATION_MODE %q", cmdRegMode)
+		return Config{}, fmt.Errorf("invalid MAMACORD_COMMAND_REGISTRATION_MODE %q", cmdRegMode)
 	}
 
-	cmdGuildIDs, err := parseUint64List(os.Getenv("MAMUSIABTW_COMMAND_GUILD_IDS"), "MAMUSIABTW_COMMAND_GUILD_IDS")
+	cmdGuildIDs, err := parseUint64List(os.Getenv("MAMACORD_COMMAND_GUILD_IDS"), "MAMACORD_COMMAND_GUILD_IDS")
 	if err != nil {
 		return Config{}, err
 	}
-	cmdRegisterAllGuilds := strings.TrimSpace(os.Getenv("MAMUSIABTW_COMMAND_REGISTER_ALL_GUILDS")) == "1"
+	cmdRegisterAllGuilds := strings.TrimSpace(os.Getenv("MAMACORD_COMMAND_REGISTER_ALL_GUILDS")) == "1"
 
-	slashCooldown, err := parseDurationMS(os.Getenv("MAMUSIABTW_SLASH_COOLDOWN_MS"), defaultSlashCooldownMS)
+	slashCooldown, err := parseDurationMS(os.Getenv("MAMACORD_SLASH_COOLDOWN_MS"), defaultSlashCooldownMS)
 	if err != nil {
 		return Config{}, err
 	}
-	componentCooldown, err := parseDurationMS(os.Getenv("MAMUSIABTW_COMPONENT_COOLDOWN_MS"), defaultComponentCooldown)
+	componentCooldown, err := parseDurationMS(os.Getenv("MAMACORD_COMPONENT_COOLDOWN_MS"), defaultComponentCooldown)
 	if err != nil {
 		return Config{}, err
 	}
-	modalCooldown, err := parseDurationMS(os.Getenv("MAMUSIABTW_MODAL_COOLDOWN_MS"), defaultModalCooldownMS)
+	modalCooldown, err := parseDurationMS(os.Getenv("MAMACORD_MODAL_COOLDOWN_MS"), defaultModalCooldownMS)
 	if err != nil {
 		return Config{}, err
 	}
-	slashBypass := parseCSV(os.Getenv("MAMUSIABTW_SLASH_COOLDOWN_BYPASS"))
+	slashBypass := parseCSV(os.Getenv("MAMACORD_SLASH_COOLDOWN_BYPASS"))
 	if len(slashBypass) == 0 {
 		slashBypass = []string{"ping", "help", "plugins", "modules", "block", "unblock"}
 	}
-	slashOverrides, err := parseCooldownOverridesMS(os.Getenv("MAMUSIABTW_SLASH_COOLDOWN_OVERRIDES_MS"))
+	slashOverrides, err := parseCooldownOverridesMS(os.Getenv("MAMACORD_SLASH_COOLDOWN_OVERRIDES_MS"))
 	if err != nil {
 		return Config{}, err
 	}
@@ -194,23 +194,23 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 		// dashboard can show setup diagnostics instead of "connection refused".
 		if prodMode {
 			if strings.TrimSpace(dashboardClientID) == "" {
-				return Config{}, errors.New("MAMUSIABTW_DASHBOARD_CLIENT_ID is required when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_DASHBOARD_CLIENT_ID is required when MAMACORD_ADMIN_ADDR is set")
 			}
 			if strings.TrimSpace(dashboardClientSecret) == "" {
-				return Config{}, errors.New("MAMUSIABTW_DASHBOARD_CLIENT_SECRET is required when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_DASHBOARD_CLIENT_SECRET is required when MAMACORD_ADMIN_ADDR is set")
 			}
 			if len(strings.TrimSpace(dashboardSessionSecret)) < 32 {
-				return Config{}, errors.New("MAMUSIABTW_DASHBOARD_SESSION_SECRET must be at least 32 characters when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_DASHBOARD_SESSION_SECRET must be at least 32 characters when MAMACORD_ADMIN_ADDR is set")
 			}
 
 			if strings.TrimSpace(publicDashboardOrigin) == "" {
-				return Config{}, errors.New("MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN is required in prod when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_PUBLIC_DASHBOARD_ORIGIN is required in prod when MAMACORD_ADMIN_ADDR is set")
 			}
 			if strings.TrimSpace(publicAPIOrigin) == "" {
-				return Config{}, errors.New("MAMUSIABTW_PUBLIC_API_ORIGIN is required in prod when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_PUBLIC_API_ORIGIN is required in prod when MAMACORD_ADMIN_ADDR is set")
 			}
 			if len(dashboardAllowedOrigins) == 0 {
-				return Config{}, errors.New("MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS is required in prod when MAMUSIABTW_ADMIN_ADDR is set")
+				return Config{}, errors.New("MAMACORD_DASHBOARD_ALLOWED_ORIGINS is required in prod when MAMACORD_ADMIN_ADDR is set")
 			}
 		} else {
 			if len(strings.TrimSpace(dashboardSessionSecret)) < 32 {

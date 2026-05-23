@@ -10,7 +10,7 @@ import {
 	useState,
 } from "react";
 
-const STORAGE_KEY = "mamusiabtw-dev-details";
+const STORAGE_KEY = "mamacord-dev-details";
 
 type DeveloperDetailsContextValue = {
 	enabled: boolean;

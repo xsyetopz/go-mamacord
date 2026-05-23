@@ -16,7 +16,11 @@
 		"forceConsistentCasingInFileNames": true,
 		"isolatedModules": true,
 		"jsx": "react-jsx",
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"lib": [
+			"ES2022",
+			"DOM",
+			"DOM.Iterable"
+		],
 		"module": "ESNext",
 		"moduleDetection": "force",
 		"moduleResolution": "bundler",
@@ -30,15 +34,26 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": [
+				"./src/*"
+			]
 		},
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "ES2022",
-		"types": ["bun-types", "react", "react-dom"],
+		"types": [
+			"bun-types",
+			"react",
+			"react-dom"
+		],
 		"useDefineForClassFields": true
 	},
-	"include": ["src"],
-	"exclude": ["node_modules", "dist"]
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
 }

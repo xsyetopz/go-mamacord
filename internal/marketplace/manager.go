@@ -17,8 +17,8 @@ import (
 	"sync"
 	"time"
 
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const (
@@ -647,8 +647,8 @@ func (m *Manager) git(ctx context.Context, dir string, source store.MarketplaceS
 		defer os.Remove(path)
 		cmd.Env = append(cmd.Env,
 			"GIT_ASKPASS="+askPassPath,
-			"MAMUSIABTW_GIT_TOKEN="+token,
-			"MAMUSIABTW_GIT_USERNAME=x-access-token",
+			"MAMACORD_GIT_TOKEN="+token,
+			"MAMACORD_GIT_USERNAME=x-access-token",
 		)
 	}
 	out, err := cmd.CombinedOutput()
@@ -663,12 +663,12 @@ func (m *Manager) git(ctx context.Context, dir string, source store.MarketplaceS
 }
 
 func writeAskPassScript(token string) (string, error) {
-	tmp, err := os.CreateTemp("", "mamusiabtw-git-askpass-*.sh")
+	tmp, err := os.CreateTemp("", "mamacord-git-askpass-*.sh")
 	if err != nil {
 		return "", err
 	}
 	defer tmp.Close()
-	content := "#!/bin/sh\ncase \"$1\" in\n*Username*) printf '%s' \"$MAMUSIABTW_GIT_USERNAME\" ;;\n*) printf '%s' \"$MAMUSIABTW_GIT_TOKEN\" ;;\nesac\n"
+	content := "#!/bin/sh\ncase \"$1\" in\n*Username*) printf '%s' \"$MAMACORD_GIT_USERNAME\" ;;\n*) printf '%s' \"$MAMACORD_GIT_TOKEN\" ;;\nesac\n"
 	if _, err := tmp.WriteString(content); err != nil {
 		return "", err
 	}

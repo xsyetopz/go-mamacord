@@ -12,15 +12,15 @@
 *.test
 *.out
 
-# mamusiabtw runtime data
+# mamacord runtime data
 /data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
 
 # Executables
-!/cmd/mamusiabtw/
-/mamusiabtw
+!/cmd/mamacord/
+/mamacord
 
 # JS/TS
 node_modules

@@ -20,10 +20,10 @@ type State = {
 	stack: string;
 };
 
-const DEV_DETAILS_KEY = "mamusiabtw-dev-details";
+const DEV_DETAILS_KEY = "mamacord-dev-details";
 
 function shouldShowDiagnostics(): boolean {
-	if (import.meta.env.DEV) {
+	if (import.meta.env["DEV"]) {
 		return true;
 	}
 	try {

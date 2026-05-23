@@ -17,16 +17,16 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/app"
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
-	"github.com/xsyetopz/go-mamusiabtw/internal/dotenv"
-	"github.com/xsyetopz/go-mamusiabtw/internal/logging"
-	"github.com/xsyetopz/go-mamusiabtw/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamusiabtw/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/app"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/dotenv"
+	"github.com/xsyetopz/go-mamacord/internal/logging"
+	"github.com/xsyetopz/go-mamacord/internal/marketplace"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
+	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
 )
 
 func main() {
@@ -43,8 +43,8 @@ func runMain() int {
 		return 1
 	}
 	if loadedEnv.Path != "" {
-		_ = os.Setenv("MAMUSIABTW_LOADED_ENV_FILE", loadedEnv.Path)
-		_ = os.Setenv("MAMUSIABTW_LOADED_ENV_SOURCE", loadedEnv.Source)
+		_ = os.Setenv("MAMACORD_LOADED_ENV_FILE", loadedEnv.Path)
+		_ = os.Setenv("MAMACORD_LOADED_ENV_SOURCE", loadedEnv.Source)
 	}
 
 	// Low mental-load workflow: allow env files to be used without requiring users
@@ -113,8 +113,8 @@ func runDoctorCommand(args []string) int {
 		_, _ = fmt.Fprintf(os.Stdout, format+"\n", a...)
 	}
 
-	loadedEnv := strings.TrimSpace(os.Getenv("MAMUSIABTW_LOADED_ENV_FILE"))
-	loadedEnvSource := strings.TrimSpace(os.Getenv("MAMUSIABTW_LOADED_ENV_SOURCE"))
+	loadedEnv := strings.TrimSpace(os.Getenv("MAMACORD_LOADED_ENV_FILE"))
+	loadedEnvSource := strings.TrimSpace(os.Getenv("MAMACORD_LOADED_ENV_SOURCE"))
 	if loadedEnv == "" {
 		writeLine("env_file_loaded: false")
 	} else {
@@ -168,7 +168,7 @@ func runDoctorCommand(args []string) int {
 			len(strings.TrimSpace(cfg.DashboardSessionSecret)) < 32 {
 			writeLine("")
 			writeLine("next: admin api is enabled in prod mode but oauth/session config is incomplete")
-			writeLine("next: fill MAMUSIABTW_DASHBOARD_* vars (client id/secret/session secret)")
+			writeLine("next: fill MAMACORD_DASHBOARD_* vars (client id/secret/session secret)")
 			return 1
 		}
 	}
@@ -183,7 +183,7 @@ func runDoctorCommand(args []string) int {
 }
 
 func autoLoadEnvFile() (dotenv.SearchResult, error) {
-	if strings.TrimSpace(os.Getenv("MAMUSIABTW_DISABLE_DOTENV")) == "1" {
+	if strings.TrimSpace(os.Getenv("MAMACORD_DISABLE_DOTENV")) == "1" {
 		return dotenv.SearchResult{}, nil
 	}
 	if bad := forbiddenDotenvFile(); bad != "" {
@@ -199,7 +199,7 @@ func autoLoadEnvFile() (dotenv.SearchResult, error) {
 		}
 	}
 
-	if explicit := strings.TrimSpace(os.Getenv("MAMUSIABTW_ENV_FILE")); explicit != "" {
+	if explicit := strings.TrimSpace(os.Getenv("MAMACORD_ENV_FILE")); explicit != "" {
 		base := filepath.Base(explicit)
 		if base != ".env.dev" && base != ".env.prod" {
 			return dotenv.SearchResult{}, fmt.Errorf("refusing to load non-standard env file %s; use .env.dev or .env.prod instead", base)
@@ -242,13 +242,13 @@ func httpBaseFromAddr(addr string) string {
 }
 
 func runDevCommand(ctx context.Context) int {
-	// Lowest-effort path: if you run "mamusiabtw dev" you get the admin API too.
-	_ = os.Setenv("MAMUSIABTW_PROD_MODE", "0")
-	if strings.TrimSpace(os.Getenv("MAMUSIABTW_ADMIN_ADDR")) == "" {
-		_ = os.Setenv("MAMUSIABTW_ADMIN_ADDR", "127.0.0.1:8081")
+	// Lowest-effort path: if you run "mamacord dev" you get the admin API too.
+	_ = os.Setenv("MAMACORD_PROD_MODE", "0")
+	if strings.TrimSpace(os.Getenv("MAMACORD_ADMIN_ADDR")) == "" {
+		_ = os.Setenv("MAMACORD_ADMIN_ADDR", "127.0.0.1:8081")
 	}
-	if strings.TrimSpace(os.Getenv("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS")) == "" {
-		_ = os.Setenv("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS", "1")
+	if strings.TrimSpace(os.Getenv("MAMACORD_ALLOW_UNSIGNED_PLUGINS")) == "" {
+		_ = os.Setenv("MAMACORD_ALLOW_UNSIGNED_PLUGINS", "1")
 	}
 
 	cfg, err := config.LoadFromEnv()
@@ -320,21 +320,21 @@ func runInitCommand(args []string) int {
 	}
 
 	root := strings.Builder{}
-	root.WriteString("# mamusiabtw\n")
+	root.WriteString("# mamacord\n")
 	root.WriteString("DISCORD_TOKEN=" + strings.TrimSpace(*discordToken) + "\n")
 	if modeKind == "prod" {
-		root.WriteString("MAMUSIABTW_PROD_MODE=1\n")
-		root.WriteString("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0\n")
+		root.WriteString("MAMACORD_PROD_MODE=1\n")
+		root.WriteString("MAMACORD_ALLOW_UNSIGNED_PLUGINS=0\n")
 	} else {
-		root.WriteString("MAMUSIABTW_PROD_MODE=0\n")
-		root.WriteString("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=1\n")
+		root.WriteString("MAMACORD_PROD_MODE=0\n")
+		root.WriteString("MAMACORD_ALLOW_UNSIGNED_PLUGINS=1\n")
 	}
 	if strings.TrimSpace(*adminAddr) != "" {
 		root.WriteString("\n# Admin API + dashboard OAuth\n")
-		root.WriteString("MAMUSIABTW_ADMIN_ADDR=" + strings.TrimSpace(*adminAddr) + "\n")
-		root.WriteString("MAMUSIABTW_DASHBOARD_CLIENT_ID=" + strings.TrimSpace(*clientID) + "\n")
-		root.WriteString("MAMUSIABTW_DASHBOARD_CLIENT_SECRET=" + strings.TrimSpace(*clientSecret) + "\n")
-		root.WriteString("MAMUSIABTW_DASHBOARD_SESSION_SECRET=" + strings.TrimSpace(*sessionSecret) + "\n")
+		root.WriteString("MAMACORD_ADMIN_ADDR=" + strings.TrimSpace(*adminAddr) + "\n")
+		root.WriteString("MAMACORD_DASHBOARD_CLIENT_ID=" + strings.TrimSpace(*clientID) + "\n")
+		root.WriteString("MAMACORD_DASHBOARD_CLIENT_SECRET=" + strings.TrimSpace(*clientSecret) + "\n")
+		root.WriteString("MAMACORD_DASHBOARD_SESSION_SECRET=" + strings.TrimSpace(*sessionSecret) + "\n")
 	}
 
 	if err := os.WriteFile(rootEnv, []byte(root.String()), 0o600); err != nil {
@@ -344,7 +344,7 @@ func runInitCommand(args []string) int {
 
 	_, _ = fmt.Fprintf(os.Stdout, "wrote: %s\n", rootEnv)
 	if modeKind == "dev" {
-		_, _ = os.Stdout.WriteString("next: mamusiabtw dev\n")
+		_, _ = os.Stdout.WriteString("next: mamacord dev\n")
 		_, _ = os.Stdout.WriteString("next: cd apps/dashboard && bun install && bun run dev\n")
 	}
 	return 0
@@ -378,16 +378,16 @@ func forbiddenDotenvFile() string {
 }
 
 func run(ctx context.Context, logger *slog.Logger, cfg config.Config) error {
-	mamusiabtw, err := app.New(app.Dependencies{
+	mamacord, err := app.New(app.Dependencies{
 		Logger: logger,
 		Config: cfg,
 	})
 	if err != nil {
 		return err
 	}
-	defer mamusiabtw.Close()
+	defer mamacord.Close()
 
-	if startErr := mamusiabtw.Start(ctx); startErr != nil {
+	if startErr := mamacord.Start(ctx); startErr != nil {
 		if errors.Is(startErr, context.Canceled) {
 			return nil
 		}
@@ -472,9 +472,9 @@ func printStatus(status migrate.Status) {
 func printMigrateUsage() {
 	_, _ = os.Stderr.WriteString(
 		"usage:\n" +
-			"  mamusiabtw migrate status\n" +
-			"  mamusiabtw migrate up\n" +
-			"  mamusiabtw migrate backup\n" +
+			"  mamacord migrate status\n" +
+			"  mamacord migrate up\n" +
+			"  mamacord migrate backup\n" +
 			"",
 	)
 }
@@ -510,7 +510,7 @@ func runSignPluginCommand(args []string) int {
 	}
 
 	if *dir == "" || *keyID == "" || *privateKeyFile == "" {
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw sign-plugin --dir <plugin_dir> --key-id <key_id> --private-key-file <path> [--out <signature.json>]\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord sign-plugin --dir <plugin_dir> --key-id <key_id> --private-key-file <path> [--out <signature.json>]\n")
 		return 1
 	}
 
@@ -566,7 +566,7 @@ func runGenSigningKeyCommand(args []string) int {
 	}
 
 	if strings.TrimSpace(*keyID) == "" {
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw gen-signing-key --key-id <key_id> [--private-key-file <path>] [--trusted-keys-file <path>]\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord gen-signing-key --key-id <key_id> [--private-key-file <path>] [--trusted-keys-file <path>]\n")
 		return 1
 	}
 
@@ -576,7 +576,7 @@ func runGenSigningKeyCommand(args []string) int {
 	}
 	trustPath := strings.TrimSpace(*trustedKeysFile)
 	if trustPath == "" {
-		trustPath = strings.TrimSpace(os.Getenv("MAMUSIABTW_TRUSTED_KEYS_FILE"))
+		trustPath = strings.TrimSpace(os.Getenv("MAMACORD_TRUSTED_KEYS_FILE"))
 	}
 	if trustPath == "" {
 		trustPath = "./config/trusted_keys.json"
@@ -610,7 +610,7 @@ func runGenSigningKeyCommand(args []string) int {
 
 func runPluginsCommand(ctx context.Context, args []string) int {
 	if len(args) == 0 {
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins <sources|search|install|update|uninstall|trust>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins <sources|search|install|update|uninstall|trust>\n")
 		return 1
 	}
 
@@ -635,7 +635,7 @@ func runPluginsCommand(ctx context.Context, args []string) int {
 	case "trust":
 		return runPluginTrustCommand(ctx, manager, args[1:])
 	default:
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins <sources|search|install|update|uninstall|trust>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins <sources|search|install|update|uninstall|trust>\n")
 		return 1
 	}
 }
@@ -687,7 +687,7 @@ func openMarketplaceManager(ctx context.Context) (*marketplace.Manager, func(), 
 
 func runPluginSourcesCommand(ctx context.Context, manager *marketplace.Manager, args []string) int {
 	if len(args) == 0 {
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins sources <list|add|remove|sync>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins sources <list|add|remove|sync>\n")
 		return 1
 	}
 	switch args[0] {
@@ -754,7 +754,7 @@ func runPluginSourcesCommand(ctx context.Context, manager *marketplace.Manager, 
 		_, _ = fmt.Fprintf(os.Stdout, "source_id: %s\nrevision: %s\n", resp.SourceID, resp.Revision)
 		return 0
 	default:
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins sources <list|add|remove|sync>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins sources <list|add|remove|sync>\n")
 		return 1
 	}
 }
@@ -841,7 +841,7 @@ func runPluginUninstallCommand(ctx context.Context, manager *marketplace.Manager
 
 func runPluginTrustCommand(ctx context.Context, manager *marketplace.Manager, args []string) int {
 	if len(args) == 0 {
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins trust <signer|vendor>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins trust <signer|vendor>\n")
 		return 1
 	}
 	switch args[0] {
@@ -890,7 +890,7 @@ func runPluginTrustCommand(ctx context.Context, manager *marketplace.Manager, ar
 		_, _ = fmt.Fprintf(os.Stdout, "vendor_id: %s\nkeys: %s\n", resp.VendorID, strings.Join(resp.KeyIDs, ","))
 		return 0
 	default:
-		_, _ = os.Stderr.WriteString("usage: mamusiabtw plugins trust <signer|vendor>\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord plugins trust <signer|vendor>\n")
 		return 1
 	}
 }

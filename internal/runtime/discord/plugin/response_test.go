@@ -34,7 +34,7 @@ func TestParseActionAllowsDeferredSlashUpdate(t *testing.T) {
 				"title":         "Lookup",
 				"thumbnail_url": "https://example.com/thumb.png",
 				"author": map[string]any{
-					"name":     "MamusiaBtw",
+					"name":     "MamaCord",
 					"icon_url": "https://example.com/author.png",
 				},
 				"footer": map[string]any{
@@ -61,7 +61,7 @@ func TestParseActionAllowsDeferredSlashUpdate(t *testing.T) {
 		t.Fatalf("expected deferred update embeds, got %#v", action.Update)
 	}
 	embed := (*action.Update.Embeds)[0]
-	if embed.Author == nil || embed.Author.Name != "MamusiaBtw" {
+	if embed.Author == nil || embed.Author.Name != "MamaCord" {
 		t.Fatalf("expected author to be parsed, got %#v", embed.Author)
 	}
 	if embed.Footer == nil || embed.Footer.Text != "Footer" {

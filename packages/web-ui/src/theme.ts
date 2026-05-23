@@ -101,5 +101,5 @@ export const siteTheme = createTheme({
 });
 
 export const colorSchemeManager = localStorageColorSchemeManager({
-	key: "mamusiabtw-color-scheme",
+	key: "mamacord-color-scheme",
 });

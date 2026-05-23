@@ -484,7 +484,7 @@ function OwnerShell({
 							hiddenFrom="sm"
 							aria-label="Toggle navigation"
 						/>
-						<Text fw={800}>mamusiabtw</Text>
+						<Text fw={800}>mamacord</Text>
 						<Badge variant="light" color="brand">
 							Owner
 						</Badge>
@@ -856,7 +856,7 @@ function PublicSiteView({
 							className="brand-button"
 							onClick={() => onNavigate({ kind: "home" })}
 						>
-							mamusiabtw
+							mamacord
 						</Button>
 						<Group gap="xs" className="site-nav" visibleFrom="sm">
 							<Button

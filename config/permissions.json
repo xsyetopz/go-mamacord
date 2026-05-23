@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/permissions.schema.v1.json",
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.v1.json",
   "version": "1",
   "defaults": {
     "storage": {

@@ -10,17 +10,17 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/adminapi"
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
-	"github.com/xsyetopz/go-mamusiabtw/internal/i18n"
-	"github.com/xsyetopz/go-mamusiabtw/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	"github.com/xsyetopz/go-mamusiabtw/internal/ops"
-	discordplatform "github.com/xsyetopz/go-mamusiabtw/internal/runtime/discord"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	"github.com/xsyetopz/go-mamusiabtw/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamusiabtw/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/adminapi"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/marketplace"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	"github.com/xsyetopz/go-mamacord/internal/ops"
+	discordplatform "github.com/xsyetopz/go-mamacord/internal/runtime/discord"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/sqlite"
+	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
 )
 
 type Dependencies struct {
@@ -51,7 +51,7 @@ func New(deps Dependencies) (*App, error) {
 		return nil, errors.New("logger is required")
 	}
 	if deps.Config.ProdMode && deps.Config.AllowUnsignedPlugins {
-		return nil, errors.New("prod mode requires signed plugins; set MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0")
+		return nil, errors.New("prod mode requires signed plugins; set MAMACORD_ALLOW_UNSIGNED_PLUGINS=0")
 	}
 
 	return &App{
@@ -186,7 +186,7 @@ func (a *App) validatePluginTrust(ctx context.Context) error {
 			pathLabel = "./config/trusted_keys.json"
 		}
 		return fmt.Errorf(
-			"prod mode requires at least one trusted signer in %s or SQLite; bundled plugins expect a trusted public key file there, and custom plugins should be signed with mamusiabtw gen-signing-key + sign-plugin",
+			"prod mode requires at least one trusted signer in %s or SQLite; bundled plugins expect a trusted public key file there, and custom plugins should be signed with mamacord gen-signing-key + sign-plugin",
 			pathLabel,
 		)
 	}

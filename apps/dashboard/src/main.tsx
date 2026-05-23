@@ -1,4 +1,4 @@
-import { colorSchemeManager, siteTheme } from "@mamusiabtw/web-ui";
+import { colorSchemeManager, siteTheme } from "@mamacord/web-ui";
 import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import React from "react";
@@ -9,7 +9,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { DeveloperDetailsProvider } from "./developerDetails";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
-import "@mamusiabtw/web-ui/styles.css";
+import "@mamacord/web-ui/styles.css";
 import "./styles.css";
 
 const root = document.getElementById("root");

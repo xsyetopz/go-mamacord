@@ -24,9 +24,9 @@ jobs:
         run: |
           go build -trimpath \
             -ldflags="-s -w \
-              -X github.com/xsyetopz/go-mamusiabtw/internal/buildinfo.Version=${GITHUB_SHA} \
-              -X github.com/xsyetopz/go-mamusiabtw/internal/buildinfo.Repository=https://github.com/${GITHUB_REPOSITORY}" \
-            ./cmd/mamusiabtw
+              -X github.com/xsyetopz/go-mamacord/internal/buildinfo.Version=${GITHUB_SHA} \
+              -X github.com/xsyetopz/go-mamacord/internal/buildinfo.Repository=https://github.com/${GITHUB_REPOSITORY}" \
+            ./cmd/mamacord
 
   web:
     runs-on: ubuntu-latest
@@ -45,5 +45,5 @@ jobs:
 
       - name: Build public site
         env:
-          MAMUSIABTW_SITE_BASE: /${{ github.event.repository.name }}/
+          MAMACORD_SITE_BASE: /${{ github.event.repository.name }}/
         run: bun --cwd apps/site run build

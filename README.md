@@ -1,20 +1,20 @@
-# go-mamusiabtw
+# go-mamacord
 
 A Discord bot + admin API (website/dashboard), written in Go.
 
-Repo internal name: `mamusiabtw` (env vars, IDs, `custom_id` prefixes).
+Repo internal name: `mamacord` (env vars, IDs, `custom_id` prefixes).
 
 ## Quick Start (Local, Bot Only)
 
 ```bash
-go run ./cmd/mamusiabtw init
-go run ./cmd/mamusiabtw dev
+go run ./cmd/mamacord init
+go run ./cmd/mamacord dev
 ```
 
 That:
 
 - reads `.env.dev` (only `.env.dev` / `.env.prod` are supported)
-- creates/opens the SQLite DB at `SQLITE_PATH` (default `./data/mamusiabtw.sqlite`)
+- creates/opens the SQLite DB at `SQLITE_PATH` (default `./data/mamacord.sqlite`)
 - applies pending SQLite migrations automatically
 - starts the Discord bot
 
@@ -30,7 +30,7 @@ The dashboard is served from the **admin API origin** (single-origin).
 
 You run:
 
-- Terminal A: `go run ./cmd/mamusiabtw dev`
+- Terminal A: `go run ./cmd/mamacord dev`
 - Terminal B (optional HMR): `cd apps/dashboard && bun install && bun run dev`
 
 You open in the browser:
@@ -45,18 +45,18 @@ cookies and API JSON parsing.
 Minimum:
 
 - `DISCORD_TOKEN=...`
-- `MAMUSIABTW_ADMIN_ADDR=127.0.0.1:8081`
+- `MAMACORD_ADMIN_ADDR=127.0.0.1:8081`
 
 To enable Discord sign-in:
 
-- `MAMUSIABTW_DASHBOARD_CLIENT_ID=...`
-- `MAMUSIABTW_DASHBOARD_CLIENT_SECRET=...`
+- `MAMACORD_DASHBOARD_CLIENT_ID=...`
+- `MAMACORD_DASHBOARD_CLIENT_SECRET=...`
 
 Sessions:
 
-- Dev default: if `MAMUSIABTW_DASHBOARD_SESSION_SECRET` is missing, a random one
+- Dev default: if `MAMACORD_DASHBOARD_SESSION_SECRET` is missing, a random one
   is generated at startup (sessions reset on restart).
-- Stable: set `MAMUSIABTW_DASHBOARD_SESSION_SECRET` to 32+ characters.
+- Stable: set `MAMACORD_DASHBOARD_SESSION_SECRET` to 32+ characters.
 
 ### One-Time Discord Portal Setup (Redirect URIs)
 
@@ -90,16 +90,16 @@ Raw `*.github.io` hosting is supported, but discouraged as the repo's main publi
 default. Prefer a custom domain if you want GitHub Pages to be the canonical
 public dashboard.
 
-Minimum prod env (when `MAMUSIABTW_ADMIN_ADDR` is enabled):
+Minimum prod env (when `MAMACORD_ADMIN_ADDR` is enabled):
 
-- `MAMUSIABTW_PROD_MODE=1`
-- `MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0`
-- `MAMUSIABTW_DASHBOARD_CLIENT_ID=...`
-- `MAMUSIABTW_DASHBOARD_CLIENT_SECRET=...`
-- `MAMUSIABTW_DASHBOARD_SESSION_SECRET=...` (32+ chars)
-- `MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN=https://...`
-- `MAMUSIABTW_PUBLIC_API_ORIGIN=https://...`
-- `MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS=https://...` (must include the dashboard origin)
+- `MAMACORD_PROD_MODE=1`
+- `MAMACORD_ALLOW_UNSIGNED_PLUGINS=0`
+- `MAMACORD_DASHBOARD_CLIENT_ID=...`
+- `MAMACORD_DASHBOARD_CLIENT_SECRET=...`
+- `MAMACORD_DASHBOARD_SESSION_SECRET=...` (32+ chars)
+- `MAMACORD_PUBLIC_DASHBOARD_ORIGIN=https://...`
+- `MAMACORD_PUBLIC_API_ORIGIN=https://...`
+- `MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://...` (must include the dashboard origin)
 
 Plugin signing in prod:
 
@@ -110,7 +110,7 @@ Plugin signing in prod:
 ## Common Problems (Fast Fixes)
 
 - Dashboard says “Admin API not reachable”:
-  - start `go run ./cmd/mamusiabtw dev`
+  - start `go run ./cmd/mamacord dev`
   - open `http://127.0.0.1:8081/` (not `:5173`)
 - Dashboard error: `Unexpected token '<' ... is not valid JSON`:
   - you opened Vite directly; open `http://127.0.0.1:8081/` instead
@@ -118,7 +118,7 @@ Plugin signing in prod:
   - add `/api/install/callback` to OAuth2 Redirect URIs (see above)
 - Bot exits with `4014 Disallowed intent(s)`:
   - Discord Developer Portal -> Bot -> Privileged Gateway Intents
-  - enable `Server Members Intent` (mamusiabtw requests Guild Members in gateway)
+  - enable `Server Members Intent` (mamacord requests Guild Members in gateway)
 
 ## Reference Docs
 

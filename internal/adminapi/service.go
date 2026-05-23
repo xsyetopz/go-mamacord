@@ -20,17 +20,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/buildinfo"
-	commandapi "github.com/xsyetopz/go-mamusiabtw/internal/commands/api"
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
-	"github.com/xsyetopz/go-mamusiabtw/internal/guildconfig"
-	"github.com/xsyetopz/go-mamusiabtw/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamusiabtw/internal/migration"
-	"github.com/xsyetopz/go-mamusiabtw/internal/ops"
-	"github.com/xsyetopz/go-mamusiabtw/internal/permissions"
-	pluginhost "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins"
-	pluginhostlua "github.com/xsyetopz/go-mamusiabtw/internal/runtime/plugins/lua"
-	store "github.com/xsyetopz/go-mamusiabtw/internal/storage"
+	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
+	"github.com/xsyetopz/go-mamacord/internal/marketplace"
+	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	"github.com/xsyetopz/go-mamacord/internal/ops"
+	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var pluginIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]{1,31}$`)
@@ -1177,7 +1177,7 @@ func (s *Service) ScaffoldPlugin(req PluginScaffoldRequest) (PluginScaffoldRespo
 		Permissions: req.Permissions,
 	}
 	manifestBytes, err := json.MarshalIndent(map[string]any{
-		"$schema":     "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/plugin.schema.v1.json",
+		"$schema":     "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
 		"id":          manifest.ID,
 		"name":        manifest.Name,
 		"version":     manifest.Version,
@@ -1381,16 +1381,16 @@ func (s *Service) setupResponse(includeHints bool) SetupResponse {
 func setupHints(resp SetupResponse) []string {
 	hints := make([]string, 0, 6)
 	if !resp.AdminEnabled {
-		hints = append(hints, "Set MAMUSIABTW_ADMIN_ADDR to start the admin API.")
+		hints = append(hints, "Set MAMACORD_ADMIN_ADDR to start the admin API.")
 	}
 	if !resp.HasClientID {
-		hints = append(hints, "Set MAMUSIABTW_DASHBOARD_CLIENT_ID.")
+		hints = append(hints, "Set MAMACORD_DASHBOARD_CLIENT_ID.")
 	}
 	if !resp.HasClientSecret {
-		hints = append(hints, "Set MAMUSIABTW_DASHBOARD_CLIENT_SECRET.")
+		hints = append(hints, "Set MAMACORD_DASHBOARD_CLIENT_SECRET.")
 	}
 	if !resp.HasSessionSecret {
-		hints = append(hints, "Set MAMUSIABTW_DASHBOARD_SESSION_SECRET to at least 32 characters.")
+		hints = append(hints, "Set MAMACORD_DASHBOARD_SESSION_SECRET to at least 32 characters.")
 	}
 	if !resp.OwnerResolved {
 		hints = append(hints, "Owner access is unavailable. Discord owner lookup did not resolve an owner, and no OWNER_USER_ID fallback is configured.")

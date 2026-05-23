@@ -1,6 +1,6 @@
 # SBC Hosting Guide
 
-This guide is for running `mamusiabtw` on small single-board computers:
+This guide is for running `mamacord` on small single-board computers:
 
 - Raspberry Pi
 - Orange Pi
@@ -23,8 +23,8 @@ If you want the shortest safe answer:
 - strong boards can build and run locally
 - if you are already on the board and the repo is cloned there, use [Local Build On The Device](#local-build-on-the-device)
 - if you are on your stronger laptop/desktop building for the board, use [Cross-Build On Another Machine](#cross-build-on-another-machine)
-- if `/opt/mamusiabtw` does not exist yet, use [First Install On A Fresh Device](#first-install-on-a-fresh-device)
-- if `/opt/mamusiabtw` and `mamusiabtw.service` already exist, use [Update An Existing Install](#update-an-existing-install)
+- if `/opt/mamacord` does not exist yet, use [First Install On A Fresh Device](#first-install-on-a-fresh-device)
+- if `/opt/mamacord` and `mamacord.service` already exist, use [Update An Existing Install](#update-an-existing-install)
 
 ## Path + Machine Legend
 
@@ -32,15 +32,15 @@ These words mean exact things in this guide.
 
 - `BUILD HOST`: the machine that compiles the binary
 - `TARGET DEVICE`: the SBC that runs the bot
-- `REPO CHECKOUT`: your git clone, for example `~/go-mamusiabtw`
-- `INSTALLED APP DIR`: `/opt/mamusiabtw`
-- `INSTALLED BINARY`: `/opt/mamusiabtw/mamusiabtw`
+- `REPO CHECKOUT`: your git clone, for example `~/go-mamacord`
+- `INSTALLED APP DIR`: `/opt/mamacord`
+- `INSTALLED BINARY`: `/opt/mamacord/mamacord`
 
 Hard rules:
 
 - do not mix `REPO CHECKOUT` commands with `INSTALLED APP DIR` commands
 - do not mix `BUILD HOST` commands with `TARGET DEVICE` commands
-- do not assume `./dist/mamusiabtw` and `./dist/mamusiabtw-linux-arm64` are the same file
+- do not assume `./dist/mamacord` and `./dist/mamacord-linux-arm64` are the same file
 
 ## Table Of Contents
 
@@ -153,9 +153,9 @@ Representative vendor pages:
   go to [Local Build On The Device](#local-build-on-the-device)
 - If you are on your laptop or desktop building for the board:
   go to [Cross-Build On Another Machine](#cross-build-on-another-machine)
-- If `/opt/mamusiabtw` does not exist yet:
+- If `/opt/mamacord` does not exist yet:
   go to [First Install On A Fresh Device](#first-install-on-a-fresh-device)
-- If `/opt/mamusiabtw` already exists and the service already works:
+- If `/opt/mamacord` already exists and the service already works:
   go to [Update An Existing Install](#update-an-existing-install)
 
 ## Golden Path A: Weak Board, Build Elsewhere
@@ -183,19 +183,19 @@ Input expected before command:
 
 Output after command:
 
-- `./dist/mamusiabtw-linux-arm64` for 64-bit targets
-- or `./dist/mamusiabtw-linux-armv7` for 32-bit targets
+- `./dist/mamacord-linux-arm64` for 64-bit targets
+- or `./dist/mamacord-linux-armv7` for 32-bit targets
 
 64-bit target:
 
 ```bash
-GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamusiabtw-linux-arm64
+GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamacord-linux-arm64
 ```
 
 32-bit target:
 
 ```bash
-GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamusiabtw-linux-armv7
+GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamacord-linux-armv7
 ```
 
 ### A2. Copy The Built Binary To The Board
@@ -217,18 +217,18 @@ Input expected before command:
 
 Output after command:
 
-- `~/mamusiabtw` exists on the `TARGET DEVICE`
+- `~/mamacord` exists on the `TARGET DEVICE`
 
 64-bit target:
 
 ```bash
-rsync -a ./dist/mamusiabtw-linux-arm64 USER@TARGET_HOST:~/mamusiabtw
+rsync -a ./dist/mamacord-linux-arm64 USER@TARGET_HOST:~/mamacord
 ```
 
 32-bit target:
 
 ```bash
-rsync -a ./dist/mamusiabtw-linux-armv7 USER@TARGET_HOST:~/mamusiabtw
+rsync -a ./dist/mamacord-linux-armv7 USER@TARGET_HOST:~/mamacord
 ```
 
 ### A3. Install It On The Board
@@ -237,15 +237,15 @@ Run on `TARGET DEVICE`.
 
 Input expected before command:
 
-- `~/mamusiabtw` exists on the device
-- `/opt/mamusiabtw` already exists if this is an update
+- `~/mamacord` exists on the device
+- `/opt/mamacord` already exists if this is an update
 
 Output after command:
 
 - `INSTALLED BINARY` exists
 
 ```bash
-sudo install -Dm755 ~/mamusiabtw /opt/mamusiabtw/mamusiabtw
+sudo install -Dm755 ~/mamacord /opt/mamacord/mamacord
 ```
 
 ### A4. Restart And Verify
@@ -258,8 +258,8 @@ Output after command:
 - `doctor` reports the installed production config
 
 ```bash
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ## Golden Path B: Stronger Board, Build Locally
@@ -286,7 +286,7 @@ Input expected before command:
 
 Output after command:
 
-- `./dist/mamusiabtw`
+- `./dist/mamacord`
 
 ```bash
 ./scripts/build-release.sh
@@ -298,14 +298,14 @@ Run on `TARGET DEVICE`, inside `REPO CHECKOUT`.
 
 Input expected before command:
 
-- `./dist/mamusiabtw` exists
+- `./dist/mamacord` exists
 
 Output after command:
 
 - `INSTALLED BINARY` exists
 
 ```bash
-sudo install -Dm755 ./dist/mamusiabtw /opt/mamusiabtw/mamusiabtw
+sudo install -Dm755 ./dist/mamacord /opt/mamacord/mamacord
 ```
 
 ### B3. Restart And Verify
@@ -313,8 +313,8 @@ sudo install -Dm755 ./dist/mamusiabtw /opt/mamusiabtw/mamusiabtw
 Run on `TARGET DEVICE`.
 
 ```bash
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ## Local Build On The Device
@@ -352,7 +352,7 @@ Run on `TARGET DEVICE`, inside `REPO CHECKOUT`.
 
 Output after command:
 
-- `./dist/mamusiabtw`
+- `./dist/mamacord`
 
 ```bash
 ./scripts/build-release.sh
@@ -364,11 +364,11 @@ Run on `TARGET DEVICE`, inside `REPO CHECKOUT`.
 
 Expected output:
 
-- a file at `./dist/mamusiabtw`
+- a file at `./dist/mamacord`
 
 ```bash
 ls -la ./dist
-find ./dist -maxdepth 1 -type f -name 'mamusiabtw*'
+find ./dist -maxdepth 1 -type f -name 'mamacord*'
 ```
 
 ### Install The Binary
@@ -377,14 +377,14 @@ Run on `TARGET DEVICE`, inside `REPO CHECKOUT`.
 
 Input expected before command:
 
-- `./dist/mamusiabtw` exists
+- `./dist/mamacord` exists
 
 Output after command:
 
 - `INSTALLED BINARY` exists
 
 ```bash
-sudo install -Dm755 ./dist/mamusiabtw /opt/mamusiabtw/mamusiabtw
+sudo install -Dm755 ./dist/mamacord /opt/mamacord/mamacord
 ```
 
 ### Install Repo Assets
@@ -404,16 +404,16 @@ Output after command:
 - those assets exist under `INSTALLED APP DIR`
 
 ```bash
-sudo rsync -a ./migrations/ /opt/mamusiabtw/migrations/
-sudo rsync -a ./locales/ /opt/mamusiabtw/locales/
-sudo rsync -a ./plugins/ /opt/mamusiabtw/plugins/
-sudo rsync -a ./config/ /opt/mamusiabtw/config/
+sudo rsync -a ./migrations/ /opt/mamacord/migrations/
+sudo rsync -a ./locales/ /opt/mamacord/locales/
+sudo rsync -a ./plugins/ /opt/mamacord/plugins/
+sudo rsync -a ./config/ /opt/mamacord/config/
 ```
 
 For Profile C only:
 
 ```bash
-sudo rsync -a ./apps/dashboard/dist/ /opt/mamusiabtw/apps/dashboard/dist/
+sudo rsync -a ./apps/dashboard/dist/ /opt/mamacord/apps/dashboard/dist/
 ```
 
 ### Install `.env.prod`
@@ -426,11 +426,11 @@ Input expected before command:
 
 Output after command:
 
-- `/opt/mamusiabtw/.env.prod`
+- `/opt/mamacord/.env.prod`
 
 ```bash
-sudo install -Dm600 ./.env.prod /opt/mamusiabtw/.env.prod
-sudo chown -R mamusiabtw:mamusiabtw /opt/mamusiabtw
+sudo install -Dm600 ./.env.prod /opt/mamacord/.env.prod
+sudo chown -R mamacord:mamacord /opt/mamacord
 ```
 
 ### Restart And Verify
@@ -438,8 +438,8 @@ sudo chown -R mamusiabtw:mamusiabtw /opt/mamusiabtw
 Run on `TARGET DEVICE`.
 
 ```bash
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ## Cross-Build On Another Machine
@@ -464,10 +464,10 @@ Run on `BUILD HOST`, inside `REPO CHECKOUT`.
 
 Output after command:
 
-- `./dist/mamusiabtw-linux-arm64`
+- `./dist/mamacord-linux-arm64`
 
 ```bash
-GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamusiabtw-linux-arm64
+GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamacord-linux-arm64
 ```
 
 ### Build For 32-bit Targets
@@ -476,10 +476,10 @@ Run on `BUILD HOST`, inside `REPO CHECKOUT`.
 
 Output after command:
 
-- `./dist/mamusiabtw-linux-armv7`
+- `./dist/mamacord-linux-armv7`
 
 ```bash
-GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamusiabtw-linux-armv7
+GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamacord-linux-armv7
 ```
 
 ### Confirm The Output Exists
@@ -488,7 +488,7 @@ Run on `BUILD HOST`, inside `REPO CHECKOUT`.
 
 ```bash
 ls -la ./dist
-find ./dist -maxdepth 1 -type f -name 'mamusiabtw*'
+find ./dist -maxdepth 1 -type f -name 'mamacord*'
 ```
 
 ### Copy To The Target Device
@@ -509,18 +509,18 @@ Input expected before command:
 
 Output after command:
 
-- `~/mamusiabtw` exists on the target board
+- `~/mamacord` exists on the target board
 
 64-bit target:
 
 ```bash
-rsync -a ./dist/mamusiabtw-linux-arm64 USER@TARGET_HOST:~/mamusiabtw
+rsync -a ./dist/mamacord-linux-arm64 USER@TARGET_HOST:~/mamacord
 ```
 
 32-bit target:
 
 ```bash
-rsync -a ./dist/mamusiabtw-linux-armv7 USER@TARGET_HOST:~/mamusiabtw
+rsync -a ./dist/mamacord-linux-armv7 USER@TARGET_HOST:~/mamacord
 ```
 
 ### Install The Copied Binary
@@ -529,14 +529,14 @@ Run on `TARGET DEVICE`.
 
 Input expected before command:
 
-- `~/mamusiabtw` exists
+- `~/mamacord` exists
 
 Output after command:
 
 - `INSTALLED BINARY` exists
 
 ```bash
-sudo install -Dm755 ~/mamusiabtw /opt/mamusiabtw/mamusiabtw
+sudo install -Dm755 ~/mamacord /opt/mamacord/mamacord
 ```
 
 ### Restart And Verify
@@ -544,16 +544,16 @@ sudo install -Dm755 ~/mamusiabtw /opt/mamusiabtw/mamusiabtw
 Run on `TARGET DEVICE`.
 
 ```bash
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ## First Install On A Fresh Device
 
 Use this only if the target device does not already have:
 
-- `/opt/mamusiabtw`
-- `/etc/systemd/system/mamusiabtw.service`
+- `/opt/mamacord`
+- `/etc/systemd/system/mamacord.service`
 
 This section is about the initial bootstrap.
 
@@ -563,10 +563,10 @@ Run on `TARGET DEVICE`.
 
 Output after command:
 
-- system user `mamusiabtw` exists
+- system user `mamacord` exists
 
 ```bash
-sudo useradd --system --home /opt/mamusiabtw --shell /usr/sbin/nologin mamusiabtw || true
+sudo useradd --system --home /opt/mamacord --shell /usr/sbin/nologin mamacord || true
 ```
 
 ### 2. Create The Install Tree
@@ -575,12 +575,12 @@ Run on `TARGET DEVICE`.
 
 Output after command:
 
-- `/opt/mamusiabtw`
-- `/opt/mamusiabtw/data`
+- `/opt/mamacord`
+- `/opt/mamacord/data`
 
 ```bash
-sudo install -d -o mamusiabtw -g mamusiabtw /opt/mamusiabtw
-sudo install -d -o mamusiabtw -g mamusiabtw /opt/mamusiabtw/data
+sudo install -d -o mamacord -g mamacord /opt/mamacord
+sudo install -d -o mamacord -g mamacord /opt/mamacord/data
 ```
 
 ### 3. Install The Binary
@@ -592,7 +592,7 @@ Pick one:
 
 After this step, you must have:
 
-- `/opt/mamusiabtw/mamusiabtw`
+- `/opt/mamacord/mamacord`
 
 ### 4. Install Repo Assets
 
@@ -600,19 +600,19 @@ If the repo checkout exists on the board, run on `TARGET DEVICE`, inside `REPO C
 
 Output after command:
 
-- `/opt/mamusiabtw/migrations/`
-- `/opt/mamusiabtw/locales/`
-- `/opt/mamusiabtw/plugins/`
-- `/opt/mamusiabtw/config/`
+- `/opt/mamacord/migrations/`
+- `/opt/mamacord/locales/`
+- `/opt/mamacord/plugins/`
+- `/opt/mamacord/config/`
 
 ```bash
-sudo rsync -a ./migrations/ /opt/mamusiabtw/migrations/
-sudo rsync -a ./locales/ /opt/mamusiabtw/locales/
-sudo rsync -a ./plugins/ /opt/mamusiabtw/plugins/
-sudo rsync -a ./config/ /opt/mamusiabtw/config/
+sudo rsync -a ./migrations/ /opt/mamacord/migrations/
+sudo rsync -a ./locales/ /opt/mamacord/locales/
+sudo rsync -a ./plugins/ /opt/mamacord/plugins/
+sudo rsync -a ./config/ /opt/mamacord/config/
 ```
 
-If you do not have a repo checkout on the board, copy these directories there first from the build host, then install them into `/opt/mamusiabtw/`.
+If you do not have a repo checkout on the board, copy these directories there first from the build host, then install them into `/opt/mamacord/`.
 
 ### 5. Install `.env.prod`
 
@@ -624,26 +624,26 @@ Input expected before command:
 
 Output after command:
 
-- `/opt/mamusiabtw/.env.prod`
+- `/opt/mamacord/.env.prod`
 
 If `.env.prod` is already on the target in your current directory:
 
 ```bash
-sudo install -Dm600 ./.env.prod /opt/mamusiabtw/.env.prod
+sudo install -Dm600 ./.env.prod /opt/mamacord/.env.prod
 ```
 
 If `.env.prod` is in your home directory:
 
 ```bash
-sudo install -Dm600 ~/.env.prod /opt/mamusiabtw/.env.prod
+sudo install -Dm600 ~/.env.prod /opt/mamacord/.env.prod
 ```
 
 ### 5.5 Production Plugin Signing
 
 If your `.env.prod` contains both of these:
 
-- `MAMUSIABTW_PROD_MODE=1`
-- `MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0`
+- `MAMACORD_PROD_MODE=1`
+- `MAMACORD_ALLOW_UNSIGNED_PLUGINS=0`
 
 then you must finish the signing setup before the service will boot.
 
@@ -653,20 +653,20 @@ Use [Production Plugin Signing](#production-plugin-signing) before you start the
 
 Run on `TARGET DEVICE`.
 
-Create `/etc/systemd/system/mamusiabtw.service` with:
+Create `/etc/systemd/system/mamacord.service` with:
 
 ```ini
 [Unit]
-Description=mamusiabtw
+Description=mamacord
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=mamusiabtw
-Group=mamusiabtw
-WorkingDirectory=/opt/mamusiabtw
-ExecStart=/opt/mamusiabtw/mamusiabtw
+User=mamacord
+Group=mamacord
+WorkingDirectory=/opt/mamacord
+ExecStart=/opt/mamacord/mamacord
 Restart=on-failure
 RestartSec=3
 
@@ -680,8 +680,8 @@ Run on `TARGET DEVICE`.
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable --now mamusiabtw
-sudo systemctl status mamusiabtw --no-pager
+sudo systemctl enable --now mamacord
+sudo systemctl status mamacord --no-pager
 ```
 
 ### 8. Fix Ownership
@@ -689,7 +689,7 @@ sudo systemctl status mamusiabtw --no-pager
 Run on `TARGET DEVICE`.
 
 ```bash
-sudo chown -R mamusiabtw:mamusiabtw /opt/mamusiabtw
+sudo chown -R mamacord:mamacord /opt/mamacord
 ```
 
 ### 9. Verify With `doctor`
@@ -697,7 +697,7 @@ sudo chown -R mamusiabtw:mamusiabtw /opt/mamusiabtw
 Run on `TARGET DEVICE`.
 
 ```bash
-/opt/mamusiabtw/mamusiabtw doctor
+/opt/mamacord/mamacord doctor
 ```
 
 You want to see:
@@ -711,8 +711,8 @@ You want to see:
 
 Use this only if both of these are already true:
 
-- `/opt/mamusiabtw` exists
-- `mamusiabtw.service` already exists
+- `/opt/mamacord` exists
+- `mamacord.service` already exists
 
 ### Update Path 1: Build On The Board
 
@@ -722,14 +722,14 @@ Run on `TARGET DEVICE`, inside `REPO CHECKOUT`.
 git pull --ff-only
 diff -u .env.prod.example .env.prod
 ./scripts/build-release.sh
-sudo install -Dm755 ./dist/mamusiabtw /opt/mamusiabtw/mamusiabtw
-sudo rsync -a ./migrations/ /opt/mamusiabtw/migrations/
-sudo rsync -a ./locales/ /opt/mamusiabtw/locales/
-sudo rsync -a ./plugins/ /opt/mamusiabtw/plugins/
-sudo rsync -a ./config/ /opt/mamusiabtw/config/
-sudo install -Dm600 ./.env.prod /opt/mamusiabtw/.env.prod
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo install -Dm755 ./dist/mamacord /opt/mamacord/mamacord
+sudo rsync -a ./migrations/ /opt/mamacord/migrations/
+sudo rsync -a ./locales/ /opt/mamacord/locales/
+sudo rsync -a ./plugins/ /opt/mamacord/plugins/
+sudo rsync -a ./config/ /opt/mamacord/config/
+sudo install -Dm600 ./.env.prod /opt/mamacord/.env.prod
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ### Update Path 2: Build Elsewhere
@@ -740,24 +740,24 @@ Run on `BUILD HOST`, inside `REPO CHECKOUT`.
 
 ```bash
 git pull --ff-only
-GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamusiabtw-linux-arm64
-rsync -a ./dist/mamusiabtw-linux-arm64 USER@TARGET_HOST:~/mamusiabtw
+GOOS=linux GOARCH=arm64 ./scripts/build-release.sh dist/mamacord-linux-arm64
+rsync -a ./dist/mamacord-linux-arm64 USER@TARGET_HOST:~/mamacord
 ```
 
 32-bit target:
 
 ```bash
 git pull --ff-only
-GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamusiabtw-linux-armv7
-rsync -a ./dist/mamusiabtw-linux-armv7 USER@TARGET_HOST:~/mamusiabtw
+GOOS=linux GOARCH=arm GOARM=7 ./scripts/build-release.sh dist/mamacord-linux-armv7
+rsync -a ./dist/mamacord-linux-armv7 USER@TARGET_HOST:~/mamacord
 ```
 
 Run on `TARGET DEVICE`.
 
 ```bash
-sudo install -Dm755 ~/mamusiabtw /opt/mamusiabtw/mamusiabtw
-sudo systemctl restart mamusiabtw
-/opt/mamusiabtw/mamusiabtw doctor
+sudo install -Dm755 ~/mamacord /opt/mamacord/mamacord
+sudo systemctl restart mamacord
+/opt/mamacord/mamacord doctor
 ```
 
 ## Environment Examples
@@ -772,9 +772,9 @@ Only these env filenames are supported:
 ```dotenv
 DISCORD_TOKEN=your-token-here
 
-MAMUSIABTW_PROD_MODE=1
-MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0
-# MAMUSIABTW_TRUSTED_KEYS_FILE=./config/trusted_keys.json
+MAMACORD_PROD_MODE=1
+MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
+# MAMACORD_TRUSTED_KEYS_FILE=./config/trusted_keys.json
 ```
 
 ### Profile B
@@ -782,18 +782,18 @@ MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0
 ```dotenv
 DISCORD_TOKEN=your-token-here
 
-MAMUSIABTW_PROD_MODE=1
-MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0
-# MAMUSIABTW_TRUSTED_KEYS_FILE=./config/trusted_keys.json
+MAMACORD_PROD_MODE=1
+MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
+# MAMACORD_TRUSTED_KEYS_FILE=./config/trusted_keys.json
 
-MAMUSIABTW_ADMIN_ADDR=0.0.0.0:8081
-MAMUSIABTW_DASHBOARD_CLIENT_ID=your-discord-client-id
-MAMUSIABTW_DASHBOARD_CLIENT_SECRET=your-discord-client-secret
-MAMUSIABTW_DASHBOARD_SESSION_SECRET=use-at-least-32-characters-here
+MAMACORD_ADMIN_ADDR=0.0.0.0:8081
+MAMACORD_DASHBOARD_CLIENT_ID=your-discord-client-id
+MAMACORD_DASHBOARD_CLIENT_SECRET=your-discord-client-secret
+MAMACORD_DASHBOARD_SESSION_SECRET=use-at-least-32-characters-here
 
-MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN=https://example.com
-MAMUSIABTW_PUBLIC_API_ORIGIN=https://api.example.com
-MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS=https://example.com
+MAMACORD_PUBLIC_DASHBOARD_ORIGIN=https://example.com
+MAMACORD_PUBLIC_API_ORIGIN=https://api.example.com
+MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://example.com
 ```
 
 ### Profile C
@@ -801,18 +801,18 @@ MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS=https://example.com
 ```dotenv
 DISCORD_TOKEN=your-token-here
 
-MAMUSIABTW_PROD_MODE=1
-MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0
-# MAMUSIABTW_TRUSTED_KEYS_FILE=./config/trusted_keys.json
+MAMACORD_PROD_MODE=1
+MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
+# MAMACORD_TRUSTED_KEYS_FILE=./config/trusted_keys.json
 
-MAMUSIABTW_ADMIN_ADDR=0.0.0.0:8081
-MAMUSIABTW_DASHBOARD_CLIENT_ID=your-discord-client-id
-MAMUSIABTW_DASHBOARD_CLIENT_SECRET=your-discord-client-secret
-MAMUSIABTW_DASHBOARD_SESSION_SECRET=use-at-least-32-characters-here
+MAMACORD_ADMIN_ADDR=0.0.0.0:8081
+MAMACORD_DASHBOARD_CLIENT_ID=your-discord-client-id
+MAMACORD_DASHBOARD_CLIENT_SECRET=your-discord-client-secret
+MAMACORD_DASHBOARD_SESSION_SECRET=use-at-least-32-characters-here
 
-MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN=https://device-or-domain.example
-MAMUSIABTW_PUBLIC_API_ORIGIN=https://device-or-domain.example
-MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS=https://device-or-domain.example
+MAMACORD_PUBLIC_DASHBOARD_ORIGIN=https://device-or-domain.example
+MAMACORD_PUBLIC_API_ORIGIN=https://device-or-domain.example
+MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://device-or-domain.example
 ```
 
 ## Production Plugin Signing
@@ -820,8 +820,8 @@ MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS=https://device-or-domain.example
 This section matters whenever all of these are true:
 
 - you are using `.env.prod`
-- `MAMUSIABTW_PROD_MODE=1`
-- `MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS=0`
+- `MAMACORD_PROD_MODE=1`
+- `MAMACORD_ALLOW_UNSIGNED_PLUGINS=0`
 
 If that is your setup, the service will not boot unless trusted signer setup is complete.
 
@@ -834,15 +834,15 @@ Good news:
 
 What must exist on the installed machine:
 
-- `/opt/mamusiabtw/config/trusted_keys.json`
-- `/opt/mamusiabtw/plugins/<plugin>/signature.json` for the bundled plugins
+- `/opt/mamacord/config/trusted_keys.json`
+- `/opt/mamacord/plugins/<plugin>/signature.json` for the bundled plugins
 
 Run on `TARGET DEVICE`:
 
 ```bash
-ls -la /opt/mamusiabtw/config/trusted_keys.json
-find /opt/mamusiabtw/plugins -maxdepth 2 -name signature.json -print | sort
-/opt/mamusiabtw/mamusiabtw doctor
+ls -la /opt/mamacord/config/trusted_keys.json
+find /opt/mamacord/plugins -maxdepth 2 -name signature.json -print | sort
+/opt/mamacord/mamacord doctor
 ```
 
 You want `doctor` to show:
@@ -857,8 +857,8 @@ If `config/trusted_keys.json` is missing from the installed machine, copy it fro
 Run on `TARGET DEVICE`, inside `REPO CHECKOUT`:
 
 ```bash
-sudo install -Dm644 ./config/trusted_keys.json /opt/mamusiabtw/config/trusted_keys.json
-sudo chown mamusiabtw:mamusiabtw /opt/mamusiabtw/config/trusted_keys.json
+sudo install -Dm644 ./config/trusted_keys.json /opt/mamacord/config/trusted_keys.json
+sudo chown mamacord:mamacord /opt/mamacord/config/trusted_keys.json
 ```
 
 ### Case 2: You Want To Sign Your Own Plugins
@@ -868,7 +868,7 @@ Run on the machine where your repo checkout lives.
 Generate a signer:
 
 ```bash
-go run ./cmd/mamusiabtw gen-signing-key --key-id your-key-id
+go run ./cmd/mamacord gen-signing-key --key-id your-key-id
 ```
 
 Default outputs:
@@ -879,7 +879,7 @@ Default outputs:
 Sign your plugin:
 
 ```bash
-go run ./cmd/mamusiabtw sign-plugin --dir ./plugins/<id> --key-id your-key-id --private-key-file ./data/keys/your-key-id.key
+go run ./cmd/mamacord sign-plugin --dir ./plugins/<id> --key-id your-key-id --private-key-file ./data/keys/your-key-id.key
 ```
 
 That creates:
@@ -899,8 +899,8 @@ You do not need to copy the private key to the target unless you want the dashbo
 If you want plugin scaffolding in the dashboard to sign automatically, set these in `.env.prod`:
 
 ```dotenv
-MAMUSIABTW_DASHBOARD_SIGNING_KEY_ID=your-key-id
-MAMUSIABTW_DASHBOARD_SIGNING_KEY_FILE=./data/keys/your-key-id.key
+MAMACORD_DASHBOARD_SIGNING_KEY_ID=your-key-id
+MAMACORD_DASHBOARD_SIGNING_KEY_FILE=./data/keys/your-key-id.key
 ```
 
 That private key file must exist on the installed machine if you enable dashboard signing.
@@ -938,13 +938,13 @@ At runtime:
 
 ## Troubleshooting
 
-### `install: cannot stat './dist/mamusiabtw'`
+### `install: cannot stat './dist/mamacord'`
 
 That means one of these is true:
 
 - the build did not finish successfully
 - you are not in the repo checkout you think you are
-- `./dist/mamusiabtw` was never created
+- `./dist/mamacord` was never created
 
 Run on the machine where you expect the build output:
 
@@ -952,12 +952,12 @@ Run on the machine where you expect the build output:
 pwd
 ls -la
 ls -la ./dist
-find . -maxdepth 3 -type f -name 'mamusiabtw*'
+find . -maxdepth 3 -type f -name 'mamacord*'
 ```
 
 If you built locally on the board with `./scripts/build-release.sh`, the expected file is:
 
-- `./dist/mamusiabtw`
+- `./dist/mamacord`
 
 If you cross-built with an explicit output path, the expected file is:
 
@@ -981,11 +981,11 @@ Do not use:
 
 unless you explicitly copied those directories into your home directory first.
 
-### `rsync` To `/opt/mamusiabtw/...` Fails
+### `rsync` To `/opt/mamacord/...` Fails
 
 That usually means one of these is true:
 
-- `/opt/mamusiabtw` does not exist yet
+- `/opt/mamacord` does not exist yet
 - your SSH user cannot write there directly
 
 Safe rule:
@@ -993,48 +993,48 @@ Safe rule:
 - copy to a user-writable path first
 - then use `sudo install` or `sudo rsync` on the target device
 
-### `systemctl restart mamusiabtw` Says Unit Not Found
+### `systemctl restart mamacord` Says Unit Not Found
 
 That means the first-install service setup was never completed.
 
 You still need to:
 
-- create `/etc/systemd/system/mamusiabtw.service`
+- create `/etc/systemd/system/mamacord.service`
 - run `sudo systemctl daemon-reload`
-- run `sudo systemctl enable --now mamusiabtw`
+- run `sudo systemctl enable --now mamacord`
 
 ### `doctor` Says `discord_token: false`
 
 Check these in order:
 
-- does `/opt/mamusiabtw/.env.prod` exist
-- are you running `/opt/mamusiabtw/mamusiabtw doctor`
+- does `/opt/mamacord/.env.prod` exist
+- are you running `/opt/mamacord/mamacord doctor`
 - does `.env.prod` actually contain `DISCORD_TOKEN=...`
-- did you install `.env.prod` into `/opt/mamusiabtw/.env.prod`
+- did you install `.env.prod` into `/opt/mamacord/.env.prod`
 
 The installed production check is:
 
 ```bash
-/opt/mamusiabtw/mamusiabtw doctor
+/opt/mamacord/mamacord doctor
 ```
 
 ### Prod Mode Says Trusted Signers Are Missing
 
 If logs say the service needs a trusted signer:
 
-- run `/opt/mamusiabtw/mamusiabtw doctor`
+- run `/opt/mamacord/mamacord doctor`
 - check `trusted_keys_file`
 - check `trusted_keys_file_exists`
-- make sure `/opt/mamusiabtw/config/trusted_keys.json` exists
+- make sure `/opt/mamacord/config/trusted_keys.json` exists
 
 If you only use the bundled plugins, the usual fix is:
 
 Run on `TARGET DEVICE`, inside `REPO CHECKOUT`:
 
 ```bash
-sudo install -Dm644 ./config/trusted_keys.json /opt/mamusiabtw/config/trusted_keys.json
-sudo chown mamusiabtw:mamusiabtw /opt/mamusiabtw/config/trusted_keys.json
-sudo systemctl restart mamusiabtw
+sudo install -Dm644 ./config/trusted_keys.json /opt/mamacord/config/trusted_keys.json
+sudo chown mamacord:mamacord /opt/mamacord/config/trusted_keys.json
+sudo systemctl restart mamacord
 ```
 
 If you are signing your own plugins, use [Production Plugin Signing](#production-plugin-signing).
@@ -1063,8 +1063,8 @@ Check whether the device OS is:
 
 If you use Profile C, make sure this exists on the target:
 
-- `/opt/mamusiabtw/apps/dashboard/dist/index.html`
+- `/opt/mamacord/apps/dashboard/dist/index.html`
 
 ### Admin API In Prod Fails At Startup
 
-If `MAMUSIABTW_ADMIN_ADDR` is set in prod mode, make sure the required dashboard OAuth, session, and public-origin vars are all set.
+If `MAMACORD_ADMIN_ADDR` is set in prod mode, make sure the required dashboard OAuth, session, and public-origin vars are all set.

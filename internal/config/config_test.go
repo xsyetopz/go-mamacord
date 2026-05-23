@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamusiabtw/internal/config"
+	"github.com/xsyetopz/go-mamacord/internal/config"
 )
 
 func TestLoadFromEnv_Defaults(t *testing.T) {
@@ -24,7 +24,7 @@ func TestLoadFromEnv_Defaults(t *testing.T) {
 	if cfg.DiscordToken != "discord-token" {
 		t.Fatalf("unexpected discord token: %q", cfg.DiscordToken)
 	}
-	if cfg.SQLitePath != "./data/mamusiabtw.sqlite" {
+	if cfg.SQLitePath != "./data/mamacord.sqlite" {
 		t.Fatalf("unexpected sqlite path: %q", cfg.SQLitePath)
 	}
 	if cfg.Migrations != "./migrations/sqlite" {
@@ -90,23 +90,23 @@ func TestLoadFromEnv_ParsesOverrides(t *testing.T) {
 	t.Setenv("DISCORD_TOKEN", "discord-token")
 	t.Setenv("OWNER_USER_ID", "11")
 	t.Setenv("DISCORD_DEV_GUILD_ID", "33")
-	t.Setenv("MAMUSIABTW_COMMAND_REGISTRATION_MODE", "hybrid")
-	t.Setenv("MAMUSIABTW_COMMAND_GUILD_IDS", "44,55")
-	t.Setenv("MAMUSIABTW_COMMAND_REGISTER_ALL_GUILDS", "1")
-	t.Setenv("MAMUSIABTW_OPS_ADDR", ":8080")
-	t.Setenv("MAMUSIABTW_ADMIN_ADDR", ":8081")
-	t.Setenv("MAMUSIABTW_PROD_MODE", "0")
-	t.Setenv("MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS", "1")
-	t.Setenv("MAMUSIABTW_DASHBOARD_CLIENT_ID", "client-id")
-	t.Setenv("MAMUSIABTW_DASHBOARD_CLIENT_SECRET", "client-secret")
-	t.Setenv("MAMUSIABTW_DASHBOARD_SESSION_SECRET", strings.Repeat("s", 32))
-	t.Setenv("MAMUSIABTW_DASHBOARD_SIGNING_KEY_ID", "official")
-	t.Setenv("MAMUSIABTW_DASHBOARD_SIGNING_KEY_FILE", "./data/keys/official.key")
-	t.Setenv("MAMUSIABTW_SLASH_COOLDOWN_MS", "9000")
-	t.Setenv("MAMUSIABTW_COMPONENT_COOLDOWN_MS", "250")
-	t.Setenv("MAMUSIABTW_MODAL_COOLDOWN_MS", "350")
-	t.Setenv("MAMUSIABTW_SLASH_COOLDOWN_BYPASS", "ping, lookup:user")
-	t.Setenv("MAMUSIABTW_SLASH_COOLDOWN_OVERRIDES_MS", "lookup:user=2500,manager:roles:add=1000")
+	t.Setenv("MAMACORD_COMMAND_REGISTRATION_MODE", "hybrid")
+	t.Setenv("MAMACORD_COMMAND_GUILD_IDS", "44,55")
+	t.Setenv("MAMACORD_COMMAND_REGISTER_ALL_GUILDS", "1")
+	t.Setenv("MAMACORD_OPS_ADDR", ":8080")
+	t.Setenv("MAMACORD_ADMIN_ADDR", ":8081")
+	t.Setenv("MAMACORD_PROD_MODE", "0")
+	t.Setenv("MAMACORD_ALLOW_UNSIGNED_PLUGINS", "1")
+	t.Setenv("MAMACORD_DASHBOARD_CLIENT_ID", "client-id")
+	t.Setenv("MAMACORD_DASHBOARD_CLIENT_SECRET", "client-secret")
+	t.Setenv("MAMACORD_DASHBOARD_SESSION_SECRET", strings.Repeat("s", 32))
+	t.Setenv("MAMACORD_DASHBOARD_SIGNING_KEY_ID", "official")
+	t.Setenv("MAMACORD_DASHBOARD_SIGNING_KEY_FILE", "./data/keys/official.key")
+	t.Setenv("MAMACORD_SLASH_COOLDOWN_MS", "9000")
+	t.Setenv("MAMACORD_COMPONENT_COOLDOWN_MS", "250")
+	t.Setenv("MAMACORD_MODAL_COOLDOWN_MS", "350")
+	t.Setenv("MAMACORD_SLASH_COOLDOWN_BYPASS", "ping, lookup:user")
+	t.Setenv("MAMACORD_SLASH_COOLDOWN_OVERRIDES_MS", "lookup:user=2500,manager:roles:add=1000")
 
 	cfg, err := config.LoadFromEnv()
 	if err != nil {
@@ -174,7 +174,7 @@ func TestLoadFromEnv_RejectsInvalidInputs(t *testing.T) {
 	t.Run("registration mode", func(t *testing.T) {
 		resetConfigEnv(t)
 		t.Setenv("DISCORD_TOKEN", "discord-token")
-		t.Setenv("MAMUSIABTW_COMMAND_REGISTRATION_MODE", "broken")
+		t.Setenv("MAMACORD_COMMAND_REGISTRATION_MODE", "broken")
 
 		if _, err := config.LoadFromEnv(); err == nil {
 			t.Fatalf("expected invalid registration mode error")
@@ -184,7 +184,7 @@ func TestLoadFromEnv_RejectsInvalidInputs(t *testing.T) {
 	t.Run("cooldown override", func(t *testing.T) {
 		resetConfigEnv(t)
 		t.Setenv("DISCORD_TOKEN", "discord-token")
-		t.Setenv("MAMUSIABTW_SLASH_COOLDOWN_OVERRIDES_MS", "lookup:user=nope")
+		t.Setenv("MAMACORD_SLASH_COOLDOWN_OVERRIDES_MS", "lookup:user=nope")
 
 		if _, err := config.LoadFromEnv(); err == nil {
 			t.Fatalf("expected invalid cooldown override error")
@@ -204,11 +204,11 @@ func TestLoadFromEnv_RejectsInvalidInputs(t *testing.T) {
 	t.Run("admin config", func(t *testing.T) {
 		resetConfigEnv(t)
 		t.Setenv("DISCORD_TOKEN", "discord-token")
-		t.Setenv("MAMUSIABTW_PROD_MODE", "1")
-		t.Setenv("MAMUSIABTW_ADMIN_ADDR", ":8081")
-		t.Setenv("MAMUSIABTW_DASHBOARD_CLIENT_ID", "client-id")
-		t.Setenv("MAMUSIABTW_DASHBOARD_CLIENT_SECRET", "client-secret")
-		t.Setenv("MAMUSIABTW_DASHBOARD_SESSION_SECRET", "too-short")
+		t.Setenv("MAMACORD_PROD_MODE", "1")
+		t.Setenv("MAMACORD_ADMIN_ADDR", ":8081")
+		t.Setenv("MAMACORD_DASHBOARD_CLIENT_ID", "client-id")
+		t.Setenv("MAMACORD_DASHBOARD_CLIENT_SECRET", "client-secret")
+		t.Setenv("MAMACORD_DASHBOARD_SESSION_SECRET", "too-short")
 
 		if _, err := config.LoadFromEnv(); err == nil {
 			t.Fatalf("expected invalid dashboard session secret error")
@@ -233,7 +233,7 @@ func TestLoadFromEnvOptionalDiscordToken_ReadsTokenWhenPresent(t *testing.T) {
 func TestShippedSchemaURLs(t *testing.T) {
 	t.Parallel()
 
-	const schemaBaseURL = "https://raw.githubusercontent.com/xsyetopz/go-mamusiabtw/refs/heads/main/schemas/"
+	const schemaBaseURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/"
 
 	cases := []struct {
 		path string
@@ -485,35 +485,35 @@ func resetConfigEnv(t *testing.T) {
 		"DISCORD_TOKEN",
 		"SQLITE_PATH",
 		"MIGRATIONS_DIR",
-		"MAMUSIABTW_MIGRATION_BACKUPS_DIR",
-		"MAMUSIABTW_OPS_ADDR",
-		"MAMUSIABTW_ADMIN_ADDR",
-		"MAMUSIABTW_PUBLIC_DASHBOARD_ORIGIN",
-		"MAMUSIABTW_PUBLIC_API_ORIGIN",
-		"MAMUSIABTW_DASHBOARD_ALLOWED_ORIGINS",
+		"MAMACORD_MIGRATION_BACKUPS_DIR",
+		"MAMACORD_OPS_ADDR",
+		"MAMACORD_ADMIN_ADDR",
+		"MAMACORD_PUBLIC_DASHBOARD_ORIGIN",
+		"MAMACORD_PUBLIC_API_ORIGIN",
+		"MAMACORD_DASHBOARD_ALLOWED_ORIGINS",
 		"LOCALES_DIR",
 		"PLUGINS_DIR",
-		"MAMUSIABTW_PERMISSIONS_FILE",
-		"MAMUSIABTW_MODULES_FILE",
+		"MAMACORD_PERMISSIONS_FILE",
+		"MAMACORD_MODULES_FILE",
 		"LOG_LEVEL",
-		"MAMUSIABTW_PROD_MODE",
-		"MAMUSIABTW_ALLOW_UNSIGNED_PLUGINS",
-		"MAMUSIABTW_TRUSTED_KEYS_FILE",
-		"MAMUSIABTW_DASHBOARD_CLIENT_ID",
-		"MAMUSIABTW_DASHBOARD_CLIENT_SECRET",
-		"MAMUSIABTW_DASHBOARD_SESSION_SECRET",
-		"MAMUSIABTW_DASHBOARD_SIGNING_KEY_ID",
-		"MAMUSIABTW_DASHBOARD_SIGNING_KEY_FILE",
+		"MAMACORD_PROD_MODE",
+		"MAMACORD_ALLOW_UNSIGNED_PLUGINS",
+		"MAMACORD_TRUSTED_KEYS_FILE",
+		"MAMACORD_DASHBOARD_CLIENT_ID",
+		"MAMACORD_DASHBOARD_CLIENT_SECRET",
+		"MAMACORD_DASHBOARD_SESSION_SECRET",
+		"MAMACORD_DASHBOARD_SIGNING_KEY_ID",
+		"MAMACORD_DASHBOARD_SIGNING_KEY_FILE",
 		"OWNER_USER_ID",
 		"DISCORD_DEV_GUILD_ID",
-		"MAMUSIABTW_COMMAND_REGISTRATION_MODE",
-		"MAMUSIABTW_COMMAND_GUILD_IDS",
-		"MAMUSIABTW_COMMAND_REGISTER_ALL_GUILDS",
-		"MAMUSIABTW_SLASH_COOLDOWN_MS",
-		"MAMUSIABTW_COMPONENT_COOLDOWN_MS",
-		"MAMUSIABTW_MODAL_COOLDOWN_MS",
-		"MAMUSIABTW_SLASH_COOLDOWN_BYPASS",
-		"MAMUSIABTW_SLASH_COOLDOWN_OVERRIDES_MS",
+		"MAMACORD_COMMAND_REGISTRATION_MODE",
+		"MAMACORD_COMMAND_GUILD_IDS",
+		"MAMACORD_COMMAND_REGISTER_ALL_GUILDS",
+		"MAMACORD_SLASH_COOLDOWN_MS",
+		"MAMACORD_COMPONENT_COOLDOWN_MS",
+		"MAMACORD_MODAL_COOLDOWN_MS",
+		"MAMACORD_SLASH_COOLDOWN_BYPASS",
+		"MAMACORD_SLASH_COOLDOWN_OVERRIDES_MS",
 	} {
 		t.Setenv(name, "")
 	}

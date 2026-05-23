@@ -29,7 +29,7 @@ jobs:
 
       - name: Build public site
         env:
-          MAMUSIABTW_SITE_BASE: /${{ github.event.repository.name }}/
+          MAMACORD_SITE_BASE: /${{ github.event.repository.name }}/
         run: bun --cwd apps/site run build
 
       - name: Upload Pages artifact

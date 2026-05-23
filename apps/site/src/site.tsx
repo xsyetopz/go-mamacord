@@ -1,4 +1,4 @@
-import { AppFrame, SectionCard, SectionTitle } from "@mamusiabtw/web-ui";
+import { AppFrame, SectionCard, SectionTitle } from "@mamacord/web-ui";
 import {
 	Badge,
 	Button,
@@ -47,15 +47,15 @@ export function SiteApp() {
 								One bot runtime. Separate public site. Separate admin dashboard.
 							</Text>
 							<Text size="lg" c="dimmed" maw={760}>
-								mamusiabtw keeps the landing page, docs, examples, and plugin
-								API reference public while the admin dashboard stays isolated
-								behind Discord auth.
+								mamacord keeps the landing page, docs, examples, and plugin API
+								reference public while the admin dashboard stays isolated behind
+								Discord auth.
 							</Text>
 						</Stack>
 						<Group gap="sm">
 							<Button
 								component="a"
-								href="https://github.com/xsyetopz/go-mamusiabtw"
+								href="https://github.com/xsyetopz/go-mamacord"
 							>
 								Open Repository
 							</Button>
