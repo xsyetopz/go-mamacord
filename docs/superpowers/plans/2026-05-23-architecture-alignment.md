@@ -8,6 +8,8 @@
 
 **Tech Stack:** Go, Bun/Vite/React, Postgres, Docker, GitHub Actions, Lua plugin runtime
 
+**Status:** Completed and re-verified on 2026-05-24.
+
 ---
 
 ## Progress rules

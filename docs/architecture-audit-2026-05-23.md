@@ -13,6 +13,16 @@ Current implementation progress against this audit is tracked in:
 
 - `docs/superpowers/plans/2026-05-23-architecture-alignment.md`
 
+Completion audit status:
+
+- 2026-05-24: the alignment tracker is fully checked and re-verified against current repo state
+- current evidence includes:
+  - `GOCACHE=/private/tmp/go-build-cache go test ./... -count=1`
+  - live Postgres-backed integration packages against a real local Postgres instance
+  - `bun run --cwd apps/dashboard build`
+  - `bun run --cwd apps/site build`
+  - `docker build .`
+
 The file below is a baseline audit document, not a live generated inventory. Historical package paths, tree names, and pressure-point notes may describe the 2026-05-23 baseline that the tracker has since been driving out of the repo.
 
 ---
