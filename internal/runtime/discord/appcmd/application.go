@@ -127,7 +127,7 @@ func (d Dispatcher) OnAutocomplete(e *events.AutocompleteInteractionCreate) {
 		UserID:    e.User().ID.String(),
 		Locale:    e.Locale().Code(),
 		IsOwner:   isOwner,
-		Options:   router.PluginAutocompleteOptions(data),
+		Options:   pluginhost.PayloadOptionsFromMap(router.PluginAutocompleteOptions(data)),
 	})
 	if err != nil {
 		d.incInteractionFailure()
@@ -256,7 +256,7 @@ func (d Dispatcher) handlePluginSlash(
 		UserID:      e.User().ID.String(),
 		Locale:      locale.Code(),
 		IsOwner:     isOwner,
-		Options:     router.PluginOptions(data),
+		Options:     pluginhost.PayloadOptionsFromMap(router.PluginOptions(data)),
 		Interaction: interaction,
 	})
 	if err != nil {
@@ -311,7 +311,7 @@ func (d Dispatcher) handlePluginUserCommand(
 		UserID:      e.User().ID.String(),
 		Locale:      locale.Code(),
 		IsOwner:     isOwner,
-		Options:     router.PluginUserContextOptions(data),
+		Options:     pluginhost.PayloadOptionsFromMap(router.PluginUserContextOptions(data)),
 		Interaction: interaction,
 	})
 	if err != nil {
@@ -366,7 +366,7 @@ func (d Dispatcher) handlePluginMessageCommand(
 		UserID:      e.User().ID.String(),
 		Locale:      locale.Code(),
 		IsOwner:     isOwner,
-		Options:     router.PluginMessageContextOptions(data),
+		Options:     pluginhost.PayloadOptionsFromMap(router.PluginMessageContextOptions(data)),
 		Interaction: interaction,
 	})
 	if err != nil {

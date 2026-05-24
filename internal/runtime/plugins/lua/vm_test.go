@@ -29,6 +29,18 @@ func (fn roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) 
 	return fn(req)
 }
 
+func TestVMPayloadOptionsBoundaryIsTyped(t *testing.T) {
+	t.Parallel()
+
+	bytes, err := os.ReadFile("vm.go")
+	if err != nil {
+		t.Fatalf("read vm.go: %v", err)
+	}
+	if strings.Contains(string(bytes), "Options     map[string]any") {
+		t.Fatal("vm.go still exposes plugin payload options as raw map[string]any at the host <-> lua boundary")
+	}
+}
+
 func bundledFirstPartyPluginDir(t *testing.T, pluginID string) string {
 	t.Helper()
 
@@ -527,7 +539,7 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteComponent, "inc", luaplugin.Payload{
 		GuildID: "1",
 		Locale:  "en-GB",
-		Options: map[string]any{"type": "button"},
+		Options: luaplugin.NewPayloadOptions(map[string]any{"type": "button"}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(component): %v", err)
@@ -547,9 +559,9 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteModal, "set_counter", luaplugin.Payload{
 		GuildID: "1",
 		Locale:  "en-GB",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"fields": map[string]any{"value": "5"},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(modal): %v", err)
@@ -604,11 +616,11 @@ return bot.plugin({
 
 	got, err := vm.CallAutocomplete(context.Background(), "topic_lookup", luaplugin.Payload{
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__command": "lookup",
 			"__option":  "topic",
 			"__value":   "a",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallAutocomplete: %v", err)
@@ -824,10 +836,10 @@ func TestFunPluginRoutes(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteCommand, "roll", luaplugin.Payload{
 		UserID: "42",
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"number": 2,
 			"sides":  6,
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(roll): %v", err)
@@ -853,9 +865,9 @@ func TestFunPluginRoutes(t *testing.T) {
 		GuildID: "1",
 		UserID:  "42",
 		Locale:  "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"user": "99",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(hug): %v", err)
@@ -879,9 +891,9 @@ func TestFunPluginRoutes(t *testing.T) {
 		GuildID: "1",
 		UserID:  "42",
 		Locale:  "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"message": "maybe",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(shrug): %v", err)
@@ -949,10 +961,10 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	got, hasValue, err := vm.CallRoute(ctx, luaplugin.RouteCommand, "timezone", luaplugin.Payload{
 		UserID: "42",
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "set",
 			"iana":         "Europe/Tallinn",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(timezone set): %v", err)
@@ -971,9 +983,9 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteCommand, "checkin", luaplugin.Payload{
 		UserID: "42",
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"mood": 5,
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(checkin): %v", err)
@@ -987,12 +999,12 @@ func TestWellnessPluginRoutes(t *testing.T) {
 		ChannelID: "11",
 		UserID:    "42",
 		Locale:    "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "create",
 			"schedule":     "0 9 * * *",
 			"kind":         "hydrate",
 			"delivery":     "dm",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(remind create): %v", err)
@@ -1020,9 +1032,9 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteCommand, "remind", luaplugin.Payload{
 		UserID: "42",
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "delete",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(remind delete): %v", err)
@@ -1042,10 +1054,10 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	got, hasValue, err = vm.CallRoute(ctx, luaplugin.RouteComponent, "delete_reminder", luaplugin.Payload{
 		UserID: "42",
 		Locale: "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"type":   "string_select",
 			"values": []any{listed[0].ID},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(delete_reminder): %v", err)
@@ -1133,10 +1145,10 @@ func TestInfoPluginRoutes(t *testing.T) {
 		UserID:      "42",
 		Locale:      "en-US",
 		Interaction: interaction,
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "user",
 			"user":         "55",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup user): %v", err)
@@ -1159,9 +1171,9 @@ func TestInfoPluginRoutes(t *testing.T) {
 		UserID:      "42",
 		Locale:      "en-US",
 		Interaction: interaction,
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "guild",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup guild): %v", err)
@@ -1180,10 +1192,10 @@ func TestInfoPluginRoutes(t *testing.T) {
 		UserID:      "42",
 		Locale:      "en-US",
 		Interaction: interaction,
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "guild",
 			"guild_id":     "999",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup guild other): %v", err)
@@ -1218,10 +1230,10 @@ func TestInfoPluginRoutes(t *testing.T) {
 		Locale:      "en-US",
 		IsOwner:     true,
 		Interaction: interaction,
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "guild",
 			"guild_id":     "999",
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup guild other owner): %v", err)
@@ -1238,7 +1250,7 @@ func TestInfoPluginRoutes(t *testing.T) {
 		ChannelID: "555",
 		UserID:    "42",
 		Locale:    "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "role",
 			"role":         "1234",
 			"__resolved:role": map[string]any{
@@ -1253,7 +1265,7 @@ func TestInfoPluginRoutes(t *testing.T) {
 				"permissions": "123456",
 				"created_at":  time.Unix(1_700_000_600, 0).Unix(),
 			},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup role): %v", err)
@@ -1267,7 +1279,7 @@ func TestInfoPluginRoutes(t *testing.T) {
 		ChannelID: "555",
 		UserID:    "42",
 		Locale:    "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"__subcommand": "channel",
 			"channel":      "555",
 			"__resolved:channel": map[string]any{
@@ -1279,7 +1291,7 @@ func TestInfoPluginRoutes(t *testing.T) {
 				"parent_id":   "444",
 				"created_at":  time.Unix(1_700_000_700, 0).Unix(),
 			},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(lookup channel): %v", err)
@@ -1365,7 +1377,7 @@ func TestModerationPluginRoutes(t *testing.T) {
 			GuildID: "7",
 			UserID:  "42",
 			Locale:  "en-US",
-			Options: baseOptions,
+			Options: luaplugin.NewPayloadOptions(baseOptions),
 		})
 		if callErr != nil {
 			t.Fatalf("CallRoute(warn %d): %v", i+1, callErr)
@@ -1415,7 +1427,7 @@ func TestModerationPluginRoutes(t *testing.T) {
 		GuildID: "7",
 		UserID:  "42",
 		Locale:  "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"user": "99",
 			"__resolved:user": map[string]any{
 				"id":      "99",
@@ -1423,7 +1435,7 @@ func TestModerationPluginRoutes(t *testing.T) {
 				"system":  false,
 				"mention": "<@99>",
 			},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(unwarn): %v", err)
@@ -1445,10 +1457,10 @@ func TestModerationPluginRoutes(t *testing.T) {
 		GuildID: "7",
 		UserID:  "42",
 		Locale:  "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"type":   "string_select",
 			"values": []any{value},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(unwarn_select): %v", err)
@@ -1531,7 +1543,7 @@ func TestModerationPluginWarnTimeoutFailure(t *testing.T) {
 			GuildID: "7",
 			UserID:  "42",
 			Locale:  "en-US",
-			Options: options,
+			Options: luaplugin.NewPayloadOptions(options),
 		})
 		if callErr != nil {
 			t.Fatalf("CallRoute(warn %d): %v", i+1, callErr)
@@ -1967,9 +1979,9 @@ func TestManagerPluginRoutes(t *testing.T) {
 		ChannelID: "9",
 		UserID:    "42",
 		Locale:    "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"seconds": 5,
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(slowmode): %v", err)
@@ -1993,7 +2005,7 @@ func TestManagerPluginRoutes(t *testing.T) {
 		GuildID: "1",
 		UserID:  "42",
 		Locale:  "en-US",
-		Options: map[string]any{
+		Options: luaplugin.NewPayloadOptions(map[string]any{
 			"user":     "99",
 			"nickname": "Captain",
 			"__resolved:user": map[string]any{
@@ -2002,7 +2014,7 @@ func TestManagerPluginRoutes(t *testing.T) {
 				"bot":     false,
 				"system":  false,
 			},
-		},
+		}),
 	})
 	if err != nil {
 		t.Fatalf("CallRoute(nick): %v", err)

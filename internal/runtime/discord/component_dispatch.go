@@ -92,7 +92,7 @@ func (b *Bot) handlePluginComponent(
 		ChannelID: e.Channel().ID().String(),
 		UserID:    e.User().ID.String(),
 		Locale:    locale.Code(),
-		Options:   router.ComponentOptions(e),
+		Options:   pluginhost.PayloadOptionsFromMap(router.ComponentOptions(e)),
 	})
 	if err != nil {
 		b.incInteractionFailure()

@@ -196,9 +196,9 @@ func (p *Automation) RunJob(ctx context.Context, job pluginhost.PluginJob) {
 			ChannelID: "",
 			UserID:    "",
 			Locale:    locale,
-			Options: map[string]any{
+			Options: pluginhost.PayloadOptionsFromMap(map[string]any{
 				"job_id": job.JobID,
-			},
+			}),
 		})
 		cancel()
 		if err != nil || !hasValue {

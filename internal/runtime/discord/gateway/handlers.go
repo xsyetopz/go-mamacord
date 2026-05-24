@@ -194,7 +194,7 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 			ChannelID: "",
 			UserID:    user.ID.String(),
 			Locale:    "",
-			Options:   map[string]any{},
+			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
 		})
 	}
 }
@@ -230,7 +230,7 @@ func (h Handlers) OnGuildMemberLeave(e *events.GuildMemberLeave) {
 			ChannelID: "",
 			UserID:    user.ID.String(),
 			Locale:    "",
-			Options:   map[string]any{},
+			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
 		})
 	}
 }
@@ -252,7 +252,7 @@ func (h Handlers) OnGuildBan(e *events.GuildBan) {
 			ChannelID: "",
 			UserID:    e.User.ID.String(),
 			Locale:    "",
-			Options:   map[string]any{},
+			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
 		})
 	}
 }
@@ -274,7 +274,7 @@ func (h Handlers) OnGuildUnban(e *events.GuildUnban) {
 			ChannelID: "",
 			UserID:    e.User.ID.String(),
 			Locale:    "",
-			Options:   map[string]any{},
+			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
 		})
 	}
 }

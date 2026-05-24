@@ -71,7 +71,7 @@ func (b *Bot) onModal(e *events.ModalSubmitInteractionCreate) {
 		ChannelID: e.Channel().ID().String(),
 		UserID:    e.User().ID.String(),
 		Locale:    locale.Code(),
-		Options:   router.ModalOptions(e, pluginID),
+		Options:   pluginhost.PayloadOptionsFromMap(router.ModalOptions(e, pluginID)),
 	})
 	if err != nil {
 		b.incInteractionFailure()

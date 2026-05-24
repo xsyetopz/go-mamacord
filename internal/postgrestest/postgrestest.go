@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
 	"github.com/xsyetopz/go-mamacord/internal/postgres"
@@ -42,7 +43,7 @@ func OpenSchemaDSN(t testing.TB) string {
 		t.Fatalf("postgres.Open(admin): %v", err)
 	}
 
-	schemaName := fmt.Sprintf("mamacord_test_%d", atomic.AddUint64(&schemaCounter, 1))
+	schemaName := nextSchemaName()
 	if _, err := adminDB.ExecContext(ctx, "CREATE SCHEMA "+quoteIdent(schemaName)); err != nil {
 		_ = adminDB.Close()
 		t.Fatalf("create schema %q: %v", schemaName, err)
@@ -88,6 +89,15 @@ func dsnWithSearchPath(t testing.TB, rawDSN string, searchPath string) string {
 
 func quoteIdent(value string) string {
 	return `"` + strings.ReplaceAll(value, `"`, `""`) + `"`
+}
+
+func nextSchemaName() string {
+	return fmt.Sprintf(
+		"mamacord_test_%d_%d_%d",
+		os.Getpid(),
+		time.Now().UnixNano(),
+		atomic.AddUint64(&schemaCounter, 1),
+	)
 }
 
 func repoRoot(t testing.TB) string {

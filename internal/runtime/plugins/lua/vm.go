@@ -60,7 +60,7 @@ type Payload struct {
 	UserID      string
 	Locale      string
 	IsOwner     bool
-	Options     map[string]any
+	Options     PayloadOptions
 	Interaction pluginbridge.Interaction
 }
 
@@ -594,7 +594,7 @@ func (v *VM) payloadToLua(p Payload) (*lua.LTable, error) {
 	t.RawSetString("locale", lua.LString(strings.TrimSpace(p.Locale)))
 
 	opts := v.L.NewTable()
-	for name, val := range p.Options {
+	for name, val := range p.Options.Map() {
 		name = strings.TrimSpace(name)
 		if name == "" {
 			continue

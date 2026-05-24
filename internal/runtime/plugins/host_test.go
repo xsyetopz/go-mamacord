@@ -52,6 +52,18 @@ func TestHostGoDoesNotUseLuaBridgeType(t *testing.T) {
 	}
 }
 
+func TestHostPayloadOptionsBoundaryIsTyped(t *testing.T) {
+	t.Parallel()
+
+	bytes, err := os.ReadFile("host.go")
+	if err != nil {
+		t.Fatalf("read host.go: %v", err)
+	}
+	if strings.Contains(string(bytes), "Options     map[string]any") {
+		t.Fatal("host.go still exposes plugin payload options as raw map[string]any at the host <-> lua boundary")
+	}
+}
+
 func TestHostLoadGoWrapsLuaBridgeAtLuaBoundary(t *testing.T) {
 	t.Parallel()
 

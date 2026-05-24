@@ -8,14 +8,10 @@ import (
 	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
-func defaultEphemeralForCommand(cmd Command, opts map[string]any) bool {
+func defaultEphemeralForCommand(cmd Command, opts luaplugin.PayloadOptions) bool {
 	if NormalizeCommandType(cmd.Type) != CommandTypeSlash {
 		return cmd.Ephemeral
 	}
-	if opts == nil {
-		return cmd.Ephemeral
-	}
-
 	sub := readPayloadString(opts, "__subcommand")
 	if sub == "" {
 		return cmd.Ephemeral
@@ -30,11 +26,8 @@ func defaultEphemeralForCommand(cmd Command, opts map[string]any) bool {
 	return defaultEphemeralFromSubcommands(cmd.Subcommands, sub, cmd.Ephemeral)
 }
 
-func readPayloadString(opts map[string]any, key string) string {
-	if opts == nil {
-		return ""
-	}
-	v, ok := opts[key]
+func readPayloadString(opts luaplugin.PayloadOptions, key string) string {
+	v, ok := opts.Lookup(key)
 	if !ok {
 		return ""
 	}

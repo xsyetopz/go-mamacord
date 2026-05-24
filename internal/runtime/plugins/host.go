@@ -99,8 +99,12 @@ type Payload struct {
 	UserID      string
 	Locale      string
 	IsOwner     bool
-	Options     map[string]any
+	Options     luaplugin.PayloadOptions
 	Interaction pluginbridge.Interaction
+}
+
+func PayloadOptionsFromMap(options map[string]any) luaplugin.PayloadOptions {
+	return luaplugin.NewPayloadOptions(options)
 }
 
 func NewHost(opts Options) (*Host, error) {
