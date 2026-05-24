@@ -10,9 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
@@ -73,9 +73,9 @@ jobs:
           --health-timeout=5s
           --health-retries=12
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
@@ -96,7 +96,7 @@ jobs:
   web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -106,9 +106,9 @@ jobs:
         run: bun install
 
       - name: Build dashboard
-        run: bun --cwd apps/dashboard run build
+        run: bun run --cwd apps/dashboard build
 
       - name: Build public site
         env:
           MAMACORD_SITE_BASE: /${{ github.event.repository.name }}/
-        run: bun --cwd apps/site run build
+        run: bun run --cwd apps/site build
