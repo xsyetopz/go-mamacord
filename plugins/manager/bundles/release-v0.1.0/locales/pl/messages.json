@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Ustaw lub zmien slowmode na kanale."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Ktory kanal?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Sekundy miedzy wiadomosciami (0 zeby usunac)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Zmien nick czlonka."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "Komu zmienic nick?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Nowy nick (puste = reset)."
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Posprzataj wiadomosci na kanale."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Usun ostatnie wiadomosci."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Usun wiadomosci sprzed wiadomosci."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Usun wiadomosci po wiadomosci."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Usun wiadomosci wokol wiadomosci."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Ile wiadomosci? (Delikatnie.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "ID wiadomosci lub link."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Zarzadzaj rolami."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Utworz role."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Edytuj role."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Usun role."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Dodaj role czlonkowi."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Usun role czlonkowi."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Ktora rola?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Ktory czlonek?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Nazwa roli."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Kolor roli (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Pokazywac osobno na liscie czlonkow?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Pozwolic na @wzmianki?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Zarzadzaj emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Utworz emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Zmien nazwe emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Usun emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Nazwa emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Obraz emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Wzmianka emoji (<:name:id>) lub ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Zarzadzaj naklejkami."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Utworz naklejke."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Edytuj naklejke."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Usun naklejke."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "ID naklejki lub link."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Nazwa naklejki."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Opis naklejki (opcjonalnie)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Tag emoji (Discord tego wymaga)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Obraz naklejki."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Dobrze, {{.Pet}}. {{.Channel}} ma slowmode: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "No i super, {{.Pet}}~. Slowmode wylaczony na {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla zmienic slowmode."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "{{.Pet}}, nie moge zmienic twojego wlasnego nicku."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Dobrze, {{.Pet}}. {{.User}} ma teraz `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Dobrze, {{.Pet}}. Zresetowalam nick {{.User}}."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla zmienic nicku {{.User}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "{{.Pet}}, to nie wyglada na poprawne ID/link wiadomosci."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "Posprzatane, {{.Pet}}. Usunelam `{{.Count}}` wiadomosci."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla usunac tych wiadomosci."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "{{.Pet}}, ten kolor jest niepoprawny: `{{.Colour}}` (RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "{{.Pet}}, nie ruszaj `@everyone`."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "{{.Pet}}, nie ruszaj `@everyone`."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "Gotowe, {{.Pet}}. {{.Role}} zostala utworzona."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla utworzyc `@{{.Name}}`."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "Gotowe, {{.Pet}}. {{.Role}} zostala zaktualizowana."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla edytowac {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Dobrze, {{.Pet}}. `@{{.Name}}` jest usunieta."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla usunac {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "Gotowe, {{.Pet}}. {{.User}} ma {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla dodac {{.Role}} do {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "Gotowe, {{.Pet}}. Usunelam {{.Role}} od {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla usunac {{.Role}} od {{.User}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "{{.Pet}}, potrzebuje zalacznika."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "{{.Pet}}, plik jest za duzy ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "{{.Pet}}, to rozszerzenie nie dziala dla emoji: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "{{.Pet}}, ten serwer ma limit emoji (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Pet}}, {{.Mommy}} moze pobierac tylko z CDN Discorda."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "{{.Pet}}, nie moglam odczytac rozmiaru obrazu."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "{{.Pet}}, obraz jest za duzy na emoji: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "{{.Pet}}, ten typ obrazu nie jest wspierany."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "{{.Pet}}, to nie wyglada na poprawne emoji: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Slodkie! {{.Pet}}, `:{{.Name}}:` zostalo utworzone."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla utworzyc `:{{.Name}}:`."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Dobrze, {{.Pet}}. Zmienilam nazwe na `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla zmienic nazwy emoji."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Dobrze, {{.Pet}}. Emoji usuniete."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla usunac emoji."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "{{.Pet}}, potrzebuje zalacznika."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "{{.Pet}}, Discord wymaga tagu emoji."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "{{.Pet}}, plik jest za duzy ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "{{.Pet}}, to rozszerzenie nie dziala dla naklejki: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "{{.Pet}}, ten serwer ma limit naklejek (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Pet}}, {{.Mommy}} moze pobierac tylko z CDN Discorda."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "{{.Pet}}, nie moglam odczytac rozmiaru obrazu."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "{{.Pet}}, obraz jest za duzy na naklejke: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "{{.Pet}}, to ID/link naklejki wyglada dziwnie: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Gotowe, {{.Pet}}~. `{{.Name}}` zostala utworzona. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla utworzyc `{{.Name}}`."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Gotowe, {{.Pet}}~. `{{.Name}}` zostala zaktualizowana. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla edytowac naklejki."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Dobrze, {{.Pet}}~. Naklejka usunieta. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} nie mogla usunac naklejki."
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "cmd.flip.name",
+    "translation": "flip"
+  },
+  {
+    "id": "cmd.flip.desc",
+    "translation": "Підкинути монетку."
+  },
+  {
+    "id": "cmd.roll.name",
+    "translation": "roll"
+  },
+  {
+    "id": "cmd.roll.desc",
+    "translation": "Кинути кубики."
+  },
+  {
+    "id": "cmd.roll.opt.number.name",
+    "translation": "number"
+  },
+  {
+    "id": "cmd.roll.opt.number.desc",
+    "translation": "Скільки кубиків?"
+  },
+  {
+    "id": "cmd.roll.opt.sides.name",
+    "translation": "sides"
+  },
+  {
+    "id": "cmd.roll.opt.sides.desc",
+    "translation": "Скільки граней у кубика?"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.name",
+    "translation": "modifier"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.desc",
+    "translation": "Який модифікатор додати?"
+  },
+  {
+    "id": "cmd.8ball.name",
+    "translation": "8ball"
+  },
+  {
+    "id": "cmd.8ball.desc",
+    "translation": "Запитати магічну кулю 8."
+  },
+  {
+    "id": "cmd.8ball.opt.question.name",
+    "translation": "question"
+  },
+  {
+    "id": "cmd.8ball.opt.question.desc",
+    "translation": "Яке питання поставити?"
+  },
+  {
+    "id": "cmd.hug.name",
+    "translation": "hug"
+  },
+  {
+    "id": "cmd.hug.desc",
+    "translation": "Обійняти когось."
+  },
+  {
+    "id": "cmd.hug.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.hug.opt.user.desc",
+    "translation": "Кого обійняти?"
+  },
+  {
+    "id": "cmd.pat.name",
+    "translation": "pat"
+  },
+  {
+    "id": "cmd.pat.desc",
+    "translation": "Погладити когось по голові."
+  },
+  {
+    "id": "cmd.pat.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.pat.opt.user.desc",
+    "translation": "Кого погладити?"
+  },
+  {
+    "id": "cmd.poke.name",
+    "translation": "poke"
+  },
+  {
+    "id": "cmd.poke.desc",
+    "translation": "Тицнути когось (обережно)."
+  },
+  {
+    "id": "cmd.poke.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.poke.opt.user.desc",
+    "translation": "Кого тицнути?"
+  },
+  {
+    "id": "cmd.shrug.name",
+    "translation": "shrug"
+  },
+  {
+    "id": "cmd.shrug.desc",
+    "translation": "Знизати плечима."
+  },
+  {
+    "id": "cmd.shrug.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.shrug.opt.message.desc",
+    "translation": "Хочеш щось додати?"
+  },
+  {
+    "id": "fun.flip.result",
+    "translation": ":coin: Орел чи решка, {{.Pet}}? {{.User}} підкинув монетку і випало `{{.Result}}`."
+  },
+  {
+    "id": "fun.roll.invalid_sides",
+    "translation": "Такий кубик не підтримується, {{.Pet}}: `{{.Sides}}`. Спробуй 4, 6, 8, 10, 12 або 20."
+  },
+  {
+    "id": "fun.roll.result",
+    "translation": ":game_die: {{.Pet}}, {{.User}} кинув `{{.Notation}}` і отримав `{{.Total}}`."
+  },
+  {
+    "id": "fun.8ball.question_error",
+    "translation": "Це не схоже на відкрите питання, {{.Pet}}: `{{.Question}}`"
+  },
+  {
+    "id": "fun.8ball.result",
+    "translation": ":8ball: {{.Answer}}, {{.Pet}}."
+  },
+  {
+    "id": "fun.kawaii.footer",
+    "translation": "Працює на Kawaii API"
+  },
+  {
+    "id": "fun.kawaii.error",
+    "translation": "{{.Pet}}, {{.Mommy}} не змогла отримати GIF."
+  },
+  {
+    "id": "fun.kawaii.self_error",
+    "translation": "Не про себе, {{.Pet}}."
+  },
+  {
+    "id": "fun.kawaii.user_mention_only",
+    "translation": "{{.Emoji}} {{.User}}"
+  }
+]

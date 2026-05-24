@@ -7,7 +7,7 @@ import (
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/gateway"
 
-	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
@@ -52,11 +52,14 @@ func (b *Bot) initPlugins(deps Dependencies) error {
 			ProdMode:            deps.ProdMode,
 			AllowUnsignedPlugin: deps.AllowUnsignedPlugins,
 			TrustedKeysFile:     deps.TrustedKeysFile,
+			Bundles:             deps.Bundles,
 			PermissionsFile:     deps.PermissionsFile,
 			Store:               deps.Store,
-			Discord: discordplugin.Executor{
-				ClientProvider:      func() *bot.Client { return b.client },
-				EnsureDMChannelFunc: b.ensureDMChannel,
+			Bridge: pluginhost.Bridge{
+				Discord: discordpluginbridge.Executor{
+					ClientProvider:      func() *bot.Client { return b.client },
+					EnsureDMChannelFunc: b.ensureDMChannel,
+				},
 			},
 			Logger: b.logger,
 			I18n:   &b.i18n,

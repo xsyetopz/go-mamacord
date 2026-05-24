@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "Научи какво съм (и коя версия работи)."
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "Провери потребители, сървъри, роли и канали."
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "Провери потребител."
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "Кой потребител? (Остави празно, за да провериш себе си.)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "Провери този сървър."
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "Провери роля."
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "Коя роля да погледне мама?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "Провери канал."
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "Кой канал да погледне мама?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 Bot"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ System"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 Locale"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 Created"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 Joined"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ Roles"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ Roles"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 Emojis"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ Stickers"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 Members"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 Channels"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 Created"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ Mention"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 Position"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 Hoist"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 Mentionable"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 Managed"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 Permissions"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 Created"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 Mention"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 Type"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ Category"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 Permissions"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 Created"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} couldn't fetch that user's info, {{.Pet}}."
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} couldn't fetch this server's info, {{.Pet}}."
+  }
+]

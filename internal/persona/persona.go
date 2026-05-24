@@ -4,8 +4,6 @@ import (
 	"encoding/binary"
 	"hash/fnv"
 	"strings"
-
-	"github.com/disgoorg/disgo/discord"
 )
 
 const (
@@ -38,9 +36,9 @@ const (
 	mommyZHTW     = "媽咪"
 )
 
-func Mommy(locale discord.Locale) string {
+func Mommy(locale string) string {
 	// Keep the persona fixed, but allow minor locale-adjacent wording.
-	code := strings.ToLower(strings.TrimSpace(locale.Code()))
+	code := strings.ToLower(strings.TrimSpace(locale))
 	mommyByLocale := map[string]string{
 		"bg":     mommyCyrillic,
 		"cs":     mommyCzech,
@@ -80,14 +78,14 @@ func Mommy(locale discord.Locale) string {
 	return mommyDefault
 }
 
-func PetName(locale discord.Locale, userID uint64, messageID string) string {
+func PetName(locale string, userID uint64, messageID string) string {
 	terms := petTerms(locale)
 	if len(terms) == 0 {
 		return "kiddo"
 	}
 
 	h := fnv.New64a()
-	_, _ = h.Write([]byte(locale.Code()))
+	_, _ = h.Write([]byte(strings.TrimSpace(locale)))
 	_, _ = h.Write([]byte{0})
 	_, _ = h.Write([]byte(strings.TrimSpace(messageID)))
 	_, _ = h.Write([]byte{0})
@@ -104,8 +102,8 @@ func PetName(locale discord.Locale, userID uint64, messageID string) string {
 	return terms[int(mod)]
 }
 
-func petTerms(locale discord.Locale) []string {
-	code := strings.ToLower(strings.TrimSpace(locale.Code()))
+func petTerms(locale string) []string {
+	code := strings.ToLower(strings.TrimSpace(locale))
 	if code == "" {
 		return defaultPetTerms()
 	}

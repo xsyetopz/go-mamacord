@@ -12,8 +12,8 @@ import (
 	"github.com/disgoorg/disgo/rest"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
-	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
+	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
@@ -57,7 +57,7 @@ type GuildStickerInfo struct {
 	Tags        string
 }
 
-func (b *Bot) ModuleInfos() []commandapi.ModuleInfo {
+func (b *Bot) ModuleInfos() []moduleapi.Info {
 	if b == nil {
 		return nil
 	}
@@ -335,8 +335,8 @@ func (b *Bot) DeleteSticker(ctx context.Context, spec pluginhostlua.StickerDelet
 	return b.executor().DeleteSticker(ctx, spec)
 }
 
-func (b *Bot) executor() discordplugin.Executor {
-	return discordplugin.Executor{
+func (b *Bot) executor() discordpluginbridge.Executor {
+	return discordpluginbridge.Executor{
 		ClientProvider:      func() *bot.Client { return b.client },
 		EnsureDMChannelFunc: b.ensureDMChannel,
 	}

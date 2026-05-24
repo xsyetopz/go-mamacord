@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Règle ton fuseau horaire pour que les rappels de Maman tombent au bon moment."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Définir ton fuseau horaire (IANA, ex: Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Afficher ton fuseau horaire actuel."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Effacer ton fuseau horaire enregistre."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Nom du fuseau horaire (ex: Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... Je ne reconnais pas ce fuseau horaire: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "D'accord, {{.Pet}}~. J'utiliserai `{{.Timezone}}` pour tes rappels. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Tu n'as pas encore defini de fuseau horaire, {{.Pet}}. Utilise `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Pour l'instant tu es sur `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "C'est efface, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Dis à Maman comment tu vas aujourd'hui."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Ton humeur: 1 (dur) à 5 (super)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Afficher tes derniers check-ins au lieu d'en enregistrer un nouveau."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Donne à {{.Mommy}} un nombre de 1 à 5, {{.Pet}}... ou mets `history=true` pour voir tes derniers check-ins."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Ca doit être 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Merci, {{.Pet}}~. J'ai enregistre `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Pas de check-ins pour l'instant, {{.Pet}}. Commencer petit, c'est courageux."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Voici tes derniers check-ins, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Définir des rappels doux (Maman te fera un petit rappel)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Créér un rappel."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Lister tes rappels."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Supprimer un rappel."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron (ex: `0 9 * * *`) ou `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Quel type de rappel ?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Petite note (optionnel, max 120 caracteres)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Ou l'envoyer ? (dm ou channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Quel canal ? (seulement si delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID du rappel."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Ce planning n'a pas l'air bon, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Si tu choisis l'envoi en canal, choisis aussi un canal, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "C'est bon, {{.Pet}}~. Je te rappellerai à {{.NextRun}} - `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Pas de rappels pour l'instant, {{.Pet}}. Utilise `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Voici tes rappels, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Choisis un rappel..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Quel rappel {{.Mommy}} doit supprimer, {{.Pet}} ?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Ce menu à expire, {{.Pet}}. Relance `/remind delete`."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Pas touche, {{.Pet}}. Ce n'est pas à toi."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Je n'ai pas trouve ce rappel, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Supprime. Bien joue, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Coucou {{.Pet}}. Rappel doux: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "boire un peu d'eau"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "faire un petit étirement"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "respirer lentement"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "prendre tes medicaments"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "te préparer à dormir"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "faire un petit check-in"
+  }
+]

@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Sæt en kanal i slowmode (hold roen)."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Hvilken kanal skal have mere ro?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Sekunder mellem beskeder (0 for at fjerne)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Skift nogens kaldenavn."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "Hvem ændrer vi kaldenavn for?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Hvad skal mamma sætte det til? (Lad stå tomt for at nulstille.)"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Ryd op i beskeder i en kanal."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Slet nylige beskeder."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Slet beskeder før en besked."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Slet beskeder efter en besked."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Slet beskeder omkring en besked."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Hvor mange beskeder? (Vær blid.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "Besked-ID eller beskedlink."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Administrer roller på din server."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Opret en ny rolle."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Redigér en rolle."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Slet en rolle."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Tilføj en rolle til et medlem."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Fjern en rolle fra et medlem."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Hvilken rolle?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Hvilket medlem?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Rollenavn."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Rollefarve (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Vis separat i medlemslisten?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Tillad @mentions?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Administrer emojis på din server."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Opret en emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Omdøb en emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Slet en emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Emoji-navn."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Emoji-billede."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Emoji-mention (<:name:id>) eller ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Administrer stickers på din server."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Opret en sticker."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Redigér en sticker."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Slet en sticker."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "Sticker-ID eller sticker-link."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Sticker-navn."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Sticker-beskrivelse (valgfrit)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Emoji-tag (Discord kræver dette)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Sticker-billede."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Okay, {{.Pet}}. {{.Channel}} er i slowmode: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "Sådan, {{.Pet}}~ Slowmode er slået fra i {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Mommy}} kunne ikke opdatere slowmode, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "Jeg kan ikke ændre dit eget kaldenavn, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Okay, {{.Pet}}. {{.User}} er nu `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Okay, {{.Pet}}. Jeg nulstillede {{.User}}s kaldenavn."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Mommy}} kunne ikke opdatere {{.User}}s kaldenavn, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "Det ligner ikke et gyldigt besked-ID eller link, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "Alt ryddet op, {{.Pet}}. Slettede `{{.Count}}` besked(er)."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Mommy}} kunne ikke slette de beskeder, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "Den farve er ikke rigtig, {{.Pet}}: `{{.Colour}}` (forventer RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "Hænderne væk fra `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "Hænderne væk fra `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "Alt sat, {{.Pet}}. {{.Role}} blev oprettet."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Mommy}} kunne ikke oprette `@{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "Alt sat, {{.Pet}}. {{.Role}} blev opdateret."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Mommy}} kunne ikke redigere {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Okay, {{.Pet}}. `@{{.Name}}` er væk."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Mommy}} kunne ikke slette {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "Alt sat, {{.Pet}}. {{.User}} har {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Mommy}} kunne ikke tilføje {{.Role}} til {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "Alt sat, {{.Pet}}. {{.Role}} blev fjernet fra {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Mommy}} kunne ikke fjerne {{.Role}} fra {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "Jeg har brug for en vedhæftning, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "Den fil er for stor, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "Den filtype virker ikke til en emoji, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "Denne server er ved emoji-grænsen, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Mommy}} kan kun downloade fra Discords CDN, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "Jeg kunne ikke læse billedets størrelse, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "Det billede er for stort til en emoji, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "Den billedtype er ikke understøttet, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "Det ligner ikke en gyldig emoji, {{.Pet}}: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Nuttet! {{.Pet}}, `:{{.Name}}:` er oprettet."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Mommy}} kunne ikke oprette `:{{.Name}}:`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Okay, {{.Pet}}. Jeg omdøbte den til `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Mommy}} kunne ikke omdøbe den emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Okay, {{.Pet}}. Emoji slettet."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Mommy}} kunne ikke slette den emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "Jeg har brug for en vedhæftning, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "Discord vil have et emoji-tag, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "Den fil er for stor, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "Den filtype virker ikke til en sticker, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "Denne server er ved sticker-grænsen, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Mommy}} kan kun downloade fra Discords CDN, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "Jeg kunne ikke læse billedets størrelse, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "Det billede er for stort til en sticker, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "Det sticker-ID/link ser ikke rigtigt ud, {{.Pet}}: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Alt sat, {{.Pet}}~ `{{.Name}}` blev oprettet. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Mommy}} kunne ikke oprette `{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Alt sat, {{.Pet}}~ `{{.Name}}` blev opdateret. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Mommy}} kunne ikke redigere den sticker, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Okay, {{.Pet}}~ Sticker slettet. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Mommy}} kunne ikke slette den sticker, {{.Pet}}."
+  }
+]

@@ -3,7 +3,7 @@ package discordruntime
 import (
 	"strings"
 
-	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
@@ -26,7 +26,7 @@ func (b *Bot) enabledPluginIDsForHost(host *pluginhost.Host) map[string]struct{}
 	return out
 }
 
-func (b *Bot) pluginRoute(pluginID string) (discordplugin.Route, bool) {
+func (b *Bot) pluginRoute(pluginID string) (discordpluginbridge.Route, bool) {
 	route, ok := b.pluginRoutes[strings.TrimSpace(pluginID)]
 	return route, ok
 }
@@ -43,14 +43,14 @@ func (b *Bot) enabledPluginJobs() []pluginhost.PluginJob {
 	return out
 }
 
-func (b *Bot) enabledPluginEventSubscribers(eventName string) []discordplugin.Route {
-	out := []discordplugin.Route{}
+func (b *Bot) enabledPluginEventSubscribers(eventName string) []discordpluginbridge.Route {
+	out := []discordpluginbridge.Route{}
 	if b.pluginHost != nil {
 		for _, pluginID := range b.pluginHost.EventSubscribers(eventName) {
 			if !b.moduleEnabled(pluginID) {
 				continue
 			}
-			out = append(out, discordplugin.Route{Host: b.pluginHost, PluginID: pluginID})
+			out = append(out, discordpluginbridge.Route{Host: b.pluginHost, PluginID: pluginID})
 		}
 	}
 	return out

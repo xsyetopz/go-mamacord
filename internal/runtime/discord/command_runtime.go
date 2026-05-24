@@ -7,12 +7,12 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 
-	discordcommands "github.com/xsyetopz/go-mamacord/internal/runtime/discord/commands"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/appcmd"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
 )
 
-func (b *Bot) commandRegistrar() discordcommands.Registrar {
-	return discordcommands.Registrar{
+func (b *Bot) commandRegistrar() appcmd.Registrar {
+	return appcmd.Registrar{
 		Client:           b.client,
 		Builtins:         b.order,
 		PluginHost:       b.pluginHost,
@@ -21,8 +21,8 @@ func (b *Bot) commandRegistrar() discordcommands.Registrar {
 	}
 }
 
-func (b *Bot) commandDispatcher() discordcommands.Dispatcher {
-	return discordcommands.Dispatcher{
+func (b *Bot) commandDispatcher() appcmd.Dispatcher {
+	return appcmd.Dispatcher{
 		Logger:                b.logger,
 		I18n:                  b.i18n,
 		ProdMode:              b.prodMode,

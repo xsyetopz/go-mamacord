@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Дай кому-то мягкое предупреждение (и короткий тайм-аут при необходимости)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Кого предупредить?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Что случилось?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Снять предупреждение и дать шанс начать заново."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "С кого снять предупреждение?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Не ты, {{.Pet}}. {{.Mommy}} тоже хочет, чтобы ты был в безопасности."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} не предупреждает ботов и системных пользователей, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Хватит, {{.Pet}}. У {{.User}} уже максимум предупреждений."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Хорошо, {{.Pet}}. Я записала предупреждение для {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} И поставила в тайм-аут на {{.TimeoutMinutes}} мин.{{end}}{{if .TimeoutFailed}} Я пыталась поставить в тайм-аут, но не смогла.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Привет, {{.Pet}}. {{.Mommy}} нужно, чтобы ты сбавил темп и был добрее. Тебя предупредили за `{{.Reason}}`.{{if .TimeoutMinutes}} Тайм-аут на {{.TimeoutMinutes}} мин, чтобы остыть.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Не ты, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Я не нашла предупреждений для {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Какое предупреждение снять, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Выбери, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Этот выбор устарел, {{.Pet}}. Запусти `/unwarn` еще раз."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Готово, {{.Pet}}~. У {{.User}} чистый лист. ❤️"
+  }
+]

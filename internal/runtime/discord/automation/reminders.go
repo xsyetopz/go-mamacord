@@ -8,11 +8,10 @@ import (
 	"time"
 
 	"github.com/disgoorg/disgo/bot"
-	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/snowflake/v2"
-	"github.com/google/uuid"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
+	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/scheduling"
@@ -23,9 +22,8 @@ import (
 const (
 	reminderClaimLimit     = 10
 	reminderLeaseDuration  = 30 * time.Second
-	reminderPollInterval   = 5 * time.Second
 	reminderMaxFailures    = 3
-	reminderDefaultLocale  = discord.LocaleEnglishUS
+	reminderDefaultLocale  = "en-US"
 	reminderMessageMaxNote = 120
 )
 
@@ -36,34 +34,17 @@ type DMEnsurer interface {
 type Reminders struct {
 	Logger     *slog.Logger
 	I18n       i18n.Registry
-	Store      commandapi.Store
+	Store      commandruntime.Store
 	Client     *bot.Client
 	DMChannels DMEnsurer
 	IncFailure func()
 }
 
-func (r Reminders) Start(ctx context.Context) {
+func (r Reminders) PollDue(ctx context.Context, leaseID string) {
 	if r.Client == nil || r.Store == nil {
 		return
 	}
-	go r.run(ctx, uuid.NewString())
-}
 
-func (r Reminders) run(ctx context.Context, leaseID string) {
-	ticker := time.NewTicker(reminderPollInterval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			r.tick(ctx, leaseID)
-		}
-	}
-}
-
-func (r Reminders) tick(ctx context.Context, leaseID string) {
 	now := time.Now().UTC()
 	reminders, err := r.Store.Reminders().ClaimDueReminders(
 		ctx,
@@ -84,7 +65,7 @@ func (r Reminders) tick(ctx context.Context, leaseID string) {
 }
 
 func (r Reminders) runOne(ctx context.Context, leaseID string, now time.Time, reminder store.Reminder) {
-	t := commandapi.Translator{
+	t := commandtext.Translator{
 		Registry: r.I18n,
 		Locale:   reminderDefaultLocale,
 		PluginID: "wellness",
@@ -167,7 +148,7 @@ func (r Reminders) userLocation(ctx context.Context, userID uint64) *time.Locati
 	return time.UTC
 }
 
-func (r Reminders) send(ctx context.Context, t commandapi.Translator, reminder store.Reminder) error {
+func (r Reminders) send(ctx context.Context, t commandtext.Translator, reminder store.Reminder) error {
 	if r.Client == nil {
 		return errors.New("discord client not configured")
 	}
@@ -207,7 +188,7 @@ func (r Reminders) send(ctx context.Context, t commandapi.Translator, reminder s
 	}
 }
 
-func reminderKindText(t commandapi.Translator, kind string) string {
+func reminderKindText(t commandtext.Translator, kind string) string {
 	switch strings.ToLower(strings.TrimSpace(kind)) {
 	case "hydrate":
 		return t.S("wellness.reminder.kind.hydrate", nil)

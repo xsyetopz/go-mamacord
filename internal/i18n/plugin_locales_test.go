@@ -5,8 +5,19 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 )
+
+func bundledFirstPartyPluginLocalesDir(t *testing.T, pluginID string) string {
+	t.Helper()
+
+	dir, err := bundles.NewLocalRepository().ResolveActiveDir(filepath.Join("..", "..", "plugins", pluginID))
+	if err != nil {
+		t.Fatalf("ResolveActiveDir(%q): %v", pluginID, err)
+	}
+	return filepath.Join(dir, "locales")
+}
 
 func TestLoadPluginLocales_OnlyLoadsSupportedDiscordLocales(t *testing.T) {
 	t.Parallel()
@@ -60,7 +71,7 @@ func TestFunPluginLocales_OwnTheirMessages(t *testing.T) {
 		t.Fatalf("expected core locales to no longer expose fun.flip.result")
 	}
 
-	if loadErr := r.LoadPluginLocales("fun", filepath.Join("..", "..", "plugins", "fun", "locales")); loadErr != nil {
+	if loadErr := r.LoadPluginLocales("fun", bundledFirstPartyPluginLocalesDir(t, "fun")); loadErr != nil {
 		t.Fatalf("LoadPluginLocales(fun): %v", loadErr)
 	}
 
@@ -99,7 +110,7 @@ func TestWellnessPluginLocales_OwnTheirMessages(t *testing.T) {
 		t.Fatalf("expected core locales to no longer expose wellness.timezone.set")
 	}
 
-	if loadErr := r.LoadPluginLocales("wellness", filepath.Join("..", "..", "plugins", "wellness", "locales")); loadErr != nil {
+	if loadErr := r.LoadPluginLocales("wellness", bundledFirstPartyPluginLocalesDir(t, "wellness")); loadErr != nil {
 		t.Fatalf("LoadPluginLocales(wellness): %v", loadErr)
 	}
 
@@ -144,7 +155,7 @@ func TestInfoPluginLocales_OwnTheirMessages(t *testing.T) {
 		t.Fatalf("expected core locales to no longer expose info.about.title")
 	}
 
-	if loadErr := r.LoadPluginLocales("info", filepath.Join("..", "..", "plugins", "info", "locales")); loadErr != nil {
+	if loadErr := r.LoadPluginLocales("info", bundledFirstPartyPluginLocalesDir(t, "info")); loadErr != nil {
 		t.Fatalf("LoadPluginLocales(info): %v", loadErr)
 	}
 
@@ -189,7 +200,7 @@ func TestModerationPluginLocales_OwnTheirMessages(t *testing.T) {
 		t.Fatalf("expected core locales to no longer expose mod.warn.success")
 	}
 
-	if loadErr := r.LoadPluginLocales("moderation", filepath.Join("..", "..", "plugins", "moderation", "locales")); loadErr != nil {
+	if loadErr := r.LoadPluginLocales("moderation", bundledFirstPartyPluginLocalesDir(t, "moderation")); loadErr != nil {
 		t.Fatalf("LoadPluginLocales(moderation): %v", loadErr)
 	}
 
@@ -234,7 +245,7 @@ func TestManagerPluginLocales_OwnTheirMessages(t *testing.T) {
 		t.Fatalf("expected core locales to no longer expose mgr.slowmode.set")
 	}
 
-	if loadErr := r.LoadPluginLocales("manager", filepath.Join("..", "..", "plugins", "manager", "locales")); loadErr != nil {
+	if loadErr := r.LoadPluginLocales("manager", bundledFirstPartyPluginLocalesDir(t, "manager")); loadErr != nil {
 		t.Fatalf("LoadPluginLocales(manager): %v", loadErr)
 	}
 

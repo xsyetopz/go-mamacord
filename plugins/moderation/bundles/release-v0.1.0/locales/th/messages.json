@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "เตือนใครสักคนแบบนุ่ม ๆ (และให้ time-out สั้น ๆ ถ้าจำเป็น)"
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "ใครต้องโดนเตือน?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "เกิดอะไรขึ้น?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "ยกเลิกคำเตือน และให้เขาลองใหม่อีกครั้ง"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "จะยกเลิกเตือนใคร?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "ไม่ใช่คุณนะ {{.Pet}}. {{.Mommy}} ก็อยากให้คุณปลอดภัยเหมือนกัน"
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} ไม่เตือนบอทหรือผู้ใช้ระบบนะ {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "พอแล้วนะ {{.Pet}}. {{.User}} ถึงขีดจำกัดคำเตือนแล้ว"
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "โอเค {{.Pet}}. มามี้บันทึกคำเตือนให้ {{.User}} แล้ว: `{{.Reason}}`.{{if .TimeoutMinutes}} และให้ time-out {{.TimeoutMinutes}} นาทีด้วยนะ{{end}}{{if .TimeoutFailed}} มามี้พยายามจะให้ time-out แล้ว แต่ทำไม่ได้{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "เฮ้ {{.Pet}}. {{.Mommy}} อยากให้คุณช้าลงหน่อยและใจดีกว่านี้นะ คุณถูกเตือนเพราะ `{{.Reason}}`.{{if .TimeoutMinutes}} คุณถูก time-out {{.TimeoutMinutes}} นาที เพื่อให้ใจเย็นลง{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "ไม่ใช่คุณนะ {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "มามี้ไม่เจอคำเตือนของ {{.User}} เลยนะ {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "มามี้ควรเอาคำเตือนอันไหนออกดี {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "เลือกหนึ่งอันให้มามี้, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "เมนูนั้นหมดอายุแล้วนะ {{.Pet}}. รัน `/unwarn` อีกครั้ง"
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "เรียบร้อย, {{.Pet}}~ {{.User}} สะอาดแล้ว. ❤️"
+  }
+]

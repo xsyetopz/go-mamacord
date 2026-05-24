@@ -8,8 +8,8 @@ import (
 	discordautomation "github.com/xsyetopz/go-mamacord/internal/runtime/discord/automation"
 )
 
-func (b *Bot) startReminderScheduler(ctx context.Context) {
-	b.reminders().Start(ctx)
+func (b *Bot) pollReminders(ctx context.Context, leaseID string) {
+	b.reminders().PollDue(ctx, leaseID)
 }
 
 func (b *Bot) reminders() discordautomation.Reminders {

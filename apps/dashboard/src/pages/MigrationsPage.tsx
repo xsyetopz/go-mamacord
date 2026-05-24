@@ -1,31 +1,16 @@
-import { Button, Card, SimpleGrid, Stack, Table, Text } from "@mantine/core";
-import { IconServer } from "@tabler/icons-react";
+import { Card, SimpleGrid, Stack, Table, Text } from "@mantine/core";
 import { MetricCard } from "../components/MetricCard";
 import { PageHeader } from "../components/PageHeader";
 import type { MigrationStatus } from "../types";
 
 type Props = {
 	migrationStatus: MigrationStatus | null;
-	busy: string | null;
-	onBackup: () => void;
 };
 
-export function MigrationsPage({ migrationStatus, busy, onBackup }: Props) {
+export function MigrationsPage({ migrationStatus }: Props) {
 	return (
 		<Stack gap="lg">
-			<PageHeader
-				title="Migrations"
-				subtitle="Current version and pending migration files."
-				action={
-					<Button
-						leftSection={<IconServer size={16} />}
-						loading={busy === "migrations:backup"}
-						onClick={onBackup}
-					>
-						Create backup
-					</Button>
-				}
-			/>
+			<PageHeader title="Migrations" subtitle="Current version and pending migration files." />
 			<SimpleGrid cols={{ base: 1, md: 3 }}>
 				<MetricCard
 					label="Current version"

@@ -443,17 +443,7 @@ function OwnerShell({
 			break;
 		case "migrations":
 			ownerContent = (
-				<MigrationsPage
-					migrationStatus={migrationStatus}
-					busy={busy}
-					onBackup={() =>
-						runAction(
-							"migrations:backup",
-							() => post("/api/owner/migrations/backup", {}, csrfToken),
-							"Backup created.",
-						)
-					}
-				/>
+				<MigrationsPage migrationStatus={migrationStatus} />
 			);
 			break;
 		default:

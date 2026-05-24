@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Postavi svoju vremensku zonu da mamine podsjetnike dobiješ na vrijeme."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Postavi vremensku zonu (IANA, npr. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Prikaži trenutnu vremensku zonu."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Očisti spremljenu vremensku zonu."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Naziv vremenske zone (npr. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... Ne prepoznajem tu vremensku zonu: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "U redu, {{.Pet}}~ koristit ću `{{.Timezone}}` za tvoje podsjetnike. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Još nisi postavio/la vremensku zonu, {{.Pet}}. Koristi `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Trenutno si na `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Sve obrisano, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Reci mami kako si danas."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Tvoje raspoloženje: 1 (teško) do 5 (sjajno)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Prikaži nedavne check-in umjesto novog."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Daj {{.Mommy}} broj od 1 do 5, {{.Pet}}... ili stavi `history=true` da vidiš svoje zadnje check-in."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Mora biti 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Hvala što si mi rekao/la, {{.Pet}}~ spremila sam `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Još nema check-in, {{.Pet}}. Hrabro je krenuti polako."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Evo tvojih nedavnih check-in, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Postavi nježne podsjetnike (mama će te lagano gurnuti)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Stvori novi podsjetnik."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Popiši svoje podsjetnike."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Obriši podsjetnik."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron raspored (npr. `0 9 * * *`) ili `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Koja je vrsta podsjetnika?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Kratka bilješka (opcionalno, max 120 znakova)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Gdje da mama pošalje? (dm ili channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Koji kanal? (samo ako je delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID podsjetnika."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Taj raspored ne izgleda dobro, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Ako odabereš slanje u kanal, odaberi i kanal, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Sve spremno, {{.Pet}}~ sljedeći put ću te lagano podsjetiti u {{.NextRun}} — reminder `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Još nema podsjetnika, {{.Pet}}. Koristi `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Evo tvojih podsjetnika, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Odaberi podsjetnik za mamu..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Koji podsjetnik {{.Mommy}} treba obrisati, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Taj izbornik je istekao, {{.Pet}}. Pokreni `/remind delete` ponovno."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Ne diraj, {{.Pet}}. To nije tvoje."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Ne mogu naći taj podsjetnik, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Obrisano. Bravo što brineš o sebi, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hej {{.Pet}}. Nježno podsjećanje: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "popij malo vode"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "malo se istegni"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "polako udahni"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "uzmi svoje lijekove"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "počini se smirivati za spavanje"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "napravi brzi check-in"
+  }
+]

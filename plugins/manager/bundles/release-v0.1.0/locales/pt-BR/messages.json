@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Coloque um canal em slowmode (pra acalmar as coisas)."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Qual canal precisa de mais calma?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Segundos entre mensagens (0 pra remover)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Mude o apelido de alguém."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "De quem vamos mudar o apelido?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Pra qual apelido a mamãe deve mudar? (Vazio pra resetar.)"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Limpe mensagens de um canal."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Apague mensagens recentes."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Apague mensagens antes de uma mensagem."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Apague mensagens depois de uma mensagem."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Apague mensagens ao redor de uma mensagem."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Quantas mensagens? (Com jeitinho.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "ID da mensagem ou link."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Gerencie cargos do seu servidor."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Crie um novo cargo."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Edite um cargo."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Apague um cargo."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Adicione um cargo a um membro."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Remova um cargo de um membro."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Qual cargo?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Qual membro?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Nome do cargo."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Cor do cargo (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Mostrar separado na lista de membros?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Permitir @mentions?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Gerencie emojis do seu servidor."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Crie um emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Renomeie um emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Apague um emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Nome do emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Imagem do emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Menção do emoji (<:name:id>) ou ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Gerencie figurinhas do seu servidor."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Crie uma figurinha."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Edite uma figurinha."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Apague uma figurinha."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "ID da figurinha ou link."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Nome da figurinha."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Descrição da figurinha (opcional)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Tag de emoji (o Discord exige isso)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Imagem da figurinha."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Tá bom, {{.Pet}}. {{.Channel}} está em slowmode: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "Pronto, {{.Pet}}~ Slowmode desativado em {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "A {{.Mommy}} não conseguiu atualizar o slowmode, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "Eu não consigo mudar o seu próprio apelido, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Tá bom, {{.Pet}}. {{.User}} agora é `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Tá bom, {{.Pet}}. Resetei o apelido de {{.User}}."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "A {{.Mommy}} não conseguiu atualizar o apelido de {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "Isso não parece um ID/link de mensagem válido, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "Tudo limpinho, {{.Pet}}. Apaguei `{{.Count}}` mensagem(ns)."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "A {{.Mommy}} não conseguiu apagar essas mensagens, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "Essa cor não tá certa, {{.Pet}}: `{{.Colour}}` (esperado RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "Nada de mexer com `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "Nada de mexer com `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "Tudo certo, {{.Pet}}. {{.Role}} foi criado."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "A {{.Mommy}} não conseguiu criar `@{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "Tudo certo, {{.Pet}}. {{.Role}} foi atualizado."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "A {{.Mommy}} não conseguiu editar {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Tá bom, {{.Pet}}. `@{{.Name}}` sumiu."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "A {{.Mommy}} não conseguiu apagar {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "Tudo certo, {{.Pet}}. {{.User}} ficou com {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "A {{.Mommy}} não conseguiu adicionar {{.Role}} pra {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "Tudo certo, {{.Pet}}. {{.Role}} foi removido de {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "A {{.Mommy}} não conseguiu remover {{.Role}} de {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "Eu preciso de um anexo, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "Esse arquivo é grande demais, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "Essa extensão não serve pra emoji, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "Este servidor chegou no limite de emoji, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "A {{.Mommy}} só pode baixar do CDN do Discord, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "Eu não consegui ler o tamanho dessa imagem, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "Essa imagem é grande demais pra emoji, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "Esse tipo de imagem não é suportado, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "Isso não parece um emoji válido, {{.Pet}}: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Fofo! {{.Pet}}, `:{{.Name}}:` foi criado."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "A {{.Mommy}} não conseguiu criar `:{{.Name}}:`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Tá bom, {{.Pet}}. Renomeei pra `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "A {{.Mommy}} não conseguiu renomear esse emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Tá bom, {{.Pet}}. Emoji apagado."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "A {{.Mommy}} não conseguiu apagar esse emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "Eu preciso de um anexo, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "O Discord precisa de uma tag de emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "Esse arquivo é grande demais, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "Essa extensão não serve pra figurinha, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "Este servidor chegou no limite de figurinhas, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "A {{.Mommy}} só pode baixar do CDN do Discord, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "Eu não consegui ler o tamanho dessa imagem, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "Essa imagem é grande demais pra figurinha, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "Esse ID/link de figurinha não parece certo, {{.Pet}}: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Tudo certo, {{.Pet}}~ `{{.Name}}` foi criado. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "A {{.Mommy}} não conseguiu criar `{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Tudo certo, {{.Pet}}~ `{{.Name}}` foi atualizado. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "A {{.Mommy}} não conseguiu editar essa figurinha, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Tá bom, {{.Pet}}~ Figurinha apagada. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "A {{.Mommy}} não conseguiu apagar essa figurinha, {{.Pet}}."
+  }
+]

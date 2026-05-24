@@ -4,16 +4,18 @@ import (
 	"testing"
 
 	"github.com/disgoorg/disgo/discord"
+
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 func TestParsePluginAutocompleteChoices(t *testing.T) {
 	t.Parallel()
 
-	choices, err := ParsePluginAutocompleteChoices("test", []any{
-		map[string]any{"name": "alpha", "value": "a"},
-		map[string]any{"name": "beta", "value": float64(2)},
-		map[string]any{"name": "gamma", "value": 2.5},
-	})
+	choices, err := ParsePluginAutocompleteChoices("test", luaplugin.EncodedValue(`[
+		{"name":"alpha","value":"a"},
+		{"name":"beta","value":2},
+		{"name":"gamma","value":2.5}
+	]`))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -34,15 +36,26 @@ func TestParsePluginAutocompleteChoices(t *testing.T) {
 func TestParsePluginAutocompleteChoicesFromObject(t *testing.T) {
 	t.Parallel()
 
-	choices, err := ParsePluginAutocompleteChoices("test", map[string]any{
-		"choices": []any{
-			map[string]any{"name": "delta", "value": "d"},
-		},
-	})
+	choices, err := ParsePluginAutocompleteChoices("test", luaplugin.EncodedValue(`{"choices":[{"name":"delta","value":"d"}]}`))
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if len(choices) != 1 {
 		t.Fatalf("unexpected choice count: got %d want 1", len(choices))
+	}
+}
+
+func TestParsePluginAutocompleteChoicesFromEncodedJSON(t *testing.T) {
+	t.Parallel()
+
+	choices, err := ParsePluginAutocompleteChoices("test", luaplugin.EncodedValue(`{"choices":[{"name":"echo","value":"e"}]}`))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(choices) != 1 {
+		t.Fatalf("unexpected choice count: got %d want 1", len(choices))
+	}
+	if _, ok := choices[0].(discord.AutocompleteChoiceString); !ok {
+		t.Fatalf("expected first choice to be string, got %T", choices[0])
 	}
 }

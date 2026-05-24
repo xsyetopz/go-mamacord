@@ -1,6 +1,9 @@
 package catalog
 
-import commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+import (
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
+)
 
 type Stats struct {
 	Ready               bool
@@ -15,8 +18,8 @@ type Stats struct {
 }
 
 func RuntimeStats(
-	modules map[string]commandapi.ModuleInfo,
-	builtinCommands []commandapi.SlashCommand,
+	modules map[string]moduleapi.Info,
+	builtinCommands []slashcmd.Command,
 	slashPlugins int,
 	userPlugins int,
 	messagePlugins int,
@@ -32,7 +35,7 @@ func RuntimeStats(
 		if info.Enabled {
 			stats.EnabledModuleCount++
 		}
-		if info.Runtime != commandapi.ModuleRuntimeLua {
+		if info.Runtime != moduleapi.RuntimeLua {
 			continue
 		}
 		stats.PluginCount++

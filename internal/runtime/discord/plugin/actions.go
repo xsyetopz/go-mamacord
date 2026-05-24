@@ -3,6 +3,8 @@ package plugin
 import (
 	"errors"
 	"strings"
+
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 type AutomationAction struct {
@@ -11,11 +13,16 @@ type AutomationAction struct {
 	GuildID   string
 	UserID    string
 	UntilUnix int64
-	Message   any
+	Message   luaplugin.EncodedValue
 }
 
-func ParseAutomationActions(raw any) ([]AutomationAction, error) {
-	m, ok := raw.(map[string]any)
+func ParseAutomationActions(raw luaplugin.EncodedValue) ([]AutomationAction, error) {
+	decoded, err := raw.Decode()
+	if err != nil {
+		return nil, err
+	}
+
+	m, ok := decoded.(map[string]any)
 	if !ok {
 		return nil, errors.New("automation response must be an object")
 	}
@@ -46,13 +53,17 @@ func ParseAutomationActions(raw any) ([]AutomationAction, error) {
 		guildID, _ := im["guild_id"].(string)
 		uid, _ := im["user_id"].(string)
 		untilUnix, _ := asInt64(im, "until_unix")
+		message, err := luaplugin.EncodeValue(im["message"])
+		if err != nil {
+			return nil, errors.New("action message must be JSON encodable")
+		}
 		out = append(out, AutomationAction{
 			Type:      typ,
 			ChannelID: strings.TrimSpace(ch),
 			GuildID:   strings.TrimSpace(guildID),
 			UserID:    strings.TrimSpace(uid),
 			UntilUnix: untilUnix,
-			Message:   im["message"],
+			Message:   message,
 		})
 	}
 	return out, nil

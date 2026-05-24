@@ -101,7 +101,10 @@ func ReadManifest(path string) (Manifest, error) {
 	if err != nil {
 		return Manifest{}, fmt.Errorf("read manifest: %w", err)
 	}
+	return ParseManifest(b)
+}
 
+func ParseManifest(b []byte) (Manifest, error) {
 	var m Manifest
 	if unmarshalErr := json.Unmarshal(b, &m); unmarshalErr != nil {
 		return Manifest{}, fmt.Errorf("parse manifest: %w", unmarshalErr)

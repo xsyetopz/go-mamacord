@@ -4,46 +4,42 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"math/big"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/config"
-	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var pluginIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]{1,31}$`)
 
 type Service struct {
-	Logger *slog.Logger
-	Config config.Config
+	Logger  *slog.Logger
+	Config  config.Config
+	Bundles bundles.Repository
 
 	Snapshot      func() ops.Snapshot
-	ModuleAdmin   commandapi.ModuleAdmin
-	PluginAdmin   commandapi.PluginAdmin
-	Marketplace   commandapi.MarketplaceAdmin
-	Store         commandapi.Store
+	ModuleAdmin   moduleapi.Admin
+	PluginAdmin   commandruntime.PluginAdmin
+	Marketplace   commandruntime.MarketplaceAdmin
+	Store         commandruntime.Store
 	BuildInfo     func() buildinfo.Info
 	OAuth         OAuthClient
 	OwnerStatus   func() OwnerStatus
@@ -300,9 +296,9 @@ type BuildResponse struct {
 }
 
 type StatusConfig struct {
-	SQLitePath              string     `json:"sqlite_path"`
+	StorageBackend          string     `json:"storage_backend"`
+	StorageTarget           string     `json:"storage_target"`
 	MigrationsDir           string     `json:"migrations_dir"`
-	MigrationBackupsDir     string     `json:"migration_backups_dir"`
 	LocalesDir              string     `json:"locales_dir"`
 	BundledPluginsDir       string     `json:"bundled_plugins_dir"`
 	UserPluginsDir          string     `json:"user_plugins_dir"`
@@ -311,6 +307,7 @@ type StatusConfig struct {
 	TrustedKeysFile         string     `json:"trusted_keys_file"`
 	OpsAddr                 string     `json:"ops_addr"`
 	AdminAddr               string     `json:"admin_addr"`
+	RuntimeRoles            []string   `json:"runtime_roles"`
 	DevGuildID              *Snowflake `json:"dev_guild_id,omitempty"`
 	CommandRegistrationMode string     `json:"command_registration_mode"`
 	ProdMode                bool       `json:"prod_mode"`
@@ -351,20 +348,21 @@ type ModuleResponse struct {
 }
 
 type PluginSummary struct {
-	ID               string   `json:"id"`
-	Name             string   `json:"name"`
-	Version          string   `json:"version"`
-	Commands         []string `json:"commands"`
-	Loaded           bool     `json:"loaded"`
-	Signed           bool     `json:"signed"`
-	HasSignatureFile bool     `json:"has_signature_file"`
-	Dir              string   `json:"dir"`
-	Bundled          bool     `json:"bundled"`
-	ProvenanceKind   string   `json:"provenance_kind"`
-	SourceID         string   `json:"source_id,omitempty"`
-	GitRevision      string   `json:"git_revision,omitempty"`
-	SignatureState   string   `json:"signature_state,omitempty"`
-	LocalModified    bool     `json:"local_modified"`
+	ID                string   `json:"id"`
+	Name              string   `json:"name"`
+	Version           string   `json:"version"`
+	Commands          []string `json:"commands"`
+	Loaded            bool     `json:"loaded"`
+	Signed            bool     `json:"signed"`
+	HasSignatureFile  bool     `json:"has_signature_file"`
+	PluginRoot        string   `json:"plugin_root"`
+	Bundled           bool     `json:"bundled"`
+	ProvenanceKind    string   `json:"provenance_kind"`
+	SourceID          string   `json:"source_id,omitempty"`
+	GitRevision       string   `json:"git_revision,omitempty"`
+	BundleRelativeDir string   `json:"bundle_relative_dir,omitempty"`
+	SignatureState    string   `json:"signature_state,omitempty"`
+	LocalModified     bool     `json:"local_modified"`
 }
 
 type MarketplaceSourcesResponse struct {
@@ -570,739 +568,6 @@ type WarningInfo struct {
 	CreatedAt   string    `json:"created_at"`
 }
 
-func (s *Service) Status(ctx context.Context) (StatusResponse, error) {
-	var devGuildID *Snowflake
-	if s.Config.DevGuildID != nil {
-		v := Snowflake(*s.Config.DevGuildID)
-		devGuildID = &v
-	}
-	resp := StatusResponse{
-		Config: StatusConfig{
-			SQLitePath:              s.Config.SQLitePath,
-			MigrationsDir:           s.Config.Migrations,
-			MigrationBackupsDir:     s.Config.MigrationBackups,
-			LocalesDir:              s.Config.LocalesDir,
-			BundledPluginsDir:       s.Config.BundledPluginsDir,
-			UserPluginsDir:          s.Config.UserPluginsDir,
-			PermissionsFile:         s.Config.PermissionsFile,
-			ModulesFile:             s.Config.ModulesFile,
-			TrustedKeysFile:         s.Config.TrustedKeysFile,
-			OpsAddr:                 s.Config.OpsAddr,
-			AdminAddr:               s.Config.AdminAddr,
-			DevGuildID:              devGuildID,
-			CommandRegistrationMode: s.Config.CommandRegistrationMode,
-			ProdMode:                s.Config.ProdMode,
-			AllowUnsignedPlugins:    s.Config.AllowUnsignedPlugins,
-		},
-		Setup: s.setupResponse(false),
-	}
-	if s.BuildInfo != nil {
-		resp.Build = buildResponse(s.BuildInfo())
-	}
-	if s.Snapshot != nil {
-		resp.Snapshot = snapshotResponse(s.Snapshot())
-	}
-	keys, err := s.TrustedKeys(ctx)
-	if err != nil {
-		return StatusResponse{}, err
-	}
-	resp.Setup.TrustedKeysConfigured = len(keys.FileKeys) > 0 || len(keys.DBKeys) > 0
-	return resp, nil
-}
-
-func (s *Service) Setup(ctx context.Context) (SetupResponse, error) {
-	resp := s.setupResponse(true)
-	keys, err := s.TrustedKeys(ctx)
-	if err != nil {
-		return SetupResponse{}, err
-	}
-	resp.TrustedKeysConfigured = len(keys.FileKeys) > 0 || len(keys.DBKeys) > 0
-	return resp, nil
-}
-
-func (s *Service) UserGuilds(ctx context.Context, accessToken string) ([]UserGuildSummary, error) {
-	if s.OAuth == nil {
-		return nil, errors.New("oauth client is not configured")
-	}
-	guilds, err := s.fetchGuildsCached(ctx, accessToken)
-	if err != nil {
-		return nil, err
-	}
-
-	// Prefer an explicit "bot has guild" check (REST) so install-state updates
-	// even when the gateway cache isn't available yet.
-	knownInstalled := toUint64Set(s.KnownGuildIDs)
-	installedCache := map[uint64]bool{}
-
-	out := make([]UserGuildSummary, 0, len(guilds))
-	for _, guild := range guilds {
-		id, err := parseDiscordID(guild.ID)
-		if err != nil {
-			continue
-		}
-		canManage := guild.Owner || hasManageGuildPermissions(string(guild.Permissions))
-		if !canManage {
-			continue
-		}
-
-		botInstalled := knownInstalled[id]
-		if s.BotHasGuild != nil {
-			if cached, ok := installedCache[id]; ok {
-				botInstalled = cached
-			} else {
-				installed, installErr := s.BotHasGuild(ctx, id)
-				if installErr == nil {
-					botInstalled = installed
-				}
-				installedCache[id] = botInstalled
-			}
-		}
-
-		out = append(out, UserGuildSummary{
-			ID:           Snowflake(id),
-			Name:         strings.TrimSpace(guild.Name),
-			IconURL:      guildIconURL(guild),
-			Owner:        guild.Owner,
-			CanManage:    canManage,
-			BotInstalled: botInstalled,
-		})
-	}
-	slices.SortFunc(out, func(a, b UserGuildSummary) int {
-		return strings.Compare(strings.ToLower(a.Name), strings.ToLower(b.Name))
-	})
-	return out, nil
-}
-
-func (s *Service) GuildDashboard(ctx context.Context, accessToken string, guildID uint64) (GuildDashboardResponse, error) {
-	guilds, err := s.UserGuilds(ctx, accessToken)
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-	target := Snowflake(guildID)
-	var guild UserGuildSummary
-	found := false
-	for _, item := range guilds {
-		if item.ID == target {
-			guild = item
-			found = true
-			break
-		}
-	}
-	if !found {
-		return GuildDashboardResponse{}, ErrGuildNotAccessible
-	}
-	installURL := fmt.Sprintf("/api/install/start?guild_id=%d", guildID)
-
-	managerCfg, err := guildconfig.Load(ctx, s.Store, guildID, "manager")
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-	moderationCfg, err := guildconfig.Load(ctx, s.Store, guildID, "moderation")
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-	funCfg, err := guildconfig.Load(ctx, s.Store, guildID, "fun")
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-	infoCfg, err := guildconfig.Load(ctx, s.Store, guildID, "info")
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-	wellnessCfg, err := guildconfig.Load(ctx, s.Store, guildID, "wellness")
-	if err != nil {
-		return GuildDashboardResponse{}, err
-	}
-
-	channels, _ := s.guildChannels(ctx, guildID)
-	roles, _ := s.guildRoles(ctx, guildID)
-	emojis, _ := s.guildEmojis(ctx, guildID)
-	stickers, _ := s.guildStickers(ctx, guildID)
-	return GuildDashboardResponse{
-		Guild:      guild,
-		InstallURL: installURL,
-		SetupChecks: []SetupCheck{
-			{
-				ID:      "user_access",
-				Label:   "You can manage this server",
-				OK:      guild.CanManage,
-				Message: boolMessage(guild.CanManage, "You have permission to manage this server.", "You do not have permission to manage this server."),
-			},
-			{
-				ID:      "bot_installed",
-				Label:   "Bot installed",
-				OK:      guild.BotInstalled,
-				Message: boolMessage(guild.BotInstalled, "The bot is already in this server.", "Add the bot to this server to continue."),
-			},
-		},
-		Manager: ManagerSection{
-			PluginSection: s.pluginSection("manager", "Manager", managerCfg),
-			ChannelCount:  len(channels),
-			RoleCount:     len(roles),
-			EmojiCount:    len(emojis),
-			StickerCount:  len(stickers),
-		},
-		Moderation: ModerationSection{
-			PluginSection:    s.pluginSection("moderation", "Moderation", moderationCfg),
-			WarningLimit:     moderationCfg.WarningLimit,
-			TimeoutThreshold: moderationCfg.TimeoutThreshold,
-			TimeoutMinutes:   moderationCfg.TimeoutMinutes,
-		},
-		Fun:  s.pluginSection("fun", "Fun", funCfg),
-		Info: s.pluginSection("info", "Info", infoCfg),
-		Wellness: WellnessSection{
-			PluginSection:            s.pluginSection("wellness", "Wellness", wellnessCfg),
-			AllowChannelReminders:    wellnessCfg.AllowChannelReminders,
-			DefaultReminderChannelID: Snowflake(wellnessCfg.DefaultReminderChannelID),
-		},
-	}, nil
-}
-
-func (s *Service) InstallURL(guildID uint64, baseURL string) (string, error) {
-	_ = baseURL
-	clientID := strings.TrimSpace(s.Config.DashboardClientID)
-	if clientID == "" {
-		return "", errors.New("dashboard client id is not configured")
-	}
-
-	values := url.Values{}
-	values.Set("client_id", clientID)
-	values.Set("scope", "bot applications.commands")
-	values.Set("permissions", "8")
-	values.Set("guild_id", fmt.Sprintf("%d", guildID))
-	values.Set("disable_guild_select", "true")
-	return "https://discord.com/oauth2/authorize?" + values.Encode(), nil
-}
-
-func (s *Service) InstallURLAnyGuild(baseURL string) (string, error) {
-	_ = baseURL
-	clientID := strings.TrimSpace(s.Config.DashboardClientID)
-	if clientID == "" {
-		return "", errors.New("dashboard client id is not configured")
-	}
-
-	values := url.Values{}
-	values.Set("client_id", clientID)
-	values.Set("scope", "bot applications.commands")
-	values.Set("permissions", "8")
-	return "https://discord.com/oauth2/authorize?" + values.Encode(), nil
-}
-
-func (s *Service) Modules() []ModuleResponse {
-	if s.ModuleAdmin == nil {
-		return nil
-	}
-	infos := s.ModuleAdmin.Infos()
-	out := make([]ModuleResponse, 0, len(infos))
-	for _, info := range infos {
-		out = append(out, ModuleResponse{
-			ID:             info.ID,
-			Name:           info.Name,
-			Kind:           string(info.Kind),
-			Runtime:        string(info.Runtime),
-			Enabled:        info.Enabled,
-			DefaultEnabled: info.DefaultEnabled,
-			Toggleable:     info.Toggleable,
-			Signed:         info.Signed,
-			Source:         info.Source,
-			Commands:       append([]string(nil), info.Commands...),
-		})
-	}
-	return out
-}
-
-func (s *Service) SetModuleEnabled(ctx context.Context, moduleID string, enabled bool, actorID uint64) error {
-	if s.ModuleAdmin == nil {
-		return errors.New("modules not configured")
-	}
-	return s.ModuleAdmin.SetEnabled(ctx, moduleID, enabled, actorID)
-}
-
-func (s *Service) ResetModule(ctx context.Context, moduleID string) error {
-	if s.ModuleAdmin == nil {
-		return errors.New("modules not configured")
-	}
-	return s.ModuleAdmin.Reset(ctx, moduleID)
-}
-
-func (s *Service) ReloadModules(ctx context.Context) error {
-	if s.ModuleAdmin == nil {
-		return errors.New("modules not configured")
-	}
-	return s.ModuleAdmin.Reload(ctx)
-}
-
-func (s *Service) Plugins() ([]PluginSummary, error) {
-	infosByID := map[string]pluginhost.PluginInfo{}
-	if s.PluginAdmin != nil {
-		for _, info := range s.PluginAdmin.Infos() {
-			infosByID[info.ID] = info
-		}
-	}
-
-	roots := []struct {
-		dir     string
-		bundled bool
-	}{
-		{dir: strings.TrimSpace(s.Config.BundledPluginsDir), bundled: true},
-		{dir: strings.TrimSpace(s.Config.UserPluginsDir), bundled: false},
-	}
-	installsByID := map[string]store.PluginInstall{}
-	if s.Store != nil {
-		installs, err := s.Store.PluginInstalls().ListPluginInstalls(context.Background())
-		if err != nil {
-			return nil, err
-		}
-		for _, install := range installs {
-			installsByID[install.PluginID] = install
-		}
-	}
-
-	outByID := map[string]PluginSummary{}
-	for _, root := range roots {
-		if root.dir == "" {
-			continue
-		}
-		entries, err := os.ReadDir(root.dir)
-		if err != nil {
-			if os.IsNotExist(err) {
-				continue
-			}
-			return nil, err
-		}
-		for _, entry := range entries {
-			if !entry.IsDir() {
-				continue
-			}
-			id := entry.Name()
-			dir := filepath.Join(root.dir, id)
-			manifestPath := filepath.Join(dir, "plugin.json")
-			if _, err := os.Stat(manifestPath); err != nil {
-				continue
-			}
-
-			summary := PluginSummary{
-				ID:               id,
-				Dir:              dir,
-				Bundled:          root.bundled,
-				HasSignatureFile: fileExists(filepath.Join(dir, "signature.json")),
-			}
-			if root.bundled {
-				summary.ProvenanceKind = string(marketplace.ProvenanceKindBundled)
-			} else {
-				summary.ProvenanceKind = string(marketplace.ProvenanceKindManual)
-			}
-			if manifest, err := pluginhost.ReadManifest(manifestPath); err == nil {
-				summary.ID = manifest.ID
-				summary.Name = manifest.Name
-				summary.Version = manifest.Version
-			}
-			if existing, ok := outByID[summary.ID]; ok && !existing.Bundled {
-				continue
-			}
-			outByID[summary.ID] = summary
-		}
-	}
-
-	out := make([]PluginSummary, 0, len(outByID))
-	for id, summary := range outByID {
-		if install, ok := installsByID[id]; ok {
-			summary.ProvenanceKind = string(marketplace.ProvenanceKindMarketplace)
-			summary.SourceID = install.SourceID
-			summary.GitRevision = install.GitRevision
-			if modified, err := marketplace.DirModified(summary.Dir, install.InstalledHashB64); err == nil {
-				summary.LocalModified = modified
-			}
-		}
-		if summary.Dir != "" {
-			state, _ := marketplace.SignatureStateForDir(context.Background(), summary.Dir, s.Config.TrustedKeysFile, s.Store)
-			summary.SignatureState = string(state)
-		}
-		if info, ok := infosByID[id]; ok {
-			summary.Name = fallbackString(summary.Name, info.Name)
-			summary.Version = fallbackString(summary.Version, info.Version)
-			summary.Dir = fallbackString(summary.Dir, info.Dir)
-			summary.Commands = make([]string, 0, len(info.Commands))
-			for _, cmd := range info.Commands {
-				if strings.TrimSpace(cmd.Name) != "" {
-					summary.Commands = append(summary.Commands, cmd.Name)
-				}
-			}
-			summary.Loaded = true
-			summary.Signed = info.Signed
-		}
-		out = append(out, summary)
-	}
-
-	slices.SortFunc(out, func(a, b PluginSummary) int {
-		return strings.Compare(a.ID, b.ID)
-	})
-	return out, nil
-}
-
-func (s *Service) ReloadPlugins(ctx context.Context) error {
-	if s.PluginAdmin == nil {
-		return errors.New("plugins not configured")
-	}
-	return s.PluginAdmin.Reload(ctx)
-}
-
-func (s *Service) MarketplaceSources(ctx context.Context) ([]marketplace.Source, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return nil, errors.New("marketplace not configured")
-	}
-	return s.Marketplace.ListSources(ctx)
-}
-
-func (s *Service) UpsertMarketplaceSource(ctx context.Context, req marketplace.SourceUpsert) (marketplace.Source, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return marketplace.Source{}, errors.New("marketplace not configured")
-	}
-	return s.Marketplace.UpsertSource(ctx, req)
-}
-
-func (s *Service) DeleteMarketplaceSource(ctx context.Context, sourceID string) error {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return errors.New("marketplace not configured")
-	}
-	return s.Marketplace.DeleteSource(ctx, sourceID)
-}
-
-func (s *Service) SyncMarketplaceSource(ctx context.Context, sourceID string) (marketplace.SyncResult, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return marketplace.SyncResult{}, errors.New("marketplace not configured")
-	}
-	return s.Marketplace.SyncSource(ctx, sourceID)
-}
-
-func (s *Service) SearchMarketplace(ctx context.Context, query marketplace.SearchQuery) ([]marketplace.PluginCandidate, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return nil, errors.New("marketplace not configured")
-	}
-	return s.Marketplace.Search(ctx, query)
-}
-
-func (s *Service) InstallMarketplacePlugin(ctx context.Context, actorID uint64, req MarketplaceInstallRequest) (marketplace.InstallResult, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return marketplace.InstallResult{}, errors.New("marketplace not configured")
-	}
-	actor := actorID
-	return s.Marketplace.Install(ctx, marketplace.InstallRequest{
-		SourceID: req.SourceID,
-		PluginID: req.PluginID,
-		Force:    req.Force,
-		ActorID:  &actor,
-	})
-}
-
-func (s *Service) UpdateMarketplacePlugin(ctx context.Context, actorID uint64, req MarketplaceUpdateRequest) (marketplace.UpdateResult, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return marketplace.UpdateResult{}, errors.New("marketplace not configured")
-	}
-	actor := actorID
-	return s.Marketplace.Update(ctx, marketplace.UpdateRequest{
-		PluginID: req.PluginID,
-		Force:    req.Force,
-		ActorID:  &actor,
-	})
-}
-
-func (s *Service) UninstallMarketplacePlugin(ctx context.Context, req MarketplaceUninstallRequest) error {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return errors.New("marketplace not configured")
-	}
-	return s.Marketplace.Uninstall(ctx, marketplace.UninstallRequest{PluginID: req.PluginID})
-}
-
-func (s *Service) TrustMarketplaceSigner(ctx context.Context, req MarketplaceTrustSignerRequest) error {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return errors.New("marketplace not configured")
-	}
-	return s.Marketplace.TrustSigner(ctx, marketplace.TrustSignerRequest{
-		KeyID:        req.KeyID,
-		PublicKeyB64: req.PublicKeyB64,
-		VendorID:     req.VendorID,
-	})
-}
-
-func (s *Service) TrustMarketplaceVendor(ctx context.Context, req MarketplaceTrustVendorRequest) (marketplace.TrustVendorResult, error) {
-	if s.Marketplace == nil || !s.Marketplace.Configured() {
-		return marketplace.TrustVendorResult{}, errors.New("marketplace not configured")
-	}
-	return s.Marketplace.TrustVendor(ctx, marketplace.TrustVendorRequest{
-		VendorID:        req.VendorID,
-		Name:            req.Name,
-		WebsiteURL:      req.WebsiteURL,
-		SupportURL:      req.SupportURL,
-		TrustedKeysPath: req.TrustedKeysPath,
-		SourceID:        req.SourceID,
-	})
-}
-
-func (s *Service) LoadModulesConfig() (config.ModulesFile, error) {
-	return config.LoadModulesFile(s.Config.ModulesFile)
-}
-
-func (s *Service) SaveModulesConfig(file config.ModulesFile) error {
-	return config.WriteModulesFile(s.Config.ModulesFile, file)
-}
-
-func (s *Service) LoadPermissionsConfig() (permissions.Policy, error) {
-	return permissions.LoadPolicyFile(s.Config.PermissionsFile)
-}
-
-func (s *Service) SavePermissionsConfig(policy permissions.Policy) error {
-	return permissions.WritePolicyFile(s.Config.PermissionsFile, policy)
-}
-
-func (s *Service) TrustedKeys(ctx context.Context) (TrustedKeysResponse, error) {
-	resp := TrustedKeysResponse{}
-	path := strings.TrimSpace(s.Config.TrustedKeysFile)
-	if path != "" && fileExists(path) {
-		bytes, err := os.ReadFile(path)
-		if err != nil {
-			return TrustedKeysResponse{}, err
-		}
-		var file pluginhost.TrustedKeys
-		if err := json.Unmarshal(bytes, &file); err != nil {
-			return TrustedKeysResponse{}, err
-		}
-		resp.FileKeys = make([]TrustedKeyResponse, 0, len(file.Keys))
-		for _, key := range file.Keys {
-			resp.FileKeys = append(resp.FileKeys, TrustedKeyResponse{
-				KeyID:        key.KeyID,
-				PublicKeyB64: key.PublicKeyB64,
-			})
-		}
-	}
-	if s.Store != nil {
-		keys, err := s.Store.TrustedSigners().ListTrustedSigners(ctx)
-		if err != nil {
-			return TrustedKeysResponse{}, err
-		}
-		resp.DBKeys = make([]TrustedSignerResponse, 0, len(keys))
-		for _, key := range keys {
-			resp.DBKeys = append(resp.DBKeys, TrustedSignerResponse{
-				KeyID:        key.KeyID,
-				PublicKeyB64: key.PublicKeyB64,
-				AddedAt:      formatTime(key.AddedAt),
-			})
-		}
-	}
-	return resp, nil
-}
-
-func (s *Service) MigrationStatus(ctx context.Context) (MigrationStatusResponse, error) {
-	runner, err := s.migrationRunner()
-	if err != nil {
-		return MigrationStatusResponse{}, err
-	}
-	status, err := runner.StatusPath(ctx, s.Config.SQLitePath)
-	if err != nil {
-		return MigrationStatusResponse{}, err
-	}
-	return migrationStatusResponse(status), nil
-}
-
-func (s *Service) MigrateUp(ctx context.Context) (MigrationStatusResponse, error) {
-	runner, err := s.migrationRunner()
-	if err != nil {
-		return MigrationStatusResponse{}, err
-	}
-	status, err := runner.UpPath(ctx, s.Config.SQLitePath)
-	if err != nil {
-		return MigrationStatusResponse{}, err
-	}
-	return migrationStatusResponse(status), nil
-}
-
-func (s *Service) BackupMigrations(ctx context.Context) (string, error) {
-	runner, err := s.migrationRunner()
-	if err != nil {
-		return "", err
-	}
-	return runner.BackupPath(ctx, s.Config.SQLitePath)
-}
-
-func (s *Service) ScaffoldPlugin(req PluginScaffoldRequest) (PluginScaffoldResponse, error) {
-	id := strings.TrimSpace(req.ID)
-	name := strings.TrimSpace(req.Name)
-	version := strings.TrimSpace(req.Version)
-	locale := strings.TrimSpace(req.Locale)
-	commandName := strings.TrimSpace(req.CommandName)
-	commandDescription := strings.TrimSpace(req.CommandDescription)
-	responseMessage := strings.TrimSpace(req.ResponseMessage)
-
-	switch {
-	case !pluginIDPattern.MatchString(id):
-		return PluginScaffoldResponse{}, errors.New("plugin id must match ^[a-z][a-z0-9_]{1,31}$")
-	case name == "":
-		return PluginScaffoldResponse{}, errors.New("plugin name is required")
-	case version == "":
-		version = "0.1.0"
-	case locale == "":
-		locale = "en-US"
-	case !pluginIDPattern.MatchString(commandName):
-		if commandName == "" {
-			commandName = id
-		} else {
-			return PluginScaffoldResponse{}, errors.New("command name must match ^[a-z][a-z0-9_]{1,31}$")
-		}
-	}
-	if commandDescription == "" {
-		commandDescription = "Run the " + name + " plugin command"
-	}
-	if responseMessage == "" {
-		responseMessage = "Hello from " + name + "."
-	}
-
-	dir := filepath.Join(s.userPluginsDir(), id)
-	if fileExists(dir) {
-		return PluginScaffoldResponse{}, fmt.Errorf("plugin %q already exists", id)
-	}
-	if err := os.MkdirAll(filepath.Join(dir, "commands"), 0o755); err != nil {
-		return PluginScaffoldResponse{}, err
-	}
-	if err := os.MkdirAll(filepath.Join(dir, "locales", locale), 0o755); err != nil {
-		return PluginScaffoldResponse{}, err
-	}
-
-	descID := "cmd." + commandName + ".desc"
-	messageID := id + ".hello"
-
-	manifest := pluginhost.Manifest{
-		ID:          id,
-		Name:        name,
-		Version:     version,
-		Permissions: req.Permissions,
-	}
-	manifestBytes, err := json.MarshalIndent(map[string]any{
-		"$schema":     "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
-		"id":          manifest.ID,
-		"name":        manifest.Name,
-		"version":     manifest.Version,
-		"permissions": manifest.Permissions,
-	}, "", "  ")
-	if err != nil {
-		return PluginScaffoldResponse{}, err
-	}
-
-	pluginLua := fmt.Sprintf(`local hello = bot.require("commands/hello.lua")
-
-return bot.plugin({
-  commands = {
-    bot.command("%s", {
-      description_id = "%s",
-      ephemeral = true,
-      run = hello
-    })
-  }
-})
-`, commandName, descID)
-
-	commandLua := fmt.Sprintf(`local i18n = bot.i18n
-local ui = bot.ui
-
-return function(_ctx)
-  return ui.reply({
-    content = i18n.t("%s", nil, nil),
-    ephemeral = true
-  })
-end
-`, messageID)
-
-	localeBytes, err := json.MarshalIndent([]map[string]string{
-		{"id": descID, "translation": commandDescription},
-		{"id": messageID, "translation": responseMessage},
-	}, "", "  ")
-	if err != nil {
-		return PluginScaffoldResponse{}, err
-	}
-
-	files := []struct {
-		rel  string
-		data []byte
-	}{
-		{rel: "plugin.json", data: append(manifestBytes, '\n')},
-		{rel: "plugin.lua", data: []byte(pluginLua)},
-		{rel: filepath.Join("commands", "hello.lua"), data: []byte(commandLua)},
-		{rel: filepath.Join("locales", locale, "messages.json"), data: append(localeBytes, '\n')},
-	}
-
-	created := make([]string, 0, len(files)+1)
-	for _, file := range files {
-		fullPath := filepath.Join(dir, file.rel)
-		if err := os.MkdirAll(filepath.Dir(fullPath), 0o755); err != nil {
-			return PluginScaffoldResponse{}, err
-		}
-		if err := os.WriteFile(fullPath, file.data, 0o644); err != nil {
-			return PluginScaffoldResponse{}, err
-		}
-		created = append(created, file.rel)
-	}
-
-	resp := PluginScaffoldResponse{
-		ID:    id,
-		Dir:   dir,
-		Files: created,
-	}
-	if req.Sign {
-		signaturePath, err := s.SignPlugin(id)
-		if err != nil {
-			return PluginScaffoldResponse{}, err
-		}
-		resp.Signed = true
-		resp.Signature = signaturePath
-		resp.Files = append(resp.Files, filepath.Base(signaturePath))
-	}
-	return resp, nil
-}
-
-func (s *Service) SignPlugin(pluginID string) (string, error) {
-	if !signingReady(s.Config) {
-		return "", errors.New("dashboard signing is not configured")
-	}
-	dir, err := s.pluginDir(pluginID)
-	if err != nil {
-		return "", err
-	}
-	if !fileExists(filepath.Join(dir, "plugin.json")) {
-		return "", fmt.Errorf("plugin %q not found", pluginID)
-	}
-
-	privateKey, err := pluginhost.ReadEd25519PrivateKeyFile(s.Config.DashboardSigningKeyFile)
-	if err != nil {
-		return "", err
-	}
-	sig, _, err := pluginhost.SignDir(dir, s.Config.DashboardSigningKeyID, privateKey)
-	if err != nil {
-		return "", err
-	}
-	payload := map[string]any{
-		"$schema":       pluginhost.SignatureSchemaURL,
-		"key_id":        sig.KeyID,
-		"hash_b64":      sig.HashB64,
-		"signature_b64": sig.SignatureB64,
-		"algorithm":     sig.Algorithm,
-	}
-	bytes, err := json.MarshalIndent(payload, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	target := filepath.Join(dir, "signature.json")
-	if err := os.WriteFile(target, append(bytes, '\n'), 0o644); err != nil {
-		return "", err
-	}
-	return target, nil
-}
-
-func (s *Service) migrationRunner() (migrate.Runner, error) {
-	return migrate.New(migrate.Options{
-		Dir:       s.Config.Migrations,
-		BackupDir: s.Config.MigrationBackups,
-	})
-}
-
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
@@ -1319,6 +584,13 @@ func (s *Service) userPluginsDir() string {
 	return strings.TrimSpace(s.Config.UserPluginsDir)
 }
 
+func (s *Service) bundleRepo() bundles.Repository {
+	if s != nil && s.Bundles != nil {
+		return s.Bundles
+	}
+	return bundles.NewLocalRepository()
+}
+
 func (s *Service) pluginDir(pluginID string) (string, error) {
 	pluginID = strings.TrimSpace(pluginID)
 	if pluginID == "" {
@@ -1332,7 +604,7 @@ func (s *Service) pluginDir(pluginID string) (string, error) {
 			continue
 		}
 		dir := filepath.Join(root, pluginID)
-		if fileExists(filepath.Join(dir, "plugin.json")) {
+		if fileExists(filepath.Join(dir, bundles.StateFileName)) {
 			return dir, nil
 		}
 	}
@@ -1354,7 +626,7 @@ func (s *Service) setupResponse(includeHints bool) SetupResponse {
 	}
 
 	resp := SetupResponse{
-		AdminEnabled:         strings.TrimSpace(s.Config.AdminAddr) != "",
+		AdminEnabled:         s.Config.ControlAPIEnabled(),
 		AuthConfigured:       dashboardAuthReady(s.Config),
 		LoginReady:           dashboardAuthReady(s.Config),
 		OwnerConfigured:      ownerStatus.Configured,
@@ -1381,7 +653,11 @@ func (s *Service) setupResponse(includeHints bool) SetupResponse {
 func setupHints(resp SetupResponse) []string {
 	hints := make([]string, 0, 6)
 	if !resp.AdminEnabled {
-		hints = append(hints, "Set MAMACORD_ADMIN_ADDR to start the admin API.")
+		if strings.TrimSpace(resp.AdminAddr) == "" {
+			hints = append(hints, "Set MAMACORD_ADMIN_ADDR to start the admin API.")
+		} else {
+			hints = append(hints, "Add control to MAMACORD_RUNTIME_ROLES to start the admin API.")
+		}
 	}
 	if !resp.HasClientID {
 		hints = append(hints, "Set MAMACORD_DASHBOARD_CLIENT_ID.")
@@ -1506,7 +782,7 @@ func boolMessage(value bool, okMessage, noMessage string) string {
 }
 
 func dashboardAuthReady(cfg config.Config) bool {
-	return cfg.AdminAddr != "" &&
+	return cfg.ControlAPIEnabled() &&
 		cfg.DashboardClientID != "" &&
 		cfg.DashboardClientSecret != "" &&
 		len(cfg.DashboardSessionSecret) >= 32

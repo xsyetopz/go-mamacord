@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Укажи свой часовой пояс, чтобы напоминания приходили вовремя."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Установить часовой пояс (IANA, например Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Показать текущий часовой пояс."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Очистить сохраненный часовой пояс."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Название часового пояса (например Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Хм, {{.Pet}}... Я не узнаю этот часовой пояс: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Хорошо, {{.Pet}}~. Буду использовать `{{.Timezone}}` для напоминаний. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Часовой пояс еще не задан, {{.Pet}}. Используй `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Сейчас у тебя `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Готово, {{.Pet}}~. Очистила. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Короткий чек-ин: как ты сегодня себя чувствуешь."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Настроение: 1 (тяжело) - 5 (отлично)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Показать последние чек-ины вместо записи нового."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Скажи число от 1 до 5, {{.Pet}}... или поставь `history=true`, чтобы посмотреть последние чек-ины."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Нужно число 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Спасибо, {{.Pet}}~. Я сохранила `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Чек-инов пока нет, {{.Pet}}. Начать с малого - это смело."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Вот твои последние чек-ины, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Установи мягкие напоминания - мама аккуратно напомнит."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Создать новое напоминание."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Показать твои напоминания."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Удалить напоминание."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron-расписание (например `0 9 * * *`) или `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Какое это напоминание?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Короткая заметка (необязательно, максимум 120 символов)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Куда отправлять? (dm или channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "В какой канал? (только если delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID напоминания."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Это расписание выглядит странно, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Если отправлять в канал, выбери канал тоже, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Готово, {{.Pet}}~. Следующий раз напомню в {{.NextRun}} - напоминание `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Напоминаний пока нет, {{.Pet}}. Используй `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Вот твои напоминания, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Выбери напоминание..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Какое напоминание удалить, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Это меню устарело, {{.Pet}}. Запусти `/remind delete` еще раз."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Руки прочь, {{.Pet}}. Это не твое."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Я не нашла это напоминание, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Удалено. Молодец, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Привет, {{.Pet}}. Нежное напоминание: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "выпить воды"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "немного размяться"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "сделать медленный вдох"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "принять лекарства"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "пора готовиться ко сну"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "сделать маленький чек-ин"
+  }
+]

@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/trusted_keys.schema.v1.json",
-  "version": "1",
   "keys": [
     {
-      "key_id": "official-release-2026-04",
-      "public_key_b64": "loTEVufgS4Ph/duuN1gQ5xlbRvIVsAHnbml/wFORUuk="
+      "key_id": "official-release-2026-05-23-bundle-layout",
+      "public_key_b64": "BHO+6REqJ8zUrnQ3+Wm0CguIst9A3pvRSM1A238AF2s="
     }
-  ]
+  ],
+  "version": "1"
 }

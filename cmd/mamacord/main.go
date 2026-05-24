@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -19,14 +20,14 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/app"
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/dotenv"
 	"github.com/xsyetopz/go-mamacord/internal/logging"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/storagebootstrap"
 )
 
 func main() {
@@ -124,8 +125,15 @@ func runDoctorCommand(args []string) int {
 
 	hasToken := strings.TrimSpace(cfg.DiscordToken) != ""
 	writeLine("discord_token: %t", hasToken)
+	writeLine("storage_backend: %s", cfg.StorageBackend)
+	writeLine("storage_target: %s", doctorStorageTarget(cfg))
+	writeLine("migrations_dir: %s", cfg.Migrations)
+	writeLine("runtime_roles: %s", strings.Join(cfg.RuntimeRoleStrings(), ","))
+	writeLine("control_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleControl))
+	writeLine("gateway_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleGateway))
+	writeLine("scheduler_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleScheduler))
 	writeLine("prod_mode: %t", cfg.ProdMode)
-	writeLine("admin_api_enabled: %t", strings.TrimSpace(cfg.AdminAddr) != "")
+	writeLine("admin_api_enabled: %t", cfg.ControlAPIEnabled())
 	writeLine("allow_unsigned_plugins: %t", cfg.AllowUnsignedPlugins)
 	writeLine("trusted_keys_file: %s", cfg.TrustedKeysFile)
 	trustedKeysPath := strings.TrimSpace(cfg.TrustedKeysFile)
@@ -145,12 +153,12 @@ func runDoctorCommand(args []string) int {
 		"dashboard_signing_configured: %t",
 		strings.TrimSpace(cfg.DashboardSigningKeyID) != "" && strings.TrimSpace(cfg.DashboardSigningKeyFile) != "",
 	)
-	if strings.TrimSpace(cfg.AdminAddr) != "" {
+	if cfg.ControlAPIEnabled() {
 		writeLine("admin_addr: %s", cfg.AdminAddr)
 		writeLine("setup_url: %s/api/setup", httpBaseFromAddr(cfg.AdminAddr))
 	}
 
-	if strings.TrimSpace(cfg.AdminAddr) != "" {
+	if cfg.ControlAPIEnabled() {
 		base := httpBaseFromAddr(cfg.AdminAddr)
 		writeLine("dashboard_base_url: %s", base)
 		writeLine("dashboard_oauth_redirect_url: %s/api/auth/callback", base)
@@ -162,7 +170,7 @@ func runDoctorCommand(args []string) int {
 		}
 	}
 
-	if strings.TrimSpace(cfg.AdminAddr) != "" && cfg.ProdMode {
+	if cfg.ControlAPIEnabled() && cfg.ProdMode {
 		if strings.TrimSpace(cfg.DashboardClientID) == "" ||
 			strings.TrimSpace(cfg.DashboardClientSecret) == "" ||
 			len(strings.TrimSpace(cfg.DashboardSessionSecret)) < 32 {
@@ -173,7 +181,7 @@ func runDoctorCommand(args []string) int {
 		}
 	}
 
-	if !hasToken {
+	if cfg.UsesDiscordRuntime() && !hasToken {
 		writeLine("")
 		writeLine("next: set DISCORD_TOKEN to start the bot")
 		return 1
@@ -329,6 +337,8 @@ func runInitCommand(args []string) int {
 		root.WriteString("MAMACORD_PROD_MODE=0\n")
 		root.WriteString("MAMACORD_ALLOW_UNSIGNED_PLUGINS=1\n")
 	}
+	root.WriteString("MAMACORD_STORAGE_BACKEND=postgres\n")
+	root.WriteString("MAMACORD_POSTGRES_DSN=postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable\n")
 	if strings.TrimSpace(*adminAddr) != "" {
 		root.WriteString("\n# Admin API + dashboard OAuth\n")
 		root.WriteString("MAMACORD_ADMIN_ADDR=" + strings.TrimSpace(*adminAddr) + "\n")
@@ -356,6 +366,36 @@ func genHexSecret(nBytes int) string {
 		return strings.Repeat("x", nBytes)
 	}
 	return hex.EncodeToString(buf)
+}
+
+func doctorStorageTarget(cfg config.Config) string {
+	switch cfg.StorageBackend {
+	case config.StorageBackendPostgres:
+		dsn := strings.TrimSpace(cfg.PostgresDSN)
+		if dsn == "" {
+			return ""
+		}
+		parsed, err := url.Parse(dsn)
+		if err != nil {
+			return "<invalid postgres dsn>"
+		}
+		if parsed.User != nil {
+			username := parsed.User.Username()
+			_, hasPassword := parsed.User.Password()
+			if username != "" {
+				parsed.User = url.User(username)
+				redacted := parsed.String()
+				if hasPassword {
+					return strings.Replace(redacted, username+"@", username+":***@", 1)
+				}
+				return redacted
+			}
+			parsed.User = nil
+		}
+		return parsed.String()
+	default:
+		return ""
+	}
 }
 
 func forbiddenDotenvFile() string {
@@ -404,15 +444,6 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 		return 1
 	}
 
-	runner, err := migrate.New(migrate.Options{
-		Dir:       cfg.Migrations,
-		BackupDir: cfg.MigrationBackups,
-	})
-	if err != nil {
-		_, _ = os.Stderr.WriteString(err.Error() + "\n")
-		return 1
-	}
-
 	if len(args) == 0 {
 		printMigrateUsage()
 		return 1
@@ -420,7 +451,7 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 
 	switch args[0] {
 	case "status":
-		status, err := runner.StatusPath(ctx, cfg.SQLitePath)
+		status, err := storagebootstrap.MigrationStatus(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
@@ -428,20 +459,12 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 		printStatus(status)
 		return 0
 	case "up":
-		status, err := runner.UpPath(ctx, cfg.SQLitePath)
+		status, err := storagebootstrap.MigrateUp(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
 		}
 		printStatus(status)
-		return 0
-	case "backup":
-		backupPath, err := runner.BackupPath(ctx, cfg.SQLitePath)
-		if err != nil {
-			_, _ = os.Stderr.WriteString(err.Error() + "\n")
-			return 1
-		}
-		_, _ = fmt.Fprintf(os.Stdout, "backup: %s\n", backupPath)
 		return 0
 	default:
 		printMigrateUsage()
@@ -474,7 +497,6 @@ func printMigrateUsage() {
 		"usage:\n" +
 			"  mamacord migrate status\n" +
 			"  mamacord migrate up\n" +
-			"  mamacord migrate backup\n" +
 			"",
 	)
 }
@@ -504,13 +526,13 @@ func runSignPluginCommand(args []string) int {
 	dir := fs.String("dir", "", "plugin directory to sign")
 	keyID := fs.String("key-id", "", "signer key id")
 	privateKeyFile := fs.String("private-key-file", "", "file containing base64 ed25519 private key bytes or seed")
-	out := fs.String("out", "", "output signature path (default: <dir>/signature.json)")
+	out := fs.String("out", "", "output signature path (default: active plugin bundle dir/signature.json)")
 	if err := fs.Parse(args); err != nil {
 		return 1
 	}
 
 	if *dir == "" || *keyID == "" || *privateKeyFile == "" {
-		_, _ = os.Stderr.WriteString("usage: mamacord sign-plugin --dir <plugin_dir> --key-id <key_id> --private-key-file <path> [--out <signature.json>]\n")
+		_, _ = os.Stderr.WriteString("usage: mamacord sign-plugin --dir <plugin_root> --key-id <key_id> --private-key-file <path> [--out <signature.json>]\n")
 		return 1
 	}
 
@@ -520,16 +542,30 @@ func runSignPluginCommand(args []string) int {
 		return 1
 	}
 
-	sig, publicKey, err := pluginhost.SignDir(*dir, *keyID, privateKey)
+	cfg, err := config.LoadBundleFromEnv()
+	if err != nil {
+		_, _ = os.Stderr.WriteString(err.Error() + "\n")
+		return 1
+	}
+	bundleRepo, err := bundles.Open(cfg)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
 
-	target := *out
-	if target == "" {
-		target = *dir + "/signature.json"
+	pluginDir, err := bundleRepo.ResolveBundleDir(*dir)
+	if err != nil {
+		_, _ = os.Stderr.WriteString(err.Error() + "\n")
+		return 1
 	}
+
+	sig, publicKey, err := pluginhost.SignDir(pluginDir, *keyID, privateKey)
+	if err != nil {
+		_, _ = os.Stderr.WriteString(err.Error() + "\n")
+		return 1
+	}
+
+	target := strings.TrimSpace(*out)
 
 	payload := map[string]any{
 		"$schema":       pluginhost.SignatureSchemaURL,
@@ -544,7 +580,13 @@ func runSignPluginCommand(args []string) int {
 		return 1
 	}
 	bytes = append(bytes, '\n')
-	if err := os.WriteFile(target, bytes, 0o644); err != nil {
+	if target == "" {
+		target, err = bundleRepo.WriteBundleSignature(*dir, bytes)
+		if err != nil {
+			_, _ = os.Stderr.WriteString(err.Error() + "\n")
+			return 1
+		}
+	} else if err := os.WriteFile(target, bytes, 0o644); err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
@@ -649,28 +691,19 @@ func openMarketplaceManager(ctx context.Context) (*marketplace.Manager, func(), 
 	if err != nil {
 		return nil, nil, err
 	}
-	runner, err := migrate.New(migrate.Options{
-		Dir:       cfg.Migrations,
-		BackupDir: cfg.MigrationBackups,
-	})
+	store, _, err := storagebootstrap.OpenRuntimeStore(ctx, cfg)
 	if err != nil {
 		return nil, nil, err
 	}
-	if _, err := runner.UpPath(ctx, cfg.SQLitePath); err != nil {
-		return nil, nil, err
-	}
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: cfg.SQLitePath})
+	bundleRepo, err := bundles.Open(cfg)
 	if err != nil {
-		return nil, nil, err
-	}
-	store, err := sqlitestore.New(db)
-	if err != nil {
-		_ = db.Close()
+		_ = store.Close()
 		return nil, nil, err
 	}
 	manager, err := marketplace.New(marketplace.Options{
 		Logger:            logger,
 		Store:             store,
+		Bundles:           bundleRepo,
 		BundledPluginsDir: cfg.BundledPluginsDir,
 		UserPluginsDir:    cfg.UserPluginsDir,
 		TrustedKeysFile:   cfg.TrustedKeysFile,

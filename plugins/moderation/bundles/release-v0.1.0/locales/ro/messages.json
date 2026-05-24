@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Dă cuiva un avertisment blând (și un time-out scurt, dacă e nevoie)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Cine are nevoie de avertisment?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Ce s-a întâmplat?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Ridică un avertisment și lasă-i să încerce din nou."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Cui îi scoatem avertismentul?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Nu pe tine, {{.Pet}}. {{.Mommy}} vrea să fii în siguranță."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} nu avertizează boți sau utilizatori de sistem, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Ajunge pentru acum, {{.Pet}}. {{.User}} e deja la limita de avertismente."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Bine, {{.Pet}}. Am înregistrat un avertisment pentru {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} L-am pus și în time-out pentru {{.TimeoutMinutes}} minute.{{end}}{{if .TimeoutFailed}} Am încercat să-l pun și în time-out, dar n-am putut.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hei {{.Pet}}. {{.Mommy}} are nevoie să încetinești și să fii mai blând. Ai primit un avertisment pentru `{{.Reason}}`.{{if .TimeoutMinutes}} Ești în time-out pentru {{.TimeoutMinutes}} minute ca să te liniștești.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Nu pe tine, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Nu am găsit avertismente pentru {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Ce avertisment ar trebui să șteargă {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Alege unul pentru mama, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Selecția a expirat, {{.Pet}}. Rulează `/unwarn` din nou."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Gata, {{.Pet}}~ {{.User}} are o foaie curată. ❤️"
+  }
+]

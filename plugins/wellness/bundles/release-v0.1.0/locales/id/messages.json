@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Set timezone kamu supaya pengingat Mama datang tepat waktu."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Atur zona waktumu (IANA, mis. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Tampilkan zona waktumu saat ini."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Hapus zona waktu tersimpan."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Nama zona waktu (mis. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... I don't recognize that timezone: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Okay, {{.Pet}}~ I'll use `{{.Timezone}}` for your reminders. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "You haven't set a timezone yet, {{.Pet}}. Use `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Right now you're set to `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "All cleared, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Kasih tahu Mama gimana keadaanmu hari ini."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Mood kamu: 1 (berat) sampai 5 (mantap)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Tampilkan check-in terbaru alih-alih mencatat yang baru."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Give {{.Mommy}} a number from 1 to 5, {{.Pet}}... or set `history=true` to see your last check-ins."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "That has to be 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Thank you for telling me, {{.Pet}}~ I saved `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "No check-ins yet, {{.Pet}}. Starting small is brave."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Here are your recent check-ins, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Bikin pengingat lembut (Mama bakal nyolek pelan)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Buat pengingat baru."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Daftar pengingatmu."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Hapus pengingat."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Jadwal cron (mis. `0 9 * * *`) atau `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Jenis pengingatnya apa?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Catatan singkat (opsional, maks 120 karakter)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Mama kirim ke mana? (dm atau channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Channel yang mana? (hanya jika delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID pengingat."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "That schedule doesn't look right, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "If you choose channel delivery, pick a channel too, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "All set, {{.Pet}}~ I'll nudge you next at {{.NextRun}} - reminder `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "No reminders yet, {{.Pet}}. Use `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Here are your reminders, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Pilih pengingat buat Mama..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Which reminder should {{.Mommy}} delete, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "That menu expired, {{.Pet}}. Run `/remind delete` again."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Hands off, {{.Pet}}. That's not yours."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "I couldn't find that reminder, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Deleted. Good job taking care of yourself, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hey {{.Pet}}. Gentle reminder: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "drink some water"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "stretch a little"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "take a slow breath"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "take your meds"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "start winding down for sleep"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "do a quick check-in"
+  }
+]

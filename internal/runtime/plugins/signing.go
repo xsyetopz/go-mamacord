@@ -4,18 +4,15 @@ import (
 	"bytes"
 	"context"
 	"crypto/ed25519"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"maps"
 	"os"
-	"path/filepath"
-	"sort"
 	"strings"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
@@ -125,7 +122,7 @@ func VerifyDirSignature(dir string, sig Signature, keys map[string]ed25519.Publi
 		return fmt.Errorf("unsupported signature algorithm %q", sig.Algorithm)
 	}
 
-	hash, err := HashDir(dir)
+	hash, err := bundles.HashDir(dir)
 	if err != nil {
 		return err
 	}
@@ -151,64 +148,6 @@ func VerifyDirSignature(dir string, sig Signature, keys map[string]ed25519.Publi
 
 	return nil
 }
-
-func HashDir(dir string) ([32]byte, error) {
-	paths, err := listFiles(dir)
-	if err != nil {
-		return [32]byte{}, err
-	}
-
-	h := sha256.New()
-	for _, rel := range paths {
-		full := filepath.Join(dir, rel)
-
-		b, readErr := os.ReadFile(full)
-		if readErr != nil {
-			return [32]byte{}, fmt.Errorf("read %q: %w", rel, readErr)
-		}
-
-		_, _ = h.Write([]byte(rel))
-		_, _ = h.Write([]byte{0})
-		_, _ = h.Write(b)
-		_, _ = h.Write([]byte{0})
-	}
-
-	var out [32]byte
-	copy(out[:], h.Sum(nil))
-	return out, nil
-}
-
-func listFiles(dir string) ([]string, error) {
-	var out []string
-
-	err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-
-		rel, err := filepath.Rel(dir, path)
-		if err != nil {
-			return err
-		}
-
-		rel = filepath.ToSlash(rel)
-		if rel == "signature.json" {
-			return nil
-		}
-		out = append(out, rel)
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("walk %q: %w", dir, err)
-	}
-
-	sort.Strings(out)
-	return out, nil
-}
-
 func decodeEd25519PublicKey(b64 string) (ed25519.PublicKey, error) {
 	b, err := base64.StdEncoding.DecodeString(b64)
 	if err != nil {

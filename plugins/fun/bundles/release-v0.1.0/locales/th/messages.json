@@ -1,0 +1,158 @@
+[
+  {
+    "id": "cmd.flip.name",
+    "translation": "flip"
+  },
+  {
+    "id": "cmd.flip.desc",
+    "translation": "โยนเหรียญ (มามี้ไม่ตัดสินนะ)"
+  },
+  {
+    "id": "cmd.roll.name",
+    "translation": "roll"
+  },
+  {
+    "id": "cmd.roll.desc",
+    "translation": "ทอยลูกเต๋า"
+  },
+  {
+    "id": "cmd.roll.opt.number.name",
+    "translation": "number"
+  },
+  {
+    "id": "cmd.roll.opt.number.desc",
+    "translation": "ทอยกี่ลูก?"
+  },
+  {
+    "id": "cmd.roll.opt.sides.name",
+    "translation": "sides"
+  },
+  {
+    "id": "cmd.roll.opt.sides.desc",
+    "translation": "ลูกเต๋ามีกี่หน้า?"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.name",
+    "translation": "modifier"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.desc",
+    "translation": "มี modifier จะบวกเพิ่มไหม?"
+  },
+  {
+    "id": "cmd.8ball.name",
+    "translation": "8ball"
+  },
+  {
+    "id": "cmd.8ball.desc",
+    "translation": "ถามคำถามกับ Magic 8 Ball"
+  },
+  {
+    "id": "cmd.8ball.opt.question.name",
+    "translation": "question"
+  },
+  {
+    "id": "cmd.8ball.opt.question.desc",
+    "translation": "อยากถามอะไร?"
+  },
+  {
+    "id": "cmd.hug.name",
+    "translation": "hug"
+  },
+  {
+    "id": "cmd.hug.desc",
+    "translation": "กอดอุ่น ๆ ให้ใครสักคน"
+  },
+  {
+    "id": "cmd.hug.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.hug.opt.user.desc",
+    "translation": "ใครต้องการกอด?"
+  },
+  {
+    "id": "cmd.pat.name",
+    "translation": "pat"
+  },
+  {
+    "id": "cmd.pat.desc",
+    "translation": "ลูบหัวเบา ๆ ให้ใครสักคน"
+  },
+  {
+    "id": "cmd.pat.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.pat.opt.user.desc",
+    "translation": "จะลูบหัวใคร?"
+  },
+  {
+    "id": "cmd.poke.name",
+    "translation": "poke"
+  },
+  {
+    "id": "cmd.poke.desc",
+    "translation": "จิ้มเบา ๆ"
+  },
+  {
+    "id": "cmd.poke.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.poke.opt.user.desc",
+    "translation": "จะจิ้มใคร?"
+  },
+  {
+    "id": "cmd.shrug.name",
+    "translation": "shrug"
+  },
+  {
+    "id": "cmd.shrug.desc",
+    "translation": "ส่ง shrug"
+  },
+  {
+    "id": "cmd.shrug.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.shrug.opt.message.desc",
+    "translation": "อยากเพิ่มอะไรไหม?"
+  },
+  {
+    "id": "fun.flip.result",
+    "translation": ":coin: หัวหรือก้อย, {{.Pet}}? {{.User}} โยนแล้วได้ `{{.Result}}`."
+  },
+  {
+    "id": "fun.roll.invalid_sides",
+    "translation": "ลูกเต๋าแบบนี้ยังไม่รองรับนะ {{.Pet}}: `{{.Sides}}`. ลอง 4, 6, 8, 10, 12 หรือ 20."
+  },
+  {
+    "id": "fun.roll.result",
+    "translation": ":game_die: {{.Pet}}, {{.User}} ทอย `{{.Notation}}` แล้วได้ `{{.Total}}`."
+  },
+  {
+    "id": "fun.8ball.question_error",
+    "translation": "ดูไม่เหมือนคำถามปลายเปิดนะ {{.Pet}}: `{{.Question}}`"
+  },
+  {
+    "id": "fun.8ball.result",
+    "translation": ":8ball: {{.Answer}}, {{.Pet}}."
+  },
+  {
+    "id": "fun.kawaii.footer",
+    "translation": "Powered by Kawaii API"
+  },
+  {
+    "id": "fun.kawaii.error",
+    "translation": "{{.Mommy}} ดึง GIF ไม่ได้, {{.Pet}}."
+  },
+  {
+    "id": "fun.kawaii.self_error",
+    "translation": "ไม่ใช่ตัวเองนะ {{.Pet}}."
+  },
+  {
+    "id": "fun.kawaii.user_mention_only",
+    "translation": "{{.Emoji}} {{.User}}"
+  }
+]

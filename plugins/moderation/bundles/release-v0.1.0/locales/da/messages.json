@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Giv nogen en blid advarsel (og et kort time-out hvis det er nødvendigt)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Hvem skal have advarslen?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Hvad skete der?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Fjern en advarsel og lad dem prøve igen."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Hvem skal have fjernet advarslen?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Ikke dig, {{.Pet}}. {{.Mommy}} vil også have dig i sikkerhed."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} advarer ikke bots eller systembrugere, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Det er nok for nu, {{.Pet}}. {{.User}} er allerede ved advarselsgrænsen."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Okay, {{.Pet}}. Jeg har logget en advarsel for {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} Jeg satte dem også i time-out i {{.TimeoutMinutes}} minutter.{{end}}{{if .TimeoutFailed}} Jeg prøvede også at time-out'e dem, men jeg kunne ikke.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hey {{.Pet}}. {{.Mommy}} har brug for, at du sænker tempoet og er venligere. Du blev advaret for `{{.Reason}}`.{{if .TimeoutMinutes}} Du er i time-out i {{.TimeoutMinutes}} minutter, så du kan køle ned.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Ikke dig selv, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Jeg kunne ikke finde nogen advarsler for {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Hvilken advarsel skal {{.Mommy}} fjerne, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Vælg én til mamma, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Det valg udløb, {{.Pet}}. Kør `/unwarn` igen."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Sådan, {{.Pet}}~ {{.User}} har en ren tavle. ❤️"
+  }
+]

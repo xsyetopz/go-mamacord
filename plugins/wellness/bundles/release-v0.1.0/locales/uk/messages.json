@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Вкажи свій часовий пояс, щоб нагадування приходили вчасно."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Встановити часовий пояс (IANA, наприклад Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Показати поточний часовий пояс."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Очистити збережений часовий пояс."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Назва часового поясу (наприклад Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Хм, {{.Pet}}... Я не впізнаю цей часовий пояс: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Добре, {{.Pet}}~. Я використаю `{{.Timezone}}` для твоїх нагадувань. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Часовий пояс ще не задано, {{.Pet}}. Використай `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Зараз у тебе `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Готово, {{.Pet}}~. Очистила. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Короткий чек-ін: як ти сьогодні себе почуваєш."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Настрій: 1 (важко) - 5 (чудово)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Показати останні чек-іни замість запису нового."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Скажи число від 1 до 5, {{.Pet}}... або постав `history=true`, щоб подивитися останні чек-іни."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Потрібно число 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Дякую, {{.Pet}}~. Я зберегла `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Чек-інів поки немає, {{.Pet}}. Почати з малого - це сміливо."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Ось твої останні чек-іни, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Налаштуй ніжні нагадування - мама лагідно нагадає."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Створити нове нагадування."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Показати твої нагадування."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Видалити нагадування."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron-розклад (наприклад `0 9 * * *`) або `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Яке це нагадування?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Коротка нотатка (необов'язково, максимум 120 символів)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Куди відправляти? (dm або channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "У який канал? (лише якщо delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID нагадування."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Цей розклад виглядає дивно, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Якщо відправляти в канал, вибери канал теж, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Готово, {{.Pet}}~. Наступного разу нагадаю о {{.NextRun}} - нагадування `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Нагадувань поки немає, {{.Pet}}. Використай `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Ось твої нагадування, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Обери нагадування..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Яке нагадування видалити, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Це меню застаріло, {{.Pet}}. Запусти `/remind delete` ще раз."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Руки геть, {{.Pet}}. Це не твоє."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Я не знайшла це нагадування, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Видалено. Молодець, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Привіт, {{.Pet}}. Ніжне нагадування: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "випити води"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "трохи розім'ятися"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "зробити повільний вдих"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "прийняти ліки"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "час готуватися до сну"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "зробити маленький чек-ін"
+  }
+]

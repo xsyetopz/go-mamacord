@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Įjunk slowmode kanale (ramiai)."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Kurį kanalą reikia nuraminti?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Sekundės tarp žinučių (0 - išjungti)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Pakeisk kažkieno slapyvardį."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "Kieno slapyvardį keičiame?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Į ką mamytė turi nustatyti? (Palik tuščią, kad atstatytum.)"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Išvalyk žinutes kanale."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Ištrink naujausias žinutes."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Ištrink žinutes prieš žinutę."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Ištrink žinutes po žinutės."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Ištrink žinutes aplink žinutę."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Kiek žinučių? (Švelniai.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "Žinutės ID arba žinutės nuoroda."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Tvarkyk vaidmenis savo serveryje."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Sukurk naują vaidmenį."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Redaguok vaidmenį."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Ištrink vaidmenį."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Pridėk vaidmenį nariui."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Nuimk vaidmenį nuo nario."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Kuris vaidmuo?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Kuris narys?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Vaidmens pavadinimas."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Vaidmens spalva (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Rodyti atskirai narių sąraše?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Leisti @paminėjimus?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Tvarkyk emociukus savo serveryje."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Sukurk emociuką."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Pervadink emociuką."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Ištrink emociuką."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Emociuko pavadinimas."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Emociuko paveikslėlis."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Emociuko paminėjimas (<:name:id>) arba ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Tvarkyk lipdukus savo serveryje."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Sukurk lipduką."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Redaguok lipduką."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Ištrink lipduką."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "Lipduko ID arba lipduko nuoroda."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Lipduko pavadinimas."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Lipduko aprašymas (nebūtina)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Emoji žyma (Discord to reikalauja)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Lipduko paveikslėlis."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Gerai, {{.Pet}}. {{.Channel}} dabar slowmode: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "Štai taip, {{.Pet}}~. Slowmode išjungtas {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Mommy}} nepavyko pakeisti slowmode, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "I can't change your own nickname, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Okay, {{.Pet}}. {{.User}} is now `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Okay, {{.Pet}}. I reset {{.User}}'s nickname."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Mommy}} couldn't update {{.User}}'s nickname, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "That doesn't look like a valid message ID or link, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "All cleaned up, {{.Pet}}. Deleted `{{.Count}}` message(s)."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Mommy}} couldn't delete those messages, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "That color isn't right, {{.Pet}}: `{{.Colour}}` (expected RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "Hands off `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "Hands off `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "All set, {{.Pet}}. {{.Role}} was created."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Mommy}} couldn't create `@{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "All set, {{.Pet}}. {{.Role}} was updated."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Mommy}} couldn't edit {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Okay, {{.Pet}}. `@{{.Name}}` is gone."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Mommy}} couldn't delete {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "All set, {{.Pet}}. {{.User}} has {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Mommy}} couldn't add {{.Role}} to {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "All set, {{.Pet}}. {{.Role}} was removed from {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Mommy}} couldn't remove {{.Role}} from {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "I need an attachment, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "That file is too big, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "That extension won't work for an emoji, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "This server is at the emoji limit, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Mommy}} can only download from Discord's CDN, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "I couldn't read that image's size, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "That image is too big for an emoji, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "That image type isn't supported, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "That doesn't look like a valid emoji, {{.Pet}}: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Cute! {{.Pet}}, `:{{.Name}}:` is created."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Mommy}} couldn't create `:{{.Name}}:`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Okay, {{.Pet}}. I renamed it to `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Mommy}} couldn't rename that emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Okay, {{.Pet}}. Emoji deleted."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Mommy}} couldn't delete that emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "Man reikia priedo, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "Discord nori emoji žymos, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "Tas failas per didelis, {{.Pet}} ({{.Size}} baitų; max {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "Toks plėtinys netinka lipdukui, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "Šiame serveryje pasiektas lipdukų limitas, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Mommy}} gali atsisiųsti tik iš Discord CDN, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "Nepavyko nuskaityti to paveikslėlio dydžio, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "Tas paveikslėlis per didelis lipdukui, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "Tas lipduko ID/nuoroda atrodo neteisinga, {{.Pet}}: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Viskas paruošta, {{.Pet}}~. `{{.Name}}` sukurtas. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Mommy}} nepavyko sukurti `{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Viskas paruošta, {{.Pet}}~. `{{.Name}}` atnaujintas. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Mommy}} nepavyko redaguoti to lipduko, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Gerai, {{.Pet}}~. Lipdukas ištrintas. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Mommy}} nepavyko ištrinti to lipduko, {{.Pet}}."
+  }
+]

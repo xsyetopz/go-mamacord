@@ -1,6 +1,6 @@
 # Architecture audit — 2026-05-23
 
-This is a repo-wide audit of the current `go-mamacord` architecture and runtime/build pipelines, followed by a proposed breaking redesign for:
+This is the baseline repo-wide audit for the `go-mamacord` architecture and runtime/build pipelines, followed by a proposed breaking redesign for:
 
 - large Discord footprint / large admin surface area
 - optional horizontal scale
@@ -8,6 +8,12 @@ This is a repo-wide audit of the current `go-mamacord` architecture and runtime/
 - zero legacy compatibility constraints
 
 Related tree export: `docs/internal-tree-audit-2026-05-23.md`
+
+Current implementation progress against this audit is tracked in:
+
+- `docs/superpowers/plans/2026-05-23-architecture-alignment.md`
+
+The file below is a baseline audit document, not a live generated inventory. Historical package paths, tree names, and pressure-point notes may describe the 2026-05-23 baseline that the tracker has since been driving out of the repo.
 
 ---
 
@@ -17,16 +23,16 @@ Primary repo evidence reviewed:
 
 - boot / process wiring: `cmd/mamacord/main.go`, `internal/app/app.go`, `internal/config/config.go`
 - Discord runtime: `internal/runtime/discord/{bot.go,client.go,lifecycle.go,command_runtime.go,gateway_events.go,plugin_runtime.go,services.go}`
-- Discord command path: `internal/runtime/discord/commands/{application.go,registration.go,runtime.go}`, `internal/commands/{catalog.go,api/contracts.go}`
-- plugin system: `internal/runtime/plugins/{host.go,manifest.go,runtime_descriptor.go}`, `internal/runtime/plugins/lua/vm.go`, `internal/runtime/discord/plugin/{automation.go,response.go,types.go}`
+- Discord command path: `internal/runtime/discord/appcmd/{application.go,registration.go,runtime.go}`, `internal/runtime/discord/slashcmd/command.go`, `internal/commands/{catalog.go,spec/spec.go}`
+- plugin system: `internal/runtime/plugins/{host.go,host_load.go,host_registry.go,host_dispatch.go,host_commands.go,manifest.go}`, `internal/runtime/plugins/lua/vm.go`, `internal/runtime/discord/pluginbridge/{automation.go,executor.go,route.go,slash_interaction.go}`
 - admin/dashboard control plane: `internal/adminapi/{server.go,service.go}` and `apps/dashboard/src/{App.tsx,api.ts}`
-- storage / migrations / ops: `internal/storage/{store.go,sqlite/store.go}`, `migrations/sqlite/*.sql`, `internal/ops/{server.go,metrics.go}`
+- storage / migrations / ops: `internal/storage/{store.go,postgres/store.go}`, `migrations/postgres/*.sql`, `internal/ops/{server.go,metrics.go}`
 - marketplace / release / deploy / web: `internal/marketplace/{manager.go,types.go}`, `Dockerfile`, `compose.yml`, `.github/workflows/{ci.yml,pages.yml}`, `apps/site/src/site.tsx`, `scripts/build-release.sh`
 
 Runtime verification checked:
 
 - `go test ./...` with local `GOCACHE`
-  - fails in `internal/runtime/plugins` because tracked bundled plugin signatures no longer verify
+  - passes
 
 ---
 
@@ -39,8 +45,8 @@ flowchart TD
     CLI[cmd/mamacord]
     APP[internal/app.App]
     CFG[internal/config]
-    DB[(SQLite)]
-    MIG[migrations/sqlite + internal/migration]
+    DB[(Postgres)]
+    MIG[migrations/postgres + internal/migration]
     OPS[ops server]
     ADMIN[adminapi server]
     BOT[discord runtime]
@@ -86,7 +92,7 @@ flowchart LR
     C --> D[app.New]
     D --> E[initStorage]
     E --> F[run migrations]
-    F --> G[open SQLite]
+    F --> G[open Postgres]
     G --> H[validate plugin trust]
     H --> I[load i18n]
     I --> J[init discord bot]
@@ -104,7 +110,7 @@ flowchart LR
     B --> C[commands.Dispatcher]
     C --> D[restriction + cooldown preflight]
     D --> E{builtin or plugin}
-    E -->|builtin| F[commandapi.SlashCommand handler]
+    E -->|builtin| F[slashcmd.Command handler]
     E -->|plugin| G[pluginhost.HandleSlash]
     G --> H[Lua VM / plugin bridge]
     H --> I[plugin response parser]
@@ -143,7 +149,7 @@ flowchart LR
     B --> C[git clone/fetch cache]
     C --> D[scan plugin manifests + signatures]
     D --> E[install/update local plugin dir]
-    E --> F[record provenance in SQLite]
+    E --> F[record provenance in Postgres]
 ```
 
 ---
@@ -155,7 +161,7 @@ flowchart LR
    - `internal/runtime/discord`, `internal/adminapi`, `internal/marketplace`, `internal/storage`, `internal/ops` are recognizably separate concerns.
 
 2. **SBC-first discipline is visible.**
-   - SQLite, local files, static dashboard option, and single-process dev flow are all legitimate single-node choices.
+   - Postgres, local files, static dashboard option, and single-process dev flow are all legitimate single-node choices.
 
 3. **The plugin model is real, not fake.**
    - Manifest + signature + host permissions + Lua VM + automation hooks are all implemented, not hand-waved.
@@ -252,7 +258,7 @@ Evidence:
 
 ## E. The storage shape is good for single-node, not for scale-out
 
-Current storage is SQLite-backed for:
+Current storage is Postgres-backed for:
 
 - command/domain state
 - admin sessions
@@ -336,14 +342,14 @@ Repo evidence:
 
 ---
 
-## I. Current test/build health is not green
+## I. Current test/build health is green
 
 Checked locally:
 
-- `go test ./...` fails in `internal/runtime/plugins`
-- failure reason: tracked bundled plugin signatures currently mismatch for `info`, `moderation`, `fun`, `wellness`, `manager`
+- `go test ./...` passes
+- bundled plugin signatures verify in the checked-in bundle layout
 
-**Consequence:** plugin signing integrity is already drifting from the checked-in artifacts.
+**Consequence:** repo-truth verification is currently green enough to keep the architecture alignment work moving on code instead of artifact repair.
 
 ---
 
@@ -431,7 +437,7 @@ internal/
     http/
       adminapi/
     storage/
-      sqlite/
+      postgres/
       postgres/
     plugins/
       lua/
@@ -503,7 +509,7 @@ flowchart TD
 ```mermaid
 flowchart TD
     U[Discord + browser users] --> D[mamacordd]
-    D --> DB[(SQLite)]
+    D --> DB[(Postgres)]
     D --> PLUG[(local plugin bundle cache)]
     D --> DISCORD[(Discord API/Gateway)]
     D --> DASH[(optional embedded or sidecar dashboard static build)]
@@ -525,7 +531,7 @@ flowchart TD
 
 - same domain/use-case code in both profiles
 - only adapters and role composition change
-- SBC stays one process with SQLite + local disk
+- SBC stays one process with Postgres + local disk
 - large installs switch DB/backend/storage and split role counts without rewriting the business logic
 
 ---
@@ -624,7 +630,7 @@ This removes the `initAdminServer requires bot` coupling present now.
 
 ### Single-node
 
-- SQLite remains supported
+- Postgres remains supported
 - WAL mode + sane busy timeouts
 - local disk plugin bundles
 
@@ -838,11 +844,10 @@ A **clean modular monolith with split-role deployment**, where:
 - the scheduler is unified
 - modules are truly one abstraction
 - plugin bundles are immutable signed artifacts
-- SQLite remains a first-class single-node option
+- Postgres remains a first-class single-node option
 - Postgres + object storage enable larger deployments
 
 That is the architecture shape that best matches both of your constraints:
 
 - **massive server/userbase ceiling**
 - **SBC runnability floor**
-

@@ -10,17 +10,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
+	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
 func TestManagerInstallAndForceUpdate(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	manager, storage, userDir := newTestManager(t, false)
+	manager, storage, _ := newTestManager(t, false)
 	defer storage.Close()
 
 	repoDir := t.TempDir()
@@ -62,9 +62,16 @@ func TestManagerInstallAndForceUpdate(t *testing.T) {
 		t.Fatalf("expected disabled module state, got %#v ok=%t", moduleState, ok)
 	}
 
-	targetDir := filepath.Join(userDir, "weather")
+	pluginRoot := install.PluginRoot
+	targetDir, err := bundles.NewLocalRepository().ResolveBundleDir(pluginRoot)
+	if err != nil {
+		t.Fatalf("ResolveBundleDir: %v", err)
+	}
 	if err := os.WriteFile(filepath.Join(targetDir, "plugin.lua"), []byte(`return { changed = true }`), 0o644); err != nil {
 		t.Fatalf("WriteFile(local change): %v", err)
+	}
+	if pluginRoot == "" {
+		t.Fatal("expected install result to include plugin_root")
 	}
 
 	writePlugin(t, repoDir, "weather", "Weather", "0.2.0", `return { updated = true }`)
@@ -110,34 +117,195 @@ func TestManagerRejectsUnsignedInstallInProd(t *testing.T) {
 	}
 }
 
-func newTestManager(t *testing.T, prod bool) (*marketplace.Manager, *sqlitestore.Store, string) {
-	t.Helper()
+func TestManagerInstallCreatesBundleStateAndVersionedBundleDir(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	manager, storage, userDir := newTestManager(t, false)
+	defer storage.Close()
+
+	repoDir := t.TempDir()
+	writePlugin(t, repoDir, "bundleme", "BundleMe", "0.1.0", `return {}`)
+	gitCommitAll(t, repoDir, "initial")
+
+	if _, err := manager.UpsertSource(ctx, marketplace.SourceUpsert{
+		SourceID: "demo",
+		GitURL:   repoDir,
+		Enabled:  true,
+	}); err != nil {
+		t.Fatalf("UpsertSource: %v", err)
+	}
+
+	install, err := manager.Install(ctx, marketplace.InstallRequest{
+		SourceID: "demo",
+		PluginID: "bundleme",
+	})
+	if err != nil {
+		t.Fatalf("Install: %v", err)
+	}
+	entryDir := filepath.Join(userDir, "bundleme")
+	if install.PluginRoot != entryDir {
+		t.Fatalf("expected install plugin_root to stay on plugin root, got %q want %q", install.PluginRoot, entryDir)
+	}
+	if install.BundleRelativeDir == "" {
+		t.Fatal("expected install result to include bundle_relative_dir")
+	}
+
+	if _, err := os.Stat(filepath.Join(entryDir, "plugin.json")); err == nil {
+		t.Fatalf("expected plugin root %q to stop being the live plugin directory", entryDir)
+	}
+	resolvedDir, err := bundles.NewLocalRepository().ResolveActiveDir(entryDir)
+	if err != nil {
+		t.Fatalf("ResolveActiveDir: %v", err)
+	}
+	if resolvedDir != filepath.Join(entryDir, install.BundleRelativeDir) {
+		t.Fatalf("expected bundle state to resolve to bundle_relative_dir, got %q want %q", resolvedDir, filepath.Join(entryDir, install.BundleRelativeDir))
+	}
+	stored, ok, err := storage.PluginInstalls().GetPluginInstall(ctx, "bundleme")
+	if err != nil {
+		t.Fatalf("GetPluginInstall: %v", err)
+	}
+	if !ok {
+		t.Fatal("expected plugin install record to exist")
+	}
+	if stored.BundleRelativeDir != install.BundleRelativeDir {
+		t.Fatalf("expected stored bundle_relative_dir %q to match install result %q", stored.BundleRelativeDir, install.BundleRelativeDir)
+	}
+}
+
+func TestManagerInstallWithCachedRepositoryStoresArtifactOutsidePluginRoot(t *testing.T) {
+	t.Parallel()
 
 	ctx := context.Background()
 	tmp := t.TempDir()
-	userDir := filepath.Join(tmp, "user")
-	dbPath := filepath.Join(tmp, "marketplace.sqlite")
-	runner, err := migrate.New(migrate.Options{
-		Dir:       filepath.Join("..", "..", "migrations", "sqlite"),
-		BackupDir: filepath.Join(tmp, "backups"),
+	repo, err := bundles.NewCachedRepository(bundles.CachedRepositoryOptions{
+		StoreDir: filepath.Join(tmp, "bundle-store"),
+		CacheDir: filepath.Join(tmp, "bundle-cache"),
 	})
 	if err != nil {
-		t.Fatalf("migrate.New: %v", err)
+		t.Fatalf("NewCachedRepository: %v", err)
 	}
-	if _, err := runner.UpPath(ctx, dbPath); err != nil {
-		t.Fatalf("UpPath: %v", err)
+
+	manager, storage, userDir := newTestManager(t, false, repo)
+	defer storage.Close()
+
+	repoDir := t.TempDir()
+	writePlugin(t, repoDir, "bundleme", "BundleMe", "0.1.0", `return {}`)
+	gitCommitAll(t, repoDir, "initial")
+
+	if _, err := manager.UpsertSource(ctx, marketplace.SourceUpsert{
+		SourceID: "demo",
+		GitURL:   repoDir,
+		Enabled:  true,
+	}); err != nil {
+		t.Fatalf("UpsertSource: %v", err)
 	}
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: dbPath})
+
+	install, err := manager.Install(ctx, marketplace.InstallRequest{
+		SourceID: "demo",
+		PluginID: "bundleme",
+	})
 	if err != nil {
-		t.Fatalf("sqlite.Open: %v", err)
+		t.Fatalf("Install: %v", err)
 	}
-	storage, err := sqlitestore.New(db)
+	entryDir := filepath.Join(userDir, "bundleme")
+	if install.PluginRoot != entryDir {
+		t.Fatalf("expected install plugin_root to stay on plugin root, got %q want %q", install.PluginRoot, entryDir)
+	}
+	if _, err := os.Stat(filepath.Join(entryDir, "plugin.json")); err == nil {
+		t.Fatalf("expected plugin root %q to remain metadata-only", entryDir)
+	}
+	activeDir, err := repo.ResolveActiveDir(entryDir)
 	if err != nil {
-		t.Fatalf("sqlitestore.New: %v", err)
+		t.Fatalf("ResolveActiveDir: %v", err)
+	}
+	if !strings.Contains(activeDir, string(filepath.Separator)+"bundle-cache"+string(filepath.Separator)) {
+		t.Fatalf("expected active dir under bundle cache, got %q", activeDir)
+	}
+	if activeDir == filepath.Join(entryDir, install.BundleRelativeDir) {
+		t.Fatalf("expected active dir and plugin-root bundle path to differ for cached repository, both were %q", activeDir)
+	}
+}
+
+func TestManagerInstallWithObjectStoreRepositoryStoresArtifactInArtifactCache(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	tmp := t.TempDir()
+	storeBackend, err := bundles.NewDirObjectStore(filepath.Join(tmp, "object-store"))
+	if err != nil {
+		t.Fatalf("NewDirObjectStore: %v", err)
+	}
+	repo, err := bundles.NewObjectStoreRepository(bundles.ObjectStoreRepositoryOptions{
+		Store:    storeBackend,
+		CacheDir: filepath.Join(tmp, "bundle-cache"),
+	})
+	if err != nil {
+		t.Fatalf("NewObjectStoreRepository: %v", err)
+	}
+
+	manager, storage, userDir := newTestManager(t, false, repo)
+	defer storage.Close()
+
+	repoDir := t.TempDir()
+	writePlugin(t, repoDir, "bundleme", "BundleMe", "0.1.0", `return {}`)
+	gitCommitAll(t, repoDir, "initial")
+
+	if _, err := manager.UpsertSource(ctx, marketplace.SourceUpsert{
+		SourceID: "demo",
+		GitURL:   repoDir,
+		Enabled:  true,
+	}); err != nil {
+		t.Fatalf("UpsertSource: %v", err)
+	}
+
+	install, err := manager.Install(ctx, marketplace.InstallRequest{
+		SourceID: "demo",
+		PluginID: "bundleme",
+	})
+	if err != nil {
+		t.Fatalf("Install: %v", err)
+	}
+	entryDir := filepath.Join(userDir, "bundleme")
+	if install.PluginRoot != entryDir {
+		t.Fatalf("expected install plugin_root to stay on plugin root, got %q want %q", install.PluginRoot, entryDir)
+	}
+	if _, err := os.Stat(filepath.Join(entryDir, "plugin.json")); err == nil {
+		t.Fatalf("expected plugin root %q to remain metadata-only", entryDir)
+	}
+	activeDir, err := repo.ResolveActiveDir(entryDir)
+	if err != nil {
+		t.Fatalf("ResolveActiveDir: %v", err)
+	}
+	if !strings.Contains(activeDir, string(filepath.Separator)+"bundle-cache"+string(filepath.Separator)+"active"+string(filepath.Separator)) {
+		t.Fatalf("expected active dir under active cache, got %q", activeDir)
+	}
+	if activeDir == filepath.Join(entryDir, install.BundleRelativeDir) {
+		t.Fatalf("expected active dir and plugin-root bundle path to differ for object-store repository, both were %q", activeDir)
+	}
+	if _, err := os.Stat(filepath.Join(tmp, "object-store", "bundleme")); err != nil {
+		t.Fatalf("expected object-store plugin root to exist: %v", err)
+	}
+}
+
+func newTestManager(t *testing.T, prod bool, bundleRepo ...bundles.Repository) (*marketplace.Manager, *postgresstore.Store, string) {
+	t.Helper()
+
+	tmp := t.TempDir()
+	userDir := filepath.Join(tmp, "user")
+	db := postgrestest.OpenMigratedDB(t)
+	storage, err := postgresstore.New(db)
+	if err != nil {
+		t.Fatalf("postgresstore.New: %v", err)
+	}
+	var repo bundles.Repository
+	if len(bundleRepo) > 0 {
+		repo = bundleRepo[0]
 	}
 	manager, err := marketplace.New(marketplace.Options{
 		Logger:            slog.New(slog.NewTextHandler(ioDiscard{}, nil)),
 		Store:             storage,
+		Bundles:           repo,
 		BundledPluginsDir: filepath.Join(tmp, "bundled"),
 		UserPluginsDir:    userDir,
 		TrustedKeysFile:   filepath.Join(tmp, "trusted_keys.json"),

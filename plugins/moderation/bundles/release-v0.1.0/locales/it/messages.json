@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Dai a qualcuno un avvertimento gentile (e un breve time-out se serve)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Chi ha bisogno dell'avvertimento?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Che cosa è successo?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Rimuovi un avvertimento e lascia che ci provino di nuovo."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "A chi vuoi togliere l'avvertimento?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Not you, {{.Pet}}. {{.Mommy}} wants you safe too."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} doesn't warn bots or system users, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "That's enough for now, {{.Pet}}. {{.User}} is already at the warning limit."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Okay, {{.Pet}}. I logged a warning for {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} I also put them in time-out for {{.TimeoutMinutes}} minutes.{{end}}{{if .TimeoutFailed}} I tried to time them out too, but I couldn't.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hey {{.Pet}}. {{.Mommy}} needs you to slow down and be kinder. You were warned for `{{.Reason}}`.{{if .TimeoutMinutes}} You're in time-out for {{.TimeoutMinutes}} minutes so you can cool off.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Non tu, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Non ho trovato avvertimenti per {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Quale avvertimento deve rimuovere {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Scegline uno, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Quella scelta è scaduta, {{.Pet}}. Esegui di nuovo `/unwarn`."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Ecco, {{.Pet}}~. {{.User}} ha di nuovo una pagina pulita. ❤️"
+  }
+]

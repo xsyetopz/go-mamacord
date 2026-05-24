@@ -71,7 +71,13 @@ export function OverviewPage({ status }: Props) {
 					<Stack gap="sm">
 						<Text fw={700}>Paths</Text>
 						<Text size="sm">
-							Database: <Code>{status.config.sqlite_path}</Code>
+							Storage:{" "}
+							<Code>
+								{status.config.storage_backend}
+								{status.config.storage_target
+									? ` (${status.config.storage_target})`
+									: ""}
+							</Code>
 						</Text>
 						<Text size="sm">
 							Bundled plugins: <Code>{status.config.bundled_plugins_dir}</Code>
@@ -83,6 +89,10 @@ export function OverviewPage({ status }: Props) {
 						</Text>
 						<Text size="sm">
 							Admin API: <Code>{status.config.admin_addr || "disabled"}</Code>
+						</Text>
+						<Text size="sm">
+							Runtime roles:{" "}
+							<Code>{status.config.runtime_roles.join(", ") || "none"}</Code>
 						</Text>
 					</Stack>
 				</Card>

@@ -133,7 +133,7 @@ func RenderPrometheus(s Snapshot, now time.Time) string {
 	writeMetric("Whether the application is ready to serve traffic.", "gauge", "mamacord_ready", ready)
 	writeMetric("Whether the application is running in production trust mode.", "gauge", "mamacord_prod_mode", prodMode)
 	writeMetric("Process uptime in seconds.", "gauge", "mamacord_uptime_seconds", uptime.Seconds())
-	writeMetric("Current SQLite migration version.", "gauge", "mamacord_migration_version", s.MigrationVersion)
+	writeMetric("Current database migration version.", "gauge", "mamacord_migration_version", s.MigrationVersion)
 	writeMetric("Current module count.", "gauge", "mamacord_modules", s.ModuleCount)
 	writeMetric("Current enabled module count.", "gauge", "mamacord_enabled_modules", s.EnabledModuleCount)
 	writeMetric("Current plugin count.", "gauge", "mamacord_plugins", s.PluginCount)

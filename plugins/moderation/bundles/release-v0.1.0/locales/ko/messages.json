@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "누군가에게 부드럽게 경고해요(필요하면 짧게 타임아웃도)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "누구를 경고할까요?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "무슨 일이 있었나요?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "경고를 해제하고 다시 시작할 기회를 줘요."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "누구의 경고를 해제할까요?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "너는 안 돼요, {{.Pet}}. {{.Mommy}}도 너를 지켜야 해요."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}、봇이나 시스템 사용자는 경고하지 않아요."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "{{.Pet}}、지금은 여기까지. {{.User}}은(는) 경고 한도에요."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "좋아요, {{.Pet}}. {{.User}}에게 경고를 기록했어요: `{{.Reason}}`.{{if .TimeoutMinutes}} 그리고 {{.TimeoutMinutes}}분 타임아웃도 했어요.{{end}}{{if .TimeoutFailed}} 타임아웃도 시도했지만 못 했어요.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "안녕, {{.Pet}}. {{.Mommy}}는 잠깐 멈추고 더 다정해지길 바라요. 사유: `{{.Reason}}`.{{if .TimeoutMinutes}} {{.TimeoutMinutes}}분 타임아웃으로 잠깐 식히자.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "너는 아니에요, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.Pet}}、{{.User}}의 경고를 찾지 못했어요."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "{{.Pet}}、어떤 경고를 지울까요?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "하나 골라봐요, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "{{.Pet}}、그 선택은 만료됐어요. `/unwarn`를 다시 실행해요."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "됐어요, {{.Pet}}~ {{.User}}은(는) 깨끗해요. ❤️"
+  }
+]

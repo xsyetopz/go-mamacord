@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "Află ce sunt (și ce versiune rulez)."
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "Caută utilizatori, servere, roluri și canale."
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "Caută un utilizator."
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "Ce utilizator? (Lasă gol ca să te cauți pe tine.)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "Caută acest server."
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "Caută un rol."
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "Ce rol ar trebui să vadă mama?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "Caută un canal."
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "Ce canal ar trebui să vadă mama?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 Bot"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ Sistem"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 Limbă"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 Creat"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 Intrat"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ Roluri"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ Roluri"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 Emoji"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ Stickere"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 Membri"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 Canale"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 Creat"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ Mențiune"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 Poziție"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 Evidențiat"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 Menționabil"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 Gestionat"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 Permisiuni"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 Creat"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 Mențiune"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 Tip"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ Categorie"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 Permisiuni"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 Creat"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} nu a putut lua informațiile acelui utilizator, {{.Pet}}."
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} nu a putut lua informațiile acestui server, {{.Pet}}."
+  }
+]

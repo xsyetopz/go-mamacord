@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "รู้ว่าฉันคืออะไร (และเวอร์ชันที่กำลังรันอยู่)"
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "ดูข้อมูลผู้ใช้ เซิร์ฟเวอร์ บทบาท และช่อง"
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "ดูข้อมูลผู้ใช้"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "ผู้ใช้คนไหน? (ปล่อยว่างเพื่อดูตัวเอง)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "ดูข้อมูลเซิร์ฟเวอร์นี้"
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "ดูข้อมูลบทบาท"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "บทบาทไหนให้มามี้ดู?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "ดูข้อมูลช่อง"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "ช่องไหนให้มามี้ดู?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 บอท"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ ระบบ"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 ภาษา"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 สร้างเมื่อ"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 เข้าร่วม"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ บทบาท"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ บทบาท"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 อีโมจิ"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ สติ๊กเกอร์"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 สมาชิก"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 ช่อง"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 สร้างเมื่อ"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ เมนชัน"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 ตำแหน่ง"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 แสดงแยก"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 เมนชันได้"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 จัดการโดยระบบ"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 สิทธิ์"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 สร้างเมื่อ"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 เมนชัน"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 ประเภท"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ หมวดหมู่"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 สิทธิ์"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 สร้างเมื่อ"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} ดึงข้อมูลผู้ใช้นั้นไม่ได้เลยนะ {{.Pet}}."
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} ดึงข้อมูลเซิร์ฟเวอร์นี้ไม่ได้เลยนะ {{.Pet}}."
+  }
+]

@@ -229,7 +229,7 @@ func (s Service) GuildMembers(ctx context.Context, accessToken string, guildID u
 		return nil, err
 	}
 	if s.SearchGuildMembers == nil {
-		return nil, errors.New("member search unavailable")
+		return nil, discordRuntimeUnavailable("member search")
 	}
 	return s.SearchGuildMembers(ctx, guildID, query, limit)
 }
@@ -253,7 +253,7 @@ func (s Service) ManagerSlowmode(ctx context.Context, accessToken string, guildI
 		return err
 	}
 	if s.SetSlowmode == nil {
-		return errors.New("slowmode control unavailable")
+		return discordRuntimeUnavailable("slowmode control")
 	}
 	return s.SetSlowmode(ctx, channelID, seconds)
 }
@@ -263,7 +263,7 @@ func (s Service) ManagerNickname(ctx context.Context, accessToken string, guildI
 		return err
 	}
 	if s.SetNickname == nil {
-		return errors.New("nickname control unavailable")
+		return discordRuntimeUnavailable("nickname control")
 	}
 	return s.SetNickname(ctx, guildID, userID, nickname)
 }
@@ -273,7 +273,7 @@ func (s Service) ManagerCreateRole(ctx context.Context, accessToken string, spec
 		return pluginhostlua.RoleResult{}, err
 	}
 	if s.CreateRole == nil {
-		return pluginhostlua.RoleResult{}, errors.New("role control unavailable")
+		return pluginhostlua.RoleResult{}, discordRuntimeUnavailable("role control")
 	}
 	return s.CreateRole(ctx, spec)
 }
@@ -283,7 +283,7 @@ func (s Service) ManagerEditRole(ctx context.Context, accessToken string, spec p
 		return pluginhostlua.RoleResult{}, err
 	}
 	if s.EditRole == nil {
-		return pluginhostlua.RoleResult{}, errors.New("role control unavailable")
+		return pluginhostlua.RoleResult{}, discordRuntimeUnavailable("role control")
 	}
 	return s.EditRole(ctx, spec)
 }
@@ -293,7 +293,7 @@ func (s Service) ManagerDeleteRole(ctx context.Context, accessToken string, guil
 		return err
 	}
 	if s.DeleteRole == nil {
-		return errors.New("role control unavailable")
+		return discordRuntimeUnavailable("role control")
 	}
 	return s.DeleteRole(ctx, guildID, roleID)
 }
@@ -304,12 +304,12 @@ func (s Service) ManagerMemberRole(ctx context.Context, accessToken string, add 
 	}
 	if add {
 		if s.AddRole == nil {
-			return errors.New("role control unavailable")
+			return discordRuntimeUnavailable("role control")
 		}
 		return s.AddRole(ctx, spec)
 	}
 	if s.RemoveRole == nil {
-		return errors.New("role control unavailable")
+		return discordRuntimeUnavailable("role control")
 	}
 	return s.RemoveRole(ctx, spec)
 }
@@ -319,7 +319,7 @@ func (s Service) ManagerPurge(ctx context.Context, accessToken string, guildID u
 		return 0, err
 	}
 	if s.PurgeMessages == nil {
-		return 0, errors.New("purge unavailable")
+		return 0, discordRuntimeUnavailable("message purge")
 	}
 	return s.PurgeMessages(ctx, spec)
 }
@@ -329,7 +329,7 @@ func (s Service) ManagerCreateEmoji(ctx context.Context, accessToken string, gui
 		return pluginhostlua.EmojiResult{}, err
 	}
 	if s.CreateEmojiUpload == nil {
-		return pluginhostlua.EmojiResult{}, errors.New("emoji control unavailable")
+		return pluginhostlua.EmojiResult{}, discordRuntimeUnavailable("emoji control")
 	}
 	body, err := decodeBase64File(contentB64)
 	if err != nil {
@@ -343,7 +343,7 @@ func (s Service) ManagerEditEmoji(ctx context.Context, accessToken string, spec 
 		return pluginhostlua.EmojiResult{}, err
 	}
 	if s.EditEmoji == nil {
-		return pluginhostlua.EmojiResult{}, errors.New("emoji control unavailable")
+		return pluginhostlua.EmojiResult{}, discordRuntimeUnavailable("emoji control")
 	}
 	return s.EditEmoji(ctx, spec)
 }
@@ -353,7 +353,7 @@ func (s Service) ManagerDeleteEmoji(ctx context.Context, accessToken string, spe
 		return err
 	}
 	if s.DeleteEmoji == nil {
-		return errors.New("emoji control unavailable")
+		return discordRuntimeUnavailable("emoji control")
 	}
 	return s.DeleteEmoji(ctx, spec)
 }
@@ -363,7 +363,7 @@ func (s Service) ManagerCreateSticker(ctx context.Context, accessToken string, g
 		return pluginhostlua.StickerResult{}, err
 	}
 	if s.CreateStickerUpload == nil {
-		return pluginhostlua.StickerResult{}, errors.New("sticker control unavailable")
+		return pluginhostlua.StickerResult{}, discordRuntimeUnavailable("sticker control")
 	}
 	body, err := decodeBase64File(contentB64)
 	if err != nil {
@@ -377,7 +377,7 @@ func (s Service) ManagerEditSticker(ctx context.Context, accessToken string, spe
 		return pluginhostlua.StickerResult{}, err
 	}
 	if s.EditSticker == nil {
-		return pluginhostlua.StickerResult{}, errors.New("sticker control unavailable")
+		return pluginhostlua.StickerResult{}, discordRuntimeUnavailable("sticker control")
 	}
 	return s.EditSticker(ctx, spec)
 }
@@ -387,35 +387,35 @@ func (s Service) ManagerDeleteSticker(ctx context.Context, accessToken string, s
 		return err
 	}
 	if s.DeleteSticker == nil {
-		return errors.New("sticker control unavailable")
+		return discordRuntimeUnavailable("sticker control")
 	}
 	return s.DeleteSticker(ctx, spec)
 }
 
 func (s Service) guildChannels(ctx context.Context, guildID uint64) ([]GuildChannelInfo, error) {
 	if s.ListGuildChannels == nil {
-		return nil, errors.New("channel listing unavailable")
+		return nil, discordRuntimeUnavailable("channel listing")
 	}
 	return s.ListGuildChannels(ctx, guildID)
 }
 
 func (s Service) guildRoles(ctx context.Context, guildID uint64) ([]GuildRoleInfo, error) {
 	if s.ListGuildRoles == nil {
-		return nil, errors.New("role listing unavailable")
+		return nil, discordRuntimeUnavailable("role listing")
 	}
 	return s.ListGuildRoles(ctx, guildID)
 }
 
 func (s Service) guildEmojis(ctx context.Context, guildID uint64) ([]GuildEmojiInfo, error) {
 	if s.ListGuildEmojis == nil {
-		return nil, errors.New("emoji listing unavailable")
+		return nil, discordRuntimeUnavailable("emoji listing")
 	}
 	return s.ListGuildEmojis(ctx, guildID)
 }
 
 func (s Service) guildStickers(ctx context.Context, guildID uint64) ([]GuildStickerInfo, error) {
 	if s.ListGuildStickers == nil {
-		return nil, errors.New("sticker listing unavailable")
+		return nil, discordRuntimeUnavailable("sticker listing")
 	}
 	return s.ListGuildStickers(ctx, guildID)
 }

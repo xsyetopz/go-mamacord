@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "जानो मैं कौन हूँ (और कौन-सा version चल रहा है)।"
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "users, servers, roles और channels की जानकारी देखो।"
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "किसी user को देखो।"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "कौन-सा user? (खाली छोड़ो तो खुद को देखोगे।)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "इस server को देखो।"
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "किसी role को देखो।"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "मम्मी किस role को देखे?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "किसी channel को देखो।"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "मम्मी किस channel को देखे?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 Bot"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ System"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 भाषा"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 बनाया गया"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 शामिल हुआ"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ भूमिकाएँ"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ भूमिकाएँ"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 Emojis"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ स्टिकर"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 सदस्य"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 चैनल"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 बनाया गया"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ मेंशन"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 Position"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 अलग दिखाएँ"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 मेंशन योग्य"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 प्रबंधित"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 अनुमतियाँ"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 बनाया गया"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 मेंशन"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 प्रकार"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ श्रेणी"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 अनुमतियाँ"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 बनाया गया"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} उस user की जानकारी नहीं ला पाई, {{.Pet}}।"
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} इस server की जानकारी नहीं ला पाई, {{.Pet}}।"
+  }
+]

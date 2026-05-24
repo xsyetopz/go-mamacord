@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "看看關於我和版本的資訊。"
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "查詢使用者、伺服器、身分組和頻道的資訊。"
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "查詢使用者資訊。"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "要查詢的使用者（留空则是你）。"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "查詢這個伺服器的資訊。"
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "查詢身分組資訊。"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "要查詢的身分組。"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "查詢頻道資訊。"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "要查詢的頻道。"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 機器人"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ 系統"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 語言"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 建立"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 加入"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ 身分組"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ 身分組"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 表情符號"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ 貼圖"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 成員"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 頻道"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 建立"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ 提及"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 位置"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 單独顯示"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 可提及"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 托管"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 權限"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 建立"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 提及"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 类型"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ 分类"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 權限"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 建立"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Pet}}，{{.Mommy}}沒能取得那個使用者的資訊。"
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Pet}}，{{.Mommy}}沒能取得這個伺服器的資訊。"
+  }
+]

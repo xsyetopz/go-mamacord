@@ -4,16 +4,23 @@ import (
 	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
+
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
-func ParsePluginAutocompleteChoices(_ string, raw any) ([]discord.AutocompleteChoice, error) {
-	switch value := raw.(type) {
+func ParsePluginAutocompleteChoices(_ string, raw luaplugin.EncodedValue) ([]discord.AutocompleteChoice, error) {
+	value, err := raw.Decode()
+	if err != nil {
+		return nil, fmt.Errorf("decode autocomplete response: %w", err)
+	}
+
+	switch typed := value.(type) {
 	case nil:
 		return nil, nil
 	case []any:
-		return autocompleteChoicesFromList(value)
+		return autocompleteChoicesFromList(typed)
 	case map[string]any:
-		if nested, ok := value["choices"]; ok {
+		if nested, ok := typed["choices"]; ok {
 			list, ok := nested.([]any)
 			if !ok {
 				return nil, fmt.Errorf("choices must be an array")
@@ -22,7 +29,7 @@ func ParsePluginAutocompleteChoices(_ string, raw any) ([]discord.AutocompleteCh
 		}
 		return nil, fmt.Errorf("unsupported autocomplete response object")
 	default:
-		return nil, fmt.Errorf("unsupported autocomplete response type %T", raw)
+		return nil, fmt.Errorf("unsupported autocomplete response type %T", value)
 	}
 }
 

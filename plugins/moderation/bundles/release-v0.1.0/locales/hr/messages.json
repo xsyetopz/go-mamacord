@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Daj nekome nježno upozorenje (i kratki time-out ako treba)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Tko treba upozorenje?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Što se dogodilo?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Ukloni upozorenje i daj im novu priliku."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Kome želiš ukloniti upozorenje?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Ne tebe, {{.Pet}}. {{.Mommy}} želi i tebe na sigurnom."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} ne upozorava botove ni sistemske korisnike, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Dosta za sad, {{.Pet}}. {{.User}} je već na limitu upozorenja."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "U redu, {{.Pet}}. Zabilježila sam upozorenje za {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} Također sam ih stavila u time-out na {{.TimeoutMinutes}} minuta.{{end}}{{if .TimeoutFailed}} Pokušala sam ih staviti u time-out, ali nisam uspjela.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hej {{.Pet}}. {{.Mommy}} treba da usporiš i budeš ljubazniji/a. Dobio/la si upozorenje zbog `{{.Reason}}`.{{if .TimeoutMinutes}} U time-outu si {{.TimeoutMinutes}} minuta da se smiriš.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Ne ti, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Nisam našla upozorenja za {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Koje upozorenje {{.Mommy}} treba ukloniti, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Odaberi jedno, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Taj odabir je istekao, {{.Pet}}. Pokreni `/unwarn` ponovno."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Gotovo, {{.Pet}}~ {{.User}} opet ima čistu stranicu. ❤️"
+  }
+]

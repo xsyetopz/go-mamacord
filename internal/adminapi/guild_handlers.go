@@ -25,7 +25,7 @@ func (s *Server) handleGuildConfig(w http.ResponseWriter, r *http.Request, sess 
 		} `json:"config"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	cfg, err := s.svc.PutGuildConfig(r.Context(), sess.AccessToken, uint64(req.GuildID), strings.TrimSpace(req.PluginID), guildconfig.PluginConfig{
@@ -42,7 +42,7 @@ func (s *Server) handleGuildConfig(w http.ResponseWriter, r *http.Request, sess 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"config": cfg})
@@ -59,7 +59,7 @@ func (s *Server) handleGuildChannels(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"channels": items})
@@ -76,7 +76,7 @@ func (s *Server) handleGuildRoles(w http.ResponseWriter, r *http.Request, sess s
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"roles": items})
@@ -94,7 +94,7 @@ func (s *Server) handleGuildMembers(w http.ResponseWriter, r *http.Request, sess
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"members": items})
@@ -111,7 +111,7 @@ func (s *Server) handleGuildEmojis(w http.ResponseWriter, r *http.Request, sess 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"emojis": items})
@@ -128,7 +128,7 @@ func (s *Server) handleGuildStickers(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"stickers": items})
@@ -154,7 +154,7 @@ func (s *Server) handleGuildWarnings(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"warnings": items})
@@ -167,7 +167,7 @@ func (s *Server) handleGuildWarn(w http.ResponseWriter, r *http.Request, sess se
 		Reason  string    `json:"reason"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	result, err := s.svc.CreateWarning(r.Context(), sess.AccessToken, uint64(req.GuildID), sess.UserID, uint64(req.UserID), req.Reason)
@@ -176,7 +176,7 @@ func (s *Server) handleGuildWarn(w http.ResponseWriter, r *http.Request, sess se
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
@@ -188,7 +188,7 @@ func (s *Server) handleGuildUnwarn(w http.ResponseWriter, r *http.Request, sess 
 		WarningID string    `json:"warning_id"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.DeleteWarning(r.Context(), sess.AccessToken, uint64(req.GuildID), sess.UserID, req.WarningID); err != nil {
@@ -196,7 +196,7 @@ func (s *Server) handleGuildUnwarn(w http.ResponseWriter, r *http.Request, sess 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -209,7 +209,7 @@ func (s *Server) handleGuildSlowmode(w http.ResponseWriter, r *http.Request, ses
 		Seconds   int       `json:"seconds"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.ManagerSlowmode(r.Context(), sess.AccessToken, uint64(req.GuildID), uint64(req.ChannelID), req.Seconds); err != nil {
@@ -217,7 +217,7 @@ func (s *Server) handleGuildSlowmode(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -230,7 +230,7 @@ func (s *Server) handleGuildNickname(w http.ResponseWriter, r *http.Request, ses
 		Nickname string    `json:"nickname"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	var nickname *string
@@ -243,7 +243,7 @@ func (s *Server) handleGuildNickname(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -258,7 +258,7 @@ func (s *Server) handleGuildRoleCreate(w http.ResponseWriter, r *http.Request, s
 		Mentionable *bool     `json:"mentionable"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	role, err := s.svc.ManagerCreateRole(r.Context(), sess.AccessToken, pluginhostlua.RoleCreateSpec{
@@ -273,7 +273,7 @@ func (s *Server) handleGuildRoleCreate(w http.ResponseWriter, r *http.Request, s
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"role": role})
@@ -289,7 +289,7 @@ func (s *Server) handleGuildRoleEdit(w http.ResponseWriter, r *http.Request, ses
 		Mentionable *bool     `json:"mentionable"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	role, err := s.svc.ManagerEditRole(r.Context(), sess.AccessToken, pluginhostlua.RoleEditSpec{
@@ -305,7 +305,7 @@ func (s *Server) handleGuildRoleEdit(w http.ResponseWriter, r *http.Request, ses
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"role": role})
@@ -317,7 +317,7 @@ func (s *Server) handleGuildRoleDelete(w http.ResponseWriter, r *http.Request, s
 		RoleID  Snowflake `json:"role_id"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.ManagerDeleteRole(r.Context(), sess.AccessToken, uint64(req.GuildID), uint64(req.RoleID)); err != nil {
@@ -325,7 +325,7 @@ func (s *Server) handleGuildRoleDelete(w http.ResponseWriter, r *http.Request, s
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -339,7 +339,7 @@ func (s *Server) handleGuildRoleMember(w http.ResponseWriter, r *http.Request, s
 		RoleID  Snowflake `json:"role_id"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.ManagerMemberRole(r.Context(), sess.AccessToken, req.Add, pluginhostlua.RoleMemberSpec{
@@ -351,7 +351,7 @@ func (s *Server) handleGuildRoleMember(w http.ResponseWriter, r *http.Request, s
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -366,7 +366,7 @@ func (s *Server) handleGuildPurge(w http.ResponseWriter, r *http.Request, sess s
 		Count     int       `json:"count"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	deleted, err := s.svc.ManagerPurge(r.Context(), sess.AccessToken, uint64(req.GuildID), pluginhostlua.PurgeSpec{
@@ -380,7 +380,7 @@ func (s *Server) handleGuildPurge(w http.ResponseWriter, r *http.Request, sess s
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"deleted_count": deleted})
@@ -396,7 +396,7 @@ func (s *Server) handleGuildEmojiCreate(w http.ResponseWriter, r *http.Request, 
 		Height     int       `json:"height"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	emoji, err := s.svc.ManagerCreateEmoji(r.Context(), sess.AccessToken, uint64(req.GuildID), req.Name, req.Filename, req.ContentB64, req.Width, req.Height)
@@ -405,7 +405,7 @@ func (s *Server) handleGuildEmojiCreate(w http.ResponseWriter, r *http.Request, 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"emoji": emoji})
@@ -418,7 +418,7 @@ func (s *Server) handleGuildEmojiEdit(w http.ResponseWriter, r *http.Request, se
 		Name     string    `json:"name"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	emoji, err := s.svc.ManagerEditEmoji(r.Context(), sess.AccessToken, pluginhostlua.EmojiEditSpec{
@@ -431,7 +431,7 @@ func (s *Server) handleGuildEmojiEdit(w http.ResponseWriter, r *http.Request, se
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"emoji": emoji})
@@ -443,7 +443,7 @@ func (s *Server) handleGuildEmojiDelete(w http.ResponseWriter, r *http.Request, 
 		RawEmoji string    `json:"raw_emoji"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.ManagerDeleteEmoji(r.Context(), sess.AccessToken, pluginhostlua.EmojiDeleteSpec{
@@ -454,7 +454,7 @@ func (s *Server) handleGuildEmojiDelete(w http.ResponseWriter, r *http.Request, 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -472,7 +472,7 @@ func (s *Server) handleGuildStickerCreate(w http.ResponseWriter, r *http.Request
 		Height      int       `json:"height"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	sticker, err := s.svc.ManagerCreateSticker(r.Context(), sess.AccessToken, uint64(req.GuildID), req.Name, req.Description, req.EmojiTag, req.Filename, req.ContentB64, req.Width, req.Height)
@@ -481,7 +481,7 @@ func (s *Server) handleGuildStickerCreate(w http.ResponseWriter, r *http.Request
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"sticker": sticker})
@@ -495,7 +495,7 @@ func (s *Server) handleGuildStickerEdit(w http.ResponseWriter, r *http.Request, 
 		Description *string   `json:"description"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	sticker, err := s.svc.ManagerEditSticker(r.Context(), sess.AccessToken, pluginhostlua.StickerEditSpec{
@@ -509,7 +509,7 @@ func (s *Server) handleGuildStickerEdit(w http.ResponseWriter, r *http.Request, 
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"sticker": sticker})
@@ -521,7 +521,7 @@ func (s *Server) handleGuildStickerDelete(w http.ResponseWriter, r *http.Request
 		RawID   string    `json:"raw_id"`
 	}
 	if err := decodeJSON(r, &req); err != nil {
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	if err := s.svc.ManagerDeleteSticker(r.Context(), sess.AccessToken, pluginhostlua.StickerDeleteSpec{
@@ -532,7 +532,7 @@ func (s *Server) handleGuildStickerDelete(w http.ResponseWriter, r *http.Request
 			writeError(w, http.StatusForbidden, err.Error())
 			return
 		}
-		writeError(w, http.StatusBadRequest, err.Error())
+		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})

@@ -22,6 +22,17 @@ import { BoolStatusIconBadge } from "../components/StatusIconBadge";
 import { useDeveloperDetails } from "../developerDetails";
 import type { PluginSummary } from "../types";
 
+function pluginOriginLabel(plugin: PluginSummary): string {
+	switch (plugin.provenance_kind) {
+		case "bundled":
+			return "Bundled plugin";
+		case "marketplace":
+			return "Marketplace plugin";
+		default:
+			return "User plugin";
+	}
+}
+
 type Props = {
 	plugins: PluginSummary[];
 	busy: string | null;
@@ -85,16 +96,23 @@ export function PluginsPage({
 									<Stack gap={1}>
 										<Text fw={600}>{plugin.name || plugin.id}</Text>
 										<Text size="xs" c="dimmed">
-											{plugin.bundled ? "Bundled plugin" : "User plugin"}
+											{pluginOriginLabel(plugin)}
 										</Text>
 										{devDetailsEnabled ? (
-											<Group gap="xs">
-												<Code>{plugin.id}</Code>
-												<CopyIconButton
-													value={plugin.id}
-													label="Copy plugin ID"
-												/>
-											</Group>
+											<Stack gap={2}>
+												<Group gap="xs">
+													<Code>{plugin.id}</Code>
+													<CopyIconButton
+														value={plugin.id}
+														label="Copy plugin ID"
+													/>
+												</Group>
+												{plugin.git_revision ? (
+													<Text size="xs" c="dimmed">
+														Revision: <Code>{plugin.git_revision}</Code>
+													</Text>
+												) : null}
+											</Stack>
 										) : null}
 									</Stack>
 								</Table.Td>
@@ -156,16 +174,23 @@ export function PluginsPage({
 										commands
 									</Text>
 									<Text size="xs" c="dimmed">
-										{plugin.bundled ? "Bundled plugin" : "User plugin"}
+										{pluginOriginLabel(plugin)}
 									</Text>
 									{devDetailsEnabled ? (
-										<Group gap="xs">
-											<Code>{plugin.id}</Code>
-											<CopyIconButton
-												value={plugin.id}
-												label="Copy plugin ID"
-											/>
-										</Group>
+										<Stack gap={2}>
+											<Group gap="xs">
+												<Code>{plugin.id}</Code>
+												<CopyIconButton
+													value={plugin.id}
+													label="Copy plugin ID"
+												/>
+											</Group>
+											{plugin.git_revision ? (
+												<Text size="xs" c="dimmed">
+													Revision: <Code>{plugin.git_revision}</Code>
+												</Text>
+											) : null}
+										</Stack>
 									) : null}
 								</Stack>
 								<BoolStatusIconBadge

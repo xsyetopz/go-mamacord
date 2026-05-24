@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
 )
 
 func TestRunnerUpIdempotent(t *testing.T) {
@@ -19,21 +19,23 @@ func TestRunnerUpIdempotent(t *testing.T) {
 	ctx := context.Background()
 	dir := t.TempDir()
 	writeMigrationUp(t, dir, 1, "init", migrate.KindNormal,
-		"CREATE TABLE IF NOT EXISTS t1 (id INTEGER PRIMARY KEY);",
+		"CREATE TABLE IF NOT EXISTS t1 (id BIGINT PRIMARY KEY);",
 	)
 
-	runner, dbPath := newRunnerAndPath(t, dir)
-	status, err := runner.UpPath(ctx, dbPath)
+	runner, db := newRunnerAndDB(t, dir)
+	defer db.Close()
+
+	status, err := runner.Up(ctx, db)
 	if err != nil {
-		t.Fatalf("UpPath(1): %v", err)
+		t.Fatalf("Up(1): %v", err)
 	}
 	if status.CurrentVersion != 1 {
 		t.Fatalf("unexpected current version after first up: %d", status.CurrentVersion)
 	}
 
-	status, err = runner.UpPath(ctx, dbPath)
+	status, err = runner.Up(ctx, db)
 	if err != nil {
-		t.Fatalf("UpPath(2): %v", err)
+		t.Fatalf("Up(2): %v", err)
 	}
 	if status.CurrentVersion != 1 {
 		t.Fatalf("unexpected current version after second up: %d", status.CurrentVersion)
@@ -49,19 +51,21 @@ func TestRunnerRejectsChecksumMismatch(t *testing.T) {
 	ctx := context.Background()
 	dir := t.TempDir()
 	writeMigrationUp(t, dir, 1, "init", migrate.KindNormal,
-		"CREATE TABLE IF NOT EXISTS t1 (id INTEGER PRIMARY KEY);",
+		"CREATE TABLE IF NOT EXISTS t1 (id BIGINT PRIMARY KEY);",
 	)
 
-	runner, dbPath := newRunnerAndPath(t, dir)
-	if _, err := runner.UpPath(ctx, dbPath); err != nil {
-		t.Fatalf("UpPath: %v", err)
+	runner, db := newRunnerAndDB(t, dir)
+	defer db.Close()
+
+	if _, err := runner.Up(ctx, db); err != nil {
+		t.Fatalf("Up: %v", err)
 	}
 
 	writeMigrationUp(t, dir, 1, "init", migrate.KindNormal,
-		"CREATE TABLE IF NOT EXISTS t1 (id INTEGER PRIMARY KEY, name TEXT NOT NULL DEFAULT 'x');",
+		"CREATE TABLE IF NOT EXISTS t1 (id BIGINT PRIMARY KEY, name TEXT NOT NULL DEFAULT 'x');",
 	)
 
-	if _, err := runner.StatusPath(ctx, dbPath); err == nil || !strings.Contains(err.Error(), "checksum mismatch") {
+	if _, err := runner.Status(ctx, db); err == nil || !strings.Contains(err.Error(), "checksum mismatch") {
 		t.Fatalf("expected checksum mismatch, got %v", err)
 	}
 }
@@ -74,8 +78,10 @@ func TestRunnerRejectsUnsupportedMigrationFilename(t *testing.T) {
 	writeMigrationFile(t, filepath.Join(dir, "001_init.up.sql"), "-- migrate:kind=normal\nCREATE TABLE t1(id INTEGER PRIMARY KEY);")
 	writeMigrationFile(t, filepath.Join(dir, "001_init.down.sql"), "DROP TABLE t1;")
 
-	runner, dbPath := newRunnerAndPath(t, dir)
-	if _, err := runner.StatusPath(ctx, dbPath); err == nil || !strings.Contains(err.Error(), "unsupported migration filename") {
+	runner, db := newRunnerAndDB(t, dir)
+	defer db.Close()
+
+	if _, err := runner.Status(ctx, db); err == nil || !strings.Contains(err.Error(), "unsupported migration filename") {
 		t.Fatalf("expected unsupported filename error, got %v", err)
 	}
 }
@@ -83,71 +89,41 @@ func TestRunnerRejectsUnsupportedMigrationFilename(t *testing.T) {
 func TestProjectMigrationsExcludeLegacyGuildTables(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
 	repoRoot := filepath.Clean(filepath.Join("..", ".."))
-	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "project.sqlite")
-
-	runner, err := migrate.New(migrate.Options{
-		Dir:       filepath.Join(repoRoot, "migrations", "sqlite"),
-		BackupDir: filepath.Join(dir, "migration_backups"),
-	})
+	migrationsDir := filepath.Join(repoRoot, "migrations", "postgres")
+	entries, err := os.ReadDir(migrationsDir)
 	if err != nil {
-		t.Fatalf("migrate.New: %v", err)
+		t.Fatalf("ReadDir(%q): %v", migrationsDir, err)
 	}
-	status, err := runner.UpPath(ctx, dbPath)
-	if err != nil {
-		t.Fatalf("UpPath: %v", err)
-	}
-	if status.CurrentVersion != 7 {
-		t.Fatalf("unexpected current version: %d", status.CurrentVersion)
-	}
-
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: dbPath})
-	if err != nil {
-		t.Fatalf("sqlite.Open: %v", err)
-	}
-	defer db.Close()
-
-	assertTableExists(t, ctx, db, "guild_plugins", false)
-	assertTableExists(t, ctx, db, "guild_settings", false)
-}
-
-func TestRunnerBackupPath(t *testing.T) {
-	t.Parallel()
-
-	ctx := context.Background()
-	dir := t.TempDir()
-	writeMigrationUp(t, dir, 1, "init", migrate.KindNormal,
-		"CREATE TABLE IF NOT EXISTS t1 (id INTEGER PRIMARY KEY);",
-	)
-
-	runner, dbPath := newRunnerAndPath(t, dir)
-	if _, err := runner.UpPath(ctx, dbPath); err != nil {
-		t.Fatalf("UpPath: %v", err)
-	}
-
-	backupPath, err := runner.BackupPath(ctx, dbPath)
-	if err != nil {
-		t.Fatalf("BackupPath: %v", err)
-	}
-	if _, err := os.Stat(backupPath); err != nil {
-		t.Fatalf("Stat(%q): %v", backupPath, err)
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".up.sql") {
+			continue
+		}
+		bytes, err := os.ReadFile(filepath.Join(migrationsDir, entry.Name()))
+		if err != nil {
+			t.Fatalf("ReadFile(%q): %v", entry.Name(), err)
+		}
+		text := string(bytes)
+		if strings.Contains(text, "guild_plugins") {
+			t.Fatalf("legacy guild_plugins table still present in %s", entry.Name())
+		}
+		if strings.Contains(text, "guild_settings") {
+			t.Fatalf("legacy guild_settings table still present in %s", entry.Name())
+		}
 	}
 }
 
-func newRunnerAndPath(t *testing.T, dir string) (migrate.Runner, string) {
+func newRunnerAndDB(t *testing.T, dir string) (migrate.Runner, *sql.DB) {
 	t.Helper()
 
 	runner, err := migrate.New(migrate.Options{
-		Dir:       dir,
-		BackupDir: filepath.Join(dir, "migration_backups"),
+		Dir: dir,
 	})
 	if err != nil {
 		t.Fatalf("migrate.New: %v", err)
 	}
 
-	return runner, filepath.Join(dir, "test.sqlite")
+	return runner, postgrestest.OpenEmptyDB(t)
 }
 
 func writeMigrationUp(t *testing.T, dir string, version int, name string, kind migrate.Kind, upSQL string) {
@@ -167,20 +143,4 @@ func writeMigrationFile(t *testing.T, path, sqlText string) {
 
 func formatMigrationFilename(version int, name, direction string) string {
 	return fmt.Sprintf("%03d_%s.%s.sql", version, name, direction)
-}
-
-func assertTableExists(t *testing.T, ctx context.Context, db *sql.DB, tableName string, want bool) {
-	t.Helper()
-
-	var n int
-	if err := db.QueryRowContext(
-		ctx,
-		"SELECT COUNT(1) FROM sqlite_master WHERE type='table' AND name = ?",
-		tableName,
-	).Scan(&n); err != nil {
-		t.Fatalf("query sqlite_master for %s: %v", tableName, err)
-	}
-	if got := n == 1; got != want {
-		t.Fatalf("unexpected table existence for %s: got %v want %v", tableName, got, want)
-	}
 }

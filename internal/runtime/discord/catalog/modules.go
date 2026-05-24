@@ -5,8 +5,9 @@ import (
 	"strings"
 
 	"github.com/xsyetopz/go-mamacord/internal/commands"
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
 	"github.com/xsyetopz/go-mamacord/internal/config"
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
@@ -55,12 +56,12 @@ func PluginDefaultEnabled(moduleID string, seed config.ModulesFile) bool {
 	return defaultEnabled
 }
 
-func ModuleKindForPlugin(pluginID string) commandapi.ModuleKind {
+func ModuleKindForPlugin(pluginID string) moduleapi.Kind {
 	_ = strings.TrimSpace(pluginID)
-	return commandapi.ModuleKindPlugin
+	return moduleapi.KindPlugin
 }
 
-func SlashCommandNames(commands []commandapi.SlashCommand) []string {
+func SlashCommandNames(commands []slashcmd.Command) []string {
 	out := make([]string, 0, len(commands))
 	for _, cmd := range commands {
 		if strings.TrimSpace(cmd.Name) != "" {

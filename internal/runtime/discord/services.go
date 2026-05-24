@@ -9,19 +9,20 @@ import (
 	"github.com/disgoorg/disgo/events"
 
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
+	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
-func (b *Bot) services(_ discord.Locale) commandapi.Services {
-	s := commandapi.Services{
+func (b *Bot) services(_ discord.Locale) commandruntime.Services {
+	s := commandruntime.Services{
 		Logger:   b.logger,
 		Store:    b.store,
 		ProdMode: b.prodMode,
 		IsOwner:  b.isOwner,
-		HelpNames: func(locale discord.Locale) []string {
-			t := commandapi.Translator{Registry: b.i18n, Locale: locale}
+		HelpNames: func(locale string) []string {
+			t := commandtext.Translator{Registry: b.i18n, Locale: locale}
 			out := make([]string, 0, len(b.order)+len(b.pluginCommands))
 			for _, cmd := range b.order {
 				name := strings.TrimSpace(cmd.Name)
@@ -51,7 +52,7 @@ func (b *Bot) services(_ discord.Locale) commandapi.Services {
 func (b *Bot) checkRestrictions(
 	ctx context.Context,
 	e *events.ApplicationCommandInteractionCreate,
-	t commandapi.Translator,
+	t commandtext.Translator,
 ) (bool, error) {
 	restrictions := b.store.Restrictions()
 

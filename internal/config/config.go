@@ -15,15 +15,19 @@ import (
 type Config struct {
 	DiscordToken string
 
-	SQLitePath          string
+	StorageBackend      StorageBackend
+	PostgresDSN         string
 	Migrations          string
-	MigrationBackups    string
 	OpsAddr             string
 	AdminAddr           string
+	RuntimeRoles        []RuntimeRole
 	LocalesDir          string
 	BundledPluginsDir   string
 	UserPluginsDir      string
 	MarketplaceCacheDir string
+	BundleBackend       BundleBackend
+	BundleStoreDir      string
+	BundleCacheDir      string
 	PermissionsFile     string
 	ModulesFile         string
 	LogLevel            string
@@ -65,24 +69,47 @@ type Config struct {
 	SlashCooldownOverrides map[string]time.Duration
 }
 
+type StorageBackend string
+
 const (
-	defaultSQLitePath          = "./data/mamacord.sqlite"
-	defaultMigrationsDir       = "./migrations/sqlite"
-	defaultMigrationBackups    = "./data/migration_backups"
-	defaultOpsAddr             = ""
-	defaultAdminAddr           = ""
-	defaultLocalesDir          = "./locales"
-	defaultBundledPluginsDir   = "./plugins"
-	defaultUserPluginsDir      = "./data/plugins"
-	defaultMarketplaceCacheDir = "./data/marketplace_cache"
-	defaultPermissionsFile     = "./config/permissions.json"
-	defaultModulesFile         = "./config/modules.json"
-	defaultTrustedKeysFile     = "./config/trusted_keys.json"
-	defaultLogLevel            = "info"
-	defaultCommandRegMode      = "global"
-	defaultSlashCooldownMS     = 5000
-	defaultComponentCooldown   = 750
-	defaultModalCooldownMS     = 1500
+	StorageBackendPostgres StorageBackend = "postgres"
+)
+
+type BundleBackend string
+
+const (
+	BundleBackendLocal       BundleBackend = "local"
+	BundleBackendCached      BundleBackend = "cached"
+	BundleBackendObjectStore BundleBackend = "objectstore"
+)
+
+type RuntimeRole string
+
+const (
+	RuntimeRoleControl   RuntimeRole = "control"
+	RuntimeRoleGateway   RuntimeRole = "gateway"
+	RuntimeRoleScheduler RuntimeRole = "scheduler"
+)
+
+const (
+	defaultPostgresDSN           = "postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable"
+	defaultPostgresMigrationsDir = "./migrations/postgres"
+	defaultOpsAddr               = ""
+	defaultAdminAddr             = ""
+	defaultLocalesDir            = "./locales"
+	defaultBundledPluginsDir     = "./plugins"
+	defaultUserPluginsDir        = "./data/plugins"
+	defaultMarketplaceCacheDir   = "./data/marketplace_cache"
+	defaultBundleStoreDir        = "./data/bundles/store"
+	defaultBundleCacheDir        = "./data/bundles/cache"
+	defaultPermissionsFile       = "./config/permissions.json"
+	defaultModulesFile           = "./config/modules.json"
+	defaultTrustedKeysFile       = "./config/trusted_keys.json"
+	defaultLogLevel              = "info"
+	defaultCommandRegMode        = "global"
+	defaultSlashCooldownMS       = 5000
+	defaultComponentCooldown     = 750
+	defaultModalCooldownMS       = 1500
 )
 
 func LoadFromEnv() (Config, error) {
@@ -100,12 +127,21 @@ func LoadStorageFromEnv() (Config, error) {
 	return loadFromEnv(false)
 }
 
+func LoadBundleFromEnv() (Config, error) {
+	return loadBundleFromEnv()
+}
+
 func loadFromEnv(requireDiscordToken bool) (Config, error) {
+	runtimeRoles, err := parseRuntimeRoles(os.Getenv("MAMACORD_RUNTIME_ROLES"))
+	if err != nil {
+		return Config{}, err
+	}
+
 	var (
 		discordToken string
-		err          error
 	)
-	if requireDiscordToken {
+	if requireDiscordToken && runtimeRolesRequireDiscordToken(runtimeRoles) {
+		var err error
 		discordToken, err = requiredEnv("DISCORD_TOKEN")
 		if err != nil {
 			return Config{}, err
@@ -114,15 +150,25 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 		discordToken = envDefault("DISCORD_TOKEN", "")
 	}
 
-	sqlitePath := envDefault("SQLITE_PATH", defaultSQLitePath)
-	migrations := envDefault("MIGRATIONS_DIR", defaultMigrationsDir)
-	migrationBackups := envDefault("MAMACORD_MIGRATION_BACKUPS_DIR", defaultMigrationBackups)
+	storageBackend := StorageBackend(strings.ToLower(envDefault("MAMACORD_STORAGE_BACKEND", string(StorageBackendPostgres))))
+	switch storageBackend {
+	case StorageBackendPostgres:
+	default:
+		return Config{}, fmt.Errorf("invalid MAMACORD_STORAGE_BACKEND %q", storageBackend)
+	}
+
+	postgresDSN := envDefault("MAMACORD_POSTGRES_DSN", defaultPostgresDSN)
+	migrations := envDefault("MIGRATIONS_DIR", defaultPostgresMigrationsDir)
 	opsAddr := envDefault("MAMACORD_OPS_ADDR", defaultOpsAddr)
 	adminAddr := envDefault("MAMACORD_ADMIN_ADDR", defaultAdminAddr)
 	localesDir := envDefault("LOCALES_DIR", defaultLocalesDir)
 	bundledPluginsDir := envDefault("MAMACORD_BUNDLED_PLUGINS_DIR", defaultBundledPluginsDir)
 	userPluginsDir := envDefault("MAMACORD_USER_PLUGINS_DIR", envDefault("PLUGINS_DIR", defaultUserPluginsDir))
 	marketplaceCacheDir := envDefault("MAMACORD_MARKETPLACE_CACHE_DIR", defaultMarketplaceCacheDir)
+	bundleBackend, bundleStoreDir, bundleCacheDir, err := parseBundleSettingsFromEnv()
+	if err != nil {
+		return Config{}, err
+	}
 	permissionsFile := envDefault("MAMACORD_PERMISSIONS_FILE", defaultPermissionsFile)
 	modulesFile := envDefault("MAMACORD_MODULES_FILE", defaultModulesFile)
 	logLevel := envDefault("LOG_LEVEL", defaultLogLevel)
@@ -189,7 +235,10 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	if strings.TrimSpace(adminAddr) != "" {
+	if strings.TrimSpace(postgresDSN) == "" {
+		return Config{}, errors.New("MAMACORD_POSTGRES_DSN is required when MAMACORD_STORAGE_BACKEND=postgres")
+	}
+	if strings.TrimSpace(adminAddr) != "" && roleEnabled(runtimeRoles, RuntimeRoleControl) {
 		// Production stays strict, but dev should still start the admin API so the
 		// dashboard can show setup diagnostics instead of "connection refused".
 		if prodMode {
@@ -222,15 +271,19 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 
 	return Config{
 		DiscordToken:        discordToken,
-		SQLitePath:          sqlitePath,
+		StorageBackend:      storageBackend,
+		PostgresDSN:         postgresDSN,
 		Migrations:          migrations,
-		MigrationBackups:    migrationBackups,
 		OpsAddr:             opsAddr,
 		AdminAddr:           adminAddr,
+		RuntimeRoles:        runtimeRoles,
 		LocalesDir:          localesDir,
 		BundledPluginsDir:   bundledPluginsDir,
 		UserPluginsDir:      userPluginsDir,
 		MarketplaceCacheDir: marketplaceCacheDir,
+		BundleBackend:       bundleBackend,
+		BundleStoreDir:      bundleStoreDir,
+		BundleCacheDir:      bundleCacheDir,
 		PermissionsFile:     permissionsFile,
 		ModulesFile:         modulesFile,
 		LogLevel:            logLevel,
@@ -260,6 +313,124 @@ func loadFromEnv(requireDiscordToken bool) (Config, error) {
 		SlashCooldownBypass:    slashBypass,
 		SlashCooldownOverrides: slashOverrides,
 	}, nil
+}
+
+func loadBundleFromEnv() (Config, error) {
+	bundleBackend, bundleStoreDir, bundleCacheDir, err := parseBundleSettingsFromEnv()
+	if err != nil {
+		return Config{}, err
+	}
+	return Config{
+		BundleBackend:  bundleBackend,
+		BundleStoreDir: bundleStoreDir,
+		BundleCacheDir: bundleCacheDir,
+	}, nil
+}
+
+func (c Config) HasRuntimeRole(role RuntimeRole) bool {
+	return roleEnabled(c.RuntimeRoles, role)
+}
+
+func (c Config) RuntimeRoleStrings() []string {
+	roles := normalizeRuntimeRoles(c.RuntimeRoles)
+	out := make([]string, 0, len(roles))
+	for _, role := range roles {
+		out = append(out, string(role))
+	}
+	return out
+}
+
+func (c Config) UsesDiscordRuntime() bool {
+	return c.HasRuntimeRole(RuntimeRoleGateway) || c.HasRuntimeRole(RuntimeRoleScheduler)
+}
+
+func (c Config) ControlAPIEnabled() bool {
+	return strings.TrimSpace(c.AdminAddr) != "" && c.HasRuntimeRole(RuntimeRoleControl)
+}
+
+func parseBundleSettingsFromEnv() (BundleBackend, string, string, error) {
+	bundleBackend := BundleBackend(strings.ToLower(envDefault("MAMACORD_BUNDLE_BACKEND", string(BundleBackendLocal))))
+	switch bundleBackend {
+	case BundleBackendLocal, BundleBackendCached, BundleBackendObjectStore:
+	default:
+		return "", "", "", fmt.Errorf("invalid MAMACORD_BUNDLE_BACKEND %q", bundleBackend)
+	}
+	bundleStoreDir := envDefault("MAMACORD_BUNDLE_STORE_DIR", defaultBundleStoreDir)
+	bundleCacheDir := envDefault("MAMACORD_BUNDLE_CACHE_DIR", defaultBundleCacheDir)
+	if bundleBackend == BundleBackendCached || bundleBackend == BundleBackendObjectStore {
+		if strings.TrimSpace(bundleStoreDir) == "" {
+			return "", "", "", errors.New("MAMACORD_BUNDLE_STORE_DIR is required when MAMACORD_BUNDLE_BACKEND is cached or objectstore")
+		}
+		if strings.TrimSpace(bundleCacheDir) == "" {
+			return "", "", "", errors.New("MAMACORD_BUNDLE_CACHE_DIR is required when MAMACORD_BUNDLE_BACKEND is cached or objectstore")
+		}
+	}
+	return bundleBackend, bundleStoreDir, bundleCacheDir, nil
+}
+
+func parseRuntimeRoles(raw string) ([]RuntimeRole, error) {
+	items := parseCSV(strings.ToLower(strings.TrimSpace(raw)))
+	if len(items) == 0 {
+		return defaultRuntimeRoles(), nil
+	}
+
+	out := make([]RuntimeRole, 0, len(items))
+	for _, item := range items {
+		role := RuntimeRole(strings.TrimSpace(item))
+		switch role {
+		case RuntimeRoleControl, RuntimeRoleGateway, RuntimeRoleScheduler:
+			out = append(out, role)
+		default:
+			return nil, fmt.Errorf("invalid MAMACORD_RUNTIME_ROLES entry %q", item)
+		}
+	}
+	return normalizeRuntimeRoles(out), nil
+}
+
+func defaultRuntimeRoles() []RuntimeRole {
+	return []RuntimeRole{
+		RuntimeRoleControl,
+		RuntimeRoleGateway,
+		RuntimeRoleScheduler,
+	}
+}
+
+func normalizeRuntimeRoles(in []RuntimeRole) []RuntimeRole {
+	ordered := defaultRuntimeRoles()
+	if len(in) == 0 {
+		return append([]RuntimeRole(nil), ordered...)
+	}
+
+	seen := map[RuntimeRole]struct{}{}
+	for _, role := range in {
+		role = RuntimeRole(strings.ToLower(strings.TrimSpace(string(role))))
+		switch role {
+		case RuntimeRoleControl, RuntimeRoleGateway, RuntimeRoleScheduler:
+			seen[role] = struct{}{}
+		}
+	}
+
+	out := make([]RuntimeRole, 0, len(ordered))
+	for _, role := range ordered {
+		if _, ok := seen[role]; ok {
+			out = append(out, role)
+		}
+	}
+	return out
+}
+
+func roleEnabled(roles []RuntimeRole, target RuntimeRole) bool {
+	target = RuntimeRole(strings.ToLower(strings.TrimSpace(string(target))))
+	for _, role := range normalizeRuntimeRoles(roles) {
+		if role == target {
+			return true
+		}
+	}
+	return false
+}
+
+func runtimeRolesRequireDiscordToken(roles []RuntimeRole) bool {
+	return roleEnabled(roles, RuntimeRoleGateway) || roleEnabled(roles, RuntimeRoleScheduler)
 }
 
 func splitHostPortLoose(addr string) (host string, port string, err error) {

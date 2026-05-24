@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "查看关于我和版本的信息。"
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "查询用户、服务器、身份组和频道的信息。"
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "查询用户信息。"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "要查询的用户（留空则是你）。"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "查询这个服务器的信息。"
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "查询身份组信息。"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "要查询的身份组。"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "查询频道信息。"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "要查询的频道。"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 机器人"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ 系统"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 语言"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 创建"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 加入"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ 身份组"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ 身份组"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 表情"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ 贴纸"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 成员"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 频道"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 创建"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ 提及"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 位置"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 单独显示"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 可提及"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 托管"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 权限"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 创建"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 提及"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 类型"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ 分类"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 权限"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 创建"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Pet}}，{{.Mommy}}没能获取那个用户的信息。"
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Pet}}，{{.Mommy}}没能获取这个服务器的信息。"
+  }
+]

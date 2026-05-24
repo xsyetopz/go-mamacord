@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "किसी को नरम चेतावनी दो (और ज़रूरत हो तो छोटा time-out)।"
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "किसे चेतावनी चाहिए?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "क्या हुआ?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "चेतावनी हटाओ और उन्हें फिर से कोशिश करने दो।"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "किसकी चेतावनी हटानी है?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "तुम्हें नहीं, {{.Pet}}। {{.Mommy}} तुम्हें भी सुरक्षित रखना चाहती है।"
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} bots या system users को warn नहीं करती, {{.Pet}}।"
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "अभी इतना काफी है, {{.Pet}}। {{.User}} पहले ही warning limit पर है।"
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "ठीक है, {{.Pet}}। मैंने {{.User}} के लिए चेतावनी दर्ज कर ली: `{{.Reason}}`.{{if .TimeoutMinutes}} मैंने उन्हें {{.TimeoutMinutes}} मिनट के लिए time-out में भी रखा है।{{end}}{{if .TimeoutFailed}} मैंने उन्हें time-out में डालने की कोशिश की, लेकिन हो नहीं पाया।{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "अरे {{.Pet}}। {{.Mommy}} चाहती है कि तुम थोड़ा धीमे हो जाओ और ज़्यादा दयालु रहो। तुम्हें `{{.Reason}}` की वजह से चेतावनी मिली है।{{if .TimeoutMinutes}} तुम {{.TimeoutMinutes}} मिनट के लिए time-out में हो—ताकि तुम शांत हो सको।{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "तुम नहीं, {{.Pet}}।"
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.User}} के लिए मुझे कोई warnings नहीं मिलीं, {{.Pet}}।"
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "{{.Pet}}, {{.Mommy}} किस warning को हटाए?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "एक चुनो, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "ये selection expire हो गया, {{.Pet}}। `/unwarn` फिर से चलाओ।"
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "हो गया, {{.Pet}}~ {{.User}} अब साफ़ slate पर है। ❤️"
+  }
+]

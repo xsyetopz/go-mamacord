@@ -15,15 +15,15 @@ ARG BUILD_DEVELOPER_URL=
 ARG BUILD_SUPPORT_SERVER_URL=
 ARG BUILD_MASCOT_IMAGE_URL=
 RUN BUILD_DESCRIPTION_BASE64="$(printf '%s' "$BUILD_DESCRIPTION" | base64 | tr -d '\n')" && \
-RUN go build -trimpath \
-  -ldflags="-s -w \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.Version=${BUILD_VERSION}' \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.Repository=${BUILD_REPOSITORY}' \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.DescriptionBase64=${BUILD_DESCRIPTION_BASE64}' \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.DeveloperURL=${BUILD_DEVELOPER_URL}' \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.SupportServerURL=${BUILD_SUPPORT_SERVER_URL}' \
-    -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.MascotImageURL=${BUILD_MASCOT_IMAGE_URL}'" \
-  -o /out/mamacord ./cmd/mamacord
+  go build -trimpath \
+    -ldflags="-s -w \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.Version=${BUILD_VERSION}' \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.Repository=${BUILD_REPOSITORY}' \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.DescriptionBase64=${BUILD_DESCRIPTION_BASE64}' \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.DeveloperURL=${BUILD_DEVELOPER_URL}' \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.SupportServerURL=${BUILD_SUPPORT_SERVER_URL}' \
+      -X 'github.com/xsyetopz/go-mamacord/internal/buildinfo.MascotImageURL=${BUILD_MASCOT_IMAGE_URL}'" \
+    -o /out/mamacord ./cmd/mamacord
 
 
 FROM debian:bookworm-slim
@@ -44,14 +44,18 @@ COPY locales ./locales
 COPY plugins ./plugins
 COPY config ./config
 
-RUN mkdir -p /data && chown -R mamacord:mamacord /data
+RUN mkdir -p /data/plugins /data/marketplace_cache /data/bundles/store /data/bundles/cache && chown -R mamacord:mamacord /data
 
 USER mamacord:mamacord
 
-ENV SQLITE_PATH=/data/mamacord.sqlite
-ENV MIGRATIONS_DIR=/app/migrations/sqlite
+ENV MAMACORD_STORAGE_BACKEND=postgres
+ENV MAMACORD_POSTGRES_DSN=postgres://mamacord:secret@postgres:5432/mamacord?sslmode=disable
 ENV LOCALES_DIR=/app/locales
-ENV PLUGINS_DIR=/app/plugins
+ENV MAMACORD_BUNDLED_PLUGINS_DIR=/app/plugins
+ENV MAMACORD_USER_PLUGINS_DIR=/data/plugins
+ENV MAMACORD_MARKETPLACE_CACHE_DIR=/data/marketplace_cache
+ENV MAMACORD_BUNDLE_STORE_DIR=/data/bundles/store
+ENV MAMACORD_BUNDLE_CACHE_DIR=/data/bundles/cache
 ENV MAMACORD_PERMISSIONS_FILE=/app/config/permissions.json
 
 ENTRYPOINT ["mamacord"]

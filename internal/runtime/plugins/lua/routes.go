@@ -44,19 +44,66 @@ func (v *VM) Definition() (Definition, bool) {
 }
 
 func (v *VM) CallRoute(ctx context.Context, kind RouteKind, routeID string, payload Payload) (any, bool, error) {
+	res, hasValue, err := v.callRouteResult(ctx, kind, routeID, payload)
+	if err != nil || !hasValue {
+		return nil, hasValue, err
+	}
+
+	out, _, err := luaToAny(res)
+	if err != nil {
+		return nil, false, fmt.Errorf("lua route %q (%s) return: %w", routeID, kind, err)
+	}
+	return out, true, nil
+}
+
+func (v *VM) CallEncodedRoute(ctx context.Context, kind RouteKind, routeID string, payload Payload) (EncodedValue, bool, error) {
+	res, hasValue, err := v.callRouteResult(ctx, kind, routeID, payload)
+	if err != nil || !hasValue {
+		return nil, hasValue, err
+	}
+
+	encoded, err := encodeLuaResult(res, fmt.Sprintf("lua route %q (%s)", routeID, kind))
+	if err != nil {
+		return nil, false, err
+	}
+	return encoded, true, nil
+}
+
+func (v *VM) CallAutocomplete(ctx context.Context, routeID string, payload Payload) (EncodedValue, error) {
+	encoded, hasValue, err := v.CallEncodedRoute(ctx, RouteAutocomplete, routeID, payload)
+	if err != nil || !hasValue {
+		return nil, err
+	}
+	return encoded, nil
+}
+
+func encodeLuaResult(res lua.LValue, context string) (EncodedValue, error) {
+	out, _, err := luaToAny(res)
+	if err != nil {
+		return nil, fmt.Errorf("%s return: %w", context, err)
+	}
+
+	encoded, err := EncodeValue(out)
+	if err != nil {
+		return nil, fmt.Errorf("%s encode: %w", context, err)
+	}
+	return encoded, nil
+}
+
+func (v *VM) callRouteResult(ctx context.Context, kind RouteKind, routeID string, payload Payload) (lua.LValue, bool, error) {
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
 	if v.L == nil {
-		return nil, false, errors.New("lua vm is closed")
+		return lua.LNil, false, errors.New("lua vm is closed")
 	}
 	if v.definition == nil {
-		return nil, false, errors.New("plugin descriptor not loaded")
+		return lua.LNil, false, errors.New("plugin descriptor not loaded")
 	}
 
 	handler, ok := v.definition.lookup(kind, routeID)
 	if !ok || handler == nil {
-		return nil, false, fmt.Errorf("route %q (%s) not found", routeID, kind)
+		return lua.LNil, false, fmt.Errorf("route %q (%s) not found", routeID, kind)
 	}
 
 	timeoutCtx := ctx
@@ -94,26 +141,22 @@ func (v *VM) CallRoute(ctx context.Context, kind RouteKind, routeID string, payl
 
 	ctxTable, err := v.routeContextToLua(kind, routeID, payload)
 	if err != nil {
-		return nil, false, err
+		return lua.LNil, false, err
 	}
 
 	v.L.Push(handler)
 	v.L.Push(ctxTable)
 	if callErr := v.L.PCall(1, 1, nil); callErr != nil {
-		return nil, false, fmt.Errorf("lua route %q (%s): %w", routeID, kind, callErr)
+		return lua.LNil, false, fmt.Errorf("lua route %q (%s): %w", routeID, kind, callErr)
 	}
 
 	res := v.L.Get(-1)
 	v.L.Pop(1)
 	if res == lua.LNil {
-		return nil, false, nil
+		return lua.LNil, false, nil
 	}
 
-	out, _, err := luaToAny(res)
-	if err != nil {
-		return nil, false, fmt.Errorf("lua route %q (%s) return: %w", routeID, kind, err)
-	}
-	return out, true, nil
+	return res, true, nil
 }
 
 func (v *VM) routeContextToLua(kind RouteKind, routeID string, payload Payload) (*lua.LTable, error) {

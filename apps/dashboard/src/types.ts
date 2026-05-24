@@ -62,9 +62,9 @@ export type StatusResponse = {
 		mascot_image_url?: string;
 	};
 	config: {
-		sqlite_path: string;
+		storage_backend: string;
+		storage_target: string;
 		migrations_dir: string;
-		migration_backups_dir: string;
 		locales_dir: string;
 		bundled_plugins_dir: string;
 		user_plugins_dir: string;
@@ -73,6 +73,7 @@ export type StatusResponse = {
 		trusted_keys_file: string;
 		ops_addr: string;
 		admin_addr: string;
+		runtime_roles: string[];
 		dev_guild_id?: string;
 		command_registration_mode: string;
 		prod_mode: boolean;
@@ -102,8 +103,14 @@ export type PluginSummary = {
 	loaded: boolean;
 	signed: boolean;
 	has_signature_file: boolean;
-	dir: string;
+	plugin_root: string;
 	bundled: boolean;
+	provenance_kind: string;
+	source_id?: string;
+	git_revision?: string;
+	signature_state?: string;
+	local_modified: boolean;
+	bundle_relative_dir?: string;
 };
 
 export type MigrationStatus = {

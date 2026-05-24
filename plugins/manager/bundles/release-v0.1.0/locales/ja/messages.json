@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "チャンネルのスローモードを設定するよ。"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "どのチャンネル？"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "メッセージ間の秒数(0で解除)。"
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "メンバーのニックネームを変更するよ。"
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "誰のニックネーム？"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "新しいニックネーム(空でリセット)。"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "チャンネルのメッセージをお片付けするよ。"
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "最近のメッセージを削除するよ。"
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "指定メッセージより前を削除するよ。"
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "指定メッセージより後を削除するよ。"
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "指定メッセージの周辺を削除するよ。"
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "何件削除する？(やさしくね。)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "メッセージIDまたはリンク。"
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "ロールを管理するよ。"
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "ロールを作成するよ。"
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "ロールを編集するよ。"
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "ロールを削除するよ。"
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "メンバーにロールを付けるよ。"
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "メンバーからロールを外すよ。"
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "どのロール？"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "どのメンバー？"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "ロール名。"
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "ロール色(RRGGBB)。"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "メンバー一覧で別表示にする？"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "@メンションを許可する？"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "絵文字を管理するよ。"
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "絵文字を作成するよ。"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "絵文字の名前を変えるよ。"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "絵文字を削除するよ。"
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "絵文字の名前。"
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "絵文字画像。"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "絵文字メンション(<:name:id>)またはID。"
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "スタンプを管理するよ。"
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "スタンプを作成するよ。"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "スタンプを編集するよ。"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "スタンプを削除するよ。"
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "スタンプIDまたはリンク。"
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "スタンプ名。"
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "スタンプの説明(任意)。"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "絵文字タグ(Discordが必須)。"
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "スタンプ画像。"
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "うん、{{.Pet}}。{{.Channel}}はスローモード: `{{.Seconds}}s`。"
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "よし、{{.Pet}}〜。{{.Channel}}のスローモードはオフだよ。 ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Pet}}、スローモードを更新できなかったの。"
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "{{.Pet}}、自分のニックネームは変えられないよ。"
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "うん、{{.Pet}}。{{.User}}は `{{.Nickname}}` になったよ。"
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "うん、{{.Pet}}。{{.User}}のニックネームをリセットしたよ。"
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Pet}}、{{.User}}のニックネームを更新できなかったの。"
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "{{.Pet}}、それは有効なメッセージID/リンクに見えないよ。"
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "お片付け完了、{{.Pet}}。`{{.Count}}` 件削除したよ。"
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Pet}}、メッセージを削除できなかったの。"
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "{{.Pet}}、その色は違うみたい: `{{.Colour}}` (RRGGBB)。"
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "{{.Pet}}、`@everyone` は触っちゃだめ。"
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "{{.Pet}}、`@everyone` は触っちゃだめ。"
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "できたよ、{{.Pet}}。{{.Role}}を作ったよ。"
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Pet}}、`@{{.Name}}` を作れなかったの。"
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "できたよ、{{.Pet}}。{{.Role}}を更新したよ。"
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Pet}}、{{.Role}}を編集できなかったの。"
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "うん、{{.Pet}}。`@{{.Name}}` は消したよ。"
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Pet}}、{{.Role}}を削除できなかったの。"
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "できたよ、{{.Pet}}。{{.User}}に{{.Role}}を付けたよ。"
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Pet}}、{{.User}}に{{.Role}}を付けられなかったの。"
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "できたよ、{{.Pet}}。{{.User}}から{{.Role}}を外したよ。"
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Pet}}、{{.User}}から{{.Role}}を外せなかったの。"
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "{{.Pet}}、添付ファイルが必要だよ。"
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "{{.Pet}}、ファイルが大きすぎるよ({{.Size}} bytes; max {{.Max}})。"
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "{{.Pet}}、その拡張子は絵文字に使えないよ: `{{.Ext}}`。"
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "{{.Pet}}、このサーバーは絵文字上限だよ(max `{{.Max}}`)。"
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Pet}}、{{.Mommy}}はDiscordのCDNからしかダウンロードできないの。"
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "{{.Pet}}、画像サイズを読み取れなかったの。"
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "{{.Pet}}、絵文字には大きすぎるよ: `{{.Width}}x{{.Height}}`。"
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "{{.Pet}}、その画像形式は対応してないの。"
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "{{.Pet}}、有効な絵文字に見えないよ: `{{.Emoji}}`。"
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "かわいい! {{.Pet}}、`:{{.Name}}:` を作ったよ。"
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Pet}}、`:{{.Name}}:` を作れなかったの。"
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "うん、{{.Pet}}。`{{.Name}}` に名前を変えたよ。"
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Pet}}、その絵文字をリネームできなかったの。"
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "うん、{{.Pet}}。絵文字を削除したよ。"
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Pet}}、絵文字を削除できなかったの。"
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "{{.Pet}}、添付ファイルが必要だよ。"
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "{{.Pet}}、Discordは絵文字タグが必要だよ。"
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "{{.Pet}}、ファイルが大きすぎるよ({{.Size}} bytes; max {{.Max}})。"
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "{{.Pet}}、その拡張子はスタンプに使えないよ: `{{.Ext}}`。"
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "{{.Pet}}、このサーバーはスタンプ上限だよ(max `{{.Max}}`)。"
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Pet}}、{{.Mommy}}はDiscordのCDNからしかダウンロードできないの。"
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "{{.Pet}}、画像サイズを読み取れなかったの。"
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "{{.Pet}}、スタンプには大きすぎるよ: `{{.Width}}x{{.Height}}`。"
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "{{.Pet}}、そのスタンプID/リンクは違うみたい: `{{.ID}}`。"
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "できたよ、{{.Pet}}〜。`{{.Name}}` を作ったよ。 ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Pet}}、`{{.Name}}` を作れなかったの。"
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "できたよ、{{.Pet}}〜。`{{.Name}}` を更新したよ。 ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Pet}}、スタンプを編集できなかったの。"
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "うん、{{.Pet}}〜。スタンプを削除したよ。 ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Pet}}、スタンプを削除できなかったの。"
+  }
+]

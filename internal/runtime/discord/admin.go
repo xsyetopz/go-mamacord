@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
@@ -30,13 +31,13 @@ func (p pluginAdmin) Reload(ctx context.Context) error {
 	return p.b.reloadModules(ctx)
 }
 
-var _ commandapi.PluginAdmin = pluginAdmin{}
+var _ commandruntime.PluginAdmin = pluginAdmin{}
 
 type moduleAdmin struct{ b *Bot }
 
 func (m moduleAdmin) Configured() bool { return m.b != nil }
 
-func (m moduleAdmin) Infos() []commandapi.ModuleInfo {
+func (m moduleAdmin) Infos() []moduleapi.Info {
 	if m.b == nil {
 		return nil
 	}
@@ -64,4 +65,4 @@ func (m moduleAdmin) Reset(ctx context.Context, moduleID string) error {
 	return m.b.resetModule(ctx, moduleID)
 }
 
-var _ commandapi.ModuleAdmin = moduleAdmin{}
+var _ moduleapi.Admin = moduleAdmin{}

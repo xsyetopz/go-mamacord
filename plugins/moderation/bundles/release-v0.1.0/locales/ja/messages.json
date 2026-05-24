@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "だれかにやさしく警告するよ(必要なら短いタイムアウトも)。"
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "誰を警告する？"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "何があったの？"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "警告を取り消して、もう一度やり直せるようにするよ。"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "誰の警告を取り消す？"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "だめだよ、{{.Pet}}。{{.Mommy}}は君のことも守りたいの。"
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}、ボットやシステムユーザーは警告できないよ。"
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "{{.Pet}}、今はここまで。{{.User}}はもう警告上限だよ。"
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "うん、{{.Pet}}。{{.User}}に警告を記録したよ: `{{.Reason}}`。{{if .TimeoutMinutes}} さらに {{.TimeoutMinutes}} 分タイムアウトにしたよ。{{end}}{{if .TimeoutFailed}} タイムアウトも試したけど、できなかったの。{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "やあ、{{.Pet}}。{{.Mommy}}は少し落ち着いて、もっと優しくしてほしいの。理由: `{{.Reason}}`。{{if .TimeoutMinutes}} {{.TimeoutMinutes}} 分のタイムアウトでクールダウンしようね。{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "それは君じゃないよ、{{.Pet}}。"
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.Pet}}、{{.User}}の警告は見つからなかったよ。"
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "{{.Pet}}、どの警告を外す？"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "{{.Pet}}、ママのために選んでね..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "{{.Pet}}、その選択は期限切れ。もう一度 `/unwarn` を実行してね。"
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "できたよ、{{.Pet}}〜。{{.User}}はまっさらだよ。 ❤️"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Δώσε σε κάποιον μια ήρεμη προειδοποίηση (και ένα μικρό time-out αν χρειαστεί)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Ποιος χρειάζεται την προειδοποίηση;"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Τι έγινε;"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Αφαίρεσε μια προειδοποίηση και άφησέ τον/την να ξαναδοκιμάσει."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Σε ποιον/ποια να αφαιρεθεί η προειδοποίηση;"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Όχι εσένα, {{.Pet}}. Η {{.Mommy}} θέλει κι εσένα ασφαλή."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "Η {{.Mommy}} δεν προειδοποιεί bots ή system users, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Φτάνει για τώρα, {{.Pet}}. Ο/Η {{.User}} είναι ήδη στο όριο προειδοποιήσεων."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Εντάξει, {{.Pet}}. Κατέγραψα μια προειδοποίηση για {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} Τον/την έβαλα και σε time-out για {{.TimeoutMinutes}} λεπτά.{{end}}{{if .TimeoutFailed}} Προσπάθησα να τον/την βάλω σε time-out, αλλά δεν μπόρεσα.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Γεια σου {{.Pet}}. Η {{.Mommy}} θέλει να κόψεις λίγο ταχύτητα και να είσαι πιο ευγενικός/ή. Πήρες προειδοποίηση για `{{.Reason}}`.{{if .TimeoutMinutes}} Είσαι σε time-out για {{.TimeoutMinutes}} λεπτά για να ηρεμήσεις.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Όχι εσένα, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Δεν βρήκα προειδοποιήσεις για {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Ποια προειδοποίηση να αφαιρέσει η {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Διάλεξε μία για τη μανούλα, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Αυτή η επιλογή έληξε, {{.Pet}}. Τρέξε `/unwarn` ξανά."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Έγινε, {{.Pet}}~ ο/η {{.User}} έχει καθαρό ιστορικό. ❤️"
+  }
+]

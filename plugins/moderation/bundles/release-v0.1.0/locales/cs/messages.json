@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Dej nekomu jemne varovani (a kdyz je treba, i kratky time-out)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Koho varovat?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Co se stalo?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Odebrat varovani a dat sanci zacit znovu."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Komu odebrat varovani?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Ne ty, {{.Pet}}. {{.Mommy}} chce chranit i tebe."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}, {{.Mommy}} nevaruje boty ani systemove ucty."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Staci, {{.Pet}}. {{.User}} uz ma limit varovani."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Dobre, {{.Pet}}. Zapsala jsem varovani pro {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} A dala jsem time-out na {{.TimeoutMinutes}} minut.{{end}}{{if .TimeoutFailed}} Time-out jsem zkusila, ale nepovedlo se.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Ahoj {{.Pet}}. {{.Mommy}} potrebuje, abys zpomalil a byl milejsi. Duvod: `{{.Reason}}`.{{if .TimeoutMinutes}} Mas time-out na {{.TimeoutMinutes}} minut, at vychladnes.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Ne ty, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.Pet}}, nenasla jsem zadna varovani pro {{.User}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Ktere varovani ma {{.Mommy}} odstranit, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Vyber jedno, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "{{.Pet}}, tohle vyprselo. Spust `/unwarn` znovu."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Hotovo, {{.Pet}}~. {{.User}} ma cisty stit. ❤️"
+  }
+]

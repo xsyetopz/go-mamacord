@@ -3,13 +3,13 @@ package catalog
 import (
 	"github.com/disgoorg/disgo/discord"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 type CommandCreateOptions struct {
-	Builtins         []commandapi.SlashCommand
+	Builtins         []slashcmd.Command
 	PluginHost       *pluginhost.Host
 	EnabledPluginIDs map[string]struct{}
 	I18n             i18n.Registry
@@ -20,10 +20,9 @@ func CommandCreates(opts CommandCreateOptions) []discord.ApplicationCommandCreat
 	const extraCreatesCapacity = 8
 	creates := make([]discord.ApplicationCommandCreate, 0, len(opts.Builtins)+extraCreatesCapacity)
 	for _, cmd := range opts.Builtins {
-		creates = append(
-			creates,
-			cmd.CreateCommand(opts.Locales, commandapi.Translator{Registry: opts.I18n, Locale: discord.LocaleEnglishUS}),
-		)
+		if create, ok := builtinCommandCreate(cmd, opts.Locales, opts.I18n); ok {
+			creates = append(creates, create)
+		}
 	}
 	if opts.PluginHost == nil {
 		return creates

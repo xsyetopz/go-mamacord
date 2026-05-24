@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Включить или изменить медленный режим в канале."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Какой канал?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Секунд между сообщениями (0 - убрать)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Изменить ник участника."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "Кому изменить ник?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Новый ник (оставь пустым, чтобы сбросить)."
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Почистить сообщения в канале."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Удалить последние сообщения."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Удалить сообщения до указанного сообщения."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Удалить сообщения после указанного сообщения."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Удалить сообщения вокруг указанного сообщения."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Сколько сообщений? (Аккуратнее.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "ID сообщения или ссылка на сообщение."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Управление ролями."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Создать роль."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Изменить роль."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Удалить роль."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Выдать роль участнику."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Снять роль с участника."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Какая роль?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Какой участник?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Имя роли."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Цвет роли (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Показывать отдельно в списке участников?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Разрешить упоминания (@mention)?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Управление эмодзи."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Создать эмодзи."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Переименовать эмодзи."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Удалить эмодзи."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Имя эмодзи."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Картинка эмодзи."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Упоминание эмодзи (<:name:id>) или ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Управление стикерами."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Создать стикер."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Изменить стикер."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Удалить стикер."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "ID стикера или ссылка на стикер."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Имя стикера."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Описание стикера (необязательно)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Эмодзи-тег (Discord требует его)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Картинка стикера."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Хорошо, {{.Pet}}. Для {{.Channel}} включен медленный режим: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "Вот и все, {{.Pet}}~. Медленный режим выключен для {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла изменить медленный режим."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "Я не могу менять твой собственный ник, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Хорошо, {{.Pet}}. {{.User}} теперь `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Хорошо, {{.Pet}}. Я сбросила ник {{.User}}."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла изменить ник {{.User}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "Это не похоже на корректный ID или ссылку на сообщение, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "Чисто, {{.Pet}}. Удалила сообщений: `{{.Count}}`."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла удалить эти сообщения."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "Этот цвет не подходит, {{.Pet}}: `{{.Colour}}` (нужно RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "Руки прочь от `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "Руки прочь от `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "Готово, {{.Pet}}. Роль {{.Role}} создана."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла создать `@{{.Name}}`."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "Готово, {{.Pet}}. Роль {{.Role}} обновлена."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла изменить {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Хорошо, {{.Pet}}. `@{{.Name}}` удалена."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла удалить {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "Готово, {{.Pet}}. У {{.User}} теперь есть {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла выдать {{.Role}} пользователю {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "Готово, {{.Pet}}. {{.Role}} снята с {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла снять {{.Role}} с {{.User}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "{{.Pet}}, мне нужен файл-вложение."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "{{.Pet}}, файл слишком большой ({{.Size}} байт; максимум {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "С таким расширением эмодзи не получится, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "На этом сервере уже максимум эмодзи, {{.Pet}} (макс. `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Pet}}, {{.Mommy}} может скачивать только с CDN Discord."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "{{.Pet}}, я не смогла прочитать размеры изображения."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "{{.Pet}}, для эмодзи картинка слишком большая: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "{{.Pet}}, этот формат изображения не поддерживается."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "Это не похоже на корректный эмодзи, {{.Pet}}: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Мило! {{.Pet}}, `:{{.Name}}:` создан."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла создать `:{{.Name}}:`."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Хорошо, {{.Pet}}. Переименовала в `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла переименовать этот эмодзи."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Хорошо, {{.Pet}}. Эмодзи удален."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла удалить этот эмодзи."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "{{.Pet}}, мне нужен файл-вложение."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "{{.Pet}}, Discord требует эмодзи-тег."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "{{.Pet}}, файл слишком большой ({{.Size}} байт; максимум {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "С таким расширением стикер не получится, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "На этом сервере уже максимум стикеров, {{.Pet}} (макс. `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Pet}}, {{.Mommy}} может скачивать только с CDN Discord."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "{{.Pet}}, я не смогла прочитать размеры изображения."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "{{.Pet}}, для стикера картинка слишком большая: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "{{.Pet}}, этот ID/ссылка на стикер выглядит неправильно: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Готово, {{.Pet}}~. `{{.Name}}` создан. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла создать `{{.Name}}`."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Готово, {{.Pet}}~. `{{.Name}}` обновлен. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла изменить этот стикер."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Хорошо, {{.Pet}}~. Стикер удален. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Pet}}, {{.Mommy}} не смогла удалить этот стикер."
+  }
+]

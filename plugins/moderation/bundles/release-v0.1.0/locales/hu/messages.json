@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Adj valakinek egy szelíd figyelmeztetést (és ha kell, rövid time-outot)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Ki kapja a figyelmeztetést?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Mi történt?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Vond vissza a figyelmeztetést, és adj egy új esélyt."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Kinek vegyük le a figyelmeztetést?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Nem téged, {{.Pet}}. {{.Mommy}} téged is biztonságban akar tudni."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} nem figyelmeztet botokat vagy rendszerfelhasználókat, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Most elég lesz, {{.Pet}}. {{.User}} már elérte a figyelmeztetés-limitet."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Rendben, {{.Pet}}. Rögzítettem egy figyelmeztetést {{.User}} számára: `{{.Reason}}`.{{if .TimeoutMinutes}} Time-outba is tettem {{.TimeoutMinutes}} percre.{{end}}{{if .TimeoutFailed}} Megpróbáltam time-outba tenni, de nem sikerült.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Szia {{.Pet}}. {{.Mommy}} azt szeretné, ha lassítanál és kedvesebb lennél. Figyelmeztetést kaptál ezért: `{{.Reason}}`.{{if .TimeoutMinutes}} {{.TimeoutMinutes}} percre time-outban vagy, hogy megnyugodj.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Nem te, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Nem találtam figyelmeztetéseket {{.User}} számára, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Melyik figyelmeztetést vegye le {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Válassz egyet, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Ez a választás lejárt, {{.Pet}}. Futtasd újra: `/unwarn`."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Kész is van, {{.Pet}}~ {{.User}} tiszta lappal indul. ❤️"
+  }
+]

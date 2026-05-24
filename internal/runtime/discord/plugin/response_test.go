@@ -1,20 +1,24 @@
 package plugin
 
-import "testing"
+import (
+	"testing"
+
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+)
 
 func TestParseActionRejectsActionsForInteractions(t *testing.T) {
 	t.Parallel()
 
-	_, err := ParseAction("moderation", map[string]any{
-		"actions": []any{
-			map[string]any{
+	_, err := ParseAction("moderation", luaplugin.EncodedValue(`{
+		"actions": [
+			{
 				"type": "send_dm",
-				"message": map[string]any{
-					"content": "hi",
-				},
-			},
-		},
-	}, false, ResponseSlash)
+				"message": {
+					"content": "hi"
+				}
+			}
+		]
+	}`), false, ResponseSlash)
 	if err == nil {
 		t.Fatal("expected actions to be rejected for interaction responses")
 	}
@@ -26,31 +30,31 @@ func TestParseActionRejectsActionsForInteractions(t *testing.T) {
 func TestParseActionAllowsDeferredSlashUpdate(t *testing.T) {
 	t.Parallel()
 
-	action, err := ParseAction("info", map[string]any{
-		"type":       "update",
+	action, err := ParseAction("info", luaplugin.EncodedValue(`{
+		"type": "update",
 		"__deferred": true,
-		"embeds": []any{
-			map[string]any{
-				"title":         "Lookup",
+		"embeds": [
+			{
+				"title": "Lookup",
 				"thumbnail_url": "https://example.com/thumb.png",
-				"author": map[string]any{
-					"name":     "MamaCord",
-					"icon_url": "https://example.com/author.png",
+				"author": {
+					"name": "MamaCord",
+					"icon_url": "https://example.com/author.png"
 				},
-				"footer": map[string]any{
-					"text":     "Footer",
-					"icon_url": "https://example.com/footer.png",
+				"footer": {
+					"text": "Footer",
+					"icon_url": "https://example.com/footer.png"
 				},
-				"fields": []any{
-					map[string]any{
-						"name":   "Created",
-						"value":  "<t:1700000000:F>",
-						"inline": true,
-					},
-				},
-			},
-		},
-	}, true, ResponseSlash)
+				"fields": [
+					{
+						"name": "Created",
+						"value": "<t:1700000000:F>",
+						"inline": true
+					}
+				]
+			}
+		]
+	}`), true, ResponseSlash)
 	if err != nil {
 		t.Fatalf("ParseAction(update): %v", err)
 	}
@@ -69,5 +73,39 @@ func TestParseActionAllowsDeferredSlashUpdate(t *testing.T) {
 	}
 	if embed.Thumbnail == nil || embed.Thumbnail.URL != "https://example.com/thumb.png" {
 		t.Fatalf("expected thumbnail to be parsed, got %#v", embed.Thumbnail)
+	}
+}
+
+func TestParseActionRejectsInvalidEncodedJSON(t *testing.T) {
+	t.Parallel()
+
+	_, err := ParseAction("broken", luaplugin.EncodedValue(`{"type":`), false, ResponseSlash)
+	if err == nil {
+		t.Fatal("expected invalid encoded json to fail")
+	}
+	if got := err.Error(); got == "" {
+		t.Fatal("expected a concrete error")
+	}
+}
+
+func TestParseAutomationMessageFromEncodedJSON(t *testing.T) {
+	t.Parallel()
+
+	msg, err := ParseAutomationMessage("info", luaplugin.EncodedValue(`{
+		"content": "hello",
+		"embeds": [
+			{
+				"title": "Hi"
+			}
+		]
+	}`))
+	if err != nil {
+		t.Fatalf("ParseAutomationMessage: %v", err)
+	}
+	if msg.Content != "hello" {
+		t.Fatalf("unexpected content: %#v", msg)
+	}
+	if len(msg.Embeds) != 1 || msg.Embeds[0].Title != "Hi" {
+		t.Fatalf("unexpected embeds: %#v", msg.Embeds)
 	}
 }

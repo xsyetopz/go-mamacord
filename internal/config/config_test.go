@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 )
 
@@ -24,14 +25,14 @@ func TestLoadFromEnv_Defaults(t *testing.T) {
 	if cfg.DiscordToken != "discord-token" {
 		t.Fatalf("unexpected discord token: %q", cfg.DiscordToken)
 	}
-	if cfg.SQLitePath != "./data/mamacord.sqlite" {
-		t.Fatalf("unexpected sqlite path: %q", cfg.SQLitePath)
+	if cfg.StorageBackend != config.StorageBackendPostgres {
+		t.Fatalf("unexpected storage backend: %q", cfg.StorageBackend)
 	}
-	if cfg.Migrations != "./migrations/sqlite" {
+	if cfg.PostgresDSN != "postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable" {
+		t.Fatalf("unexpected postgres dsn: %q", cfg.PostgresDSN)
+	}
+	if cfg.Migrations != "./migrations/postgres" {
 		t.Fatalf("unexpected migrations dir: %q", cfg.Migrations)
-	}
-	if cfg.MigrationBackups != "./data/migration_backups" {
-		t.Fatalf("unexpected migration backup dir: %q", cfg.MigrationBackups)
 	}
 	if cfg.OpsAddr != "" {
 		t.Fatalf("unexpected ops addr: %q", cfg.OpsAddr)
@@ -50,6 +51,15 @@ func TestLoadFromEnv_Defaults(t *testing.T) {
 	}
 	if cfg.MarketplaceCacheDir != "./data/marketplace_cache" {
 		t.Fatalf("unexpected marketplace cache dir: %q", cfg.MarketplaceCacheDir)
+	}
+	if cfg.BundleBackend != config.BundleBackendLocal {
+		t.Fatalf("unexpected bundle backend: %q", cfg.BundleBackend)
+	}
+	if cfg.BundleStoreDir != "./data/bundles/store" {
+		t.Fatalf("unexpected bundle store dir: %q", cfg.BundleStoreDir)
+	}
+	if cfg.BundleCacheDir != "./data/bundles/cache" {
+		t.Fatalf("unexpected bundle cache dir: %q", cfg.BundleCacheDir)
 	}
 	if cfg.PermissionsFile != "./config/permissions.json" {
 		t.Fatalf("unexpected permissions file: %q", cfg.PermissionsFile)
@@ -82,6 +92,132 @@ func TestLoadFromEnv_Defaults(t *testing.T) {
 	}
 	if len(cfg.SlashCooldownOverrides) != 0 {
 		t.Fatalf("expected no cooldown overrides, got %#v", cfg.SlashCooldownOverrides)
+	}
+}
+
+func TestLoadStorageFromEnv_ParsesPostgresBackend(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("MAMACORD_STORAGE_BACKEND", "postgres")
+	t.Setenv("MAMACORD_POSTGRES_DSN", "postgres://bot:secret@localhost:5432/mamacord?sslmode=disable")
+
+	cfg, err := config.LoadStorageFromEnv()
+	if err != nil {
+		t.Fatalf("LoadStorageFromEnv: %v", err)
+	}
+	if cfg.StorageBackend != config.StorageBackendPostgres {
+		t.Fatalf("unexpected storage backend: %q", cfg.StorageBackend)
+	}
+	if cfg.PostgresDSN != "postgres://bot:secret@localhost:5432/mamacord?sslmode=disable" {
+		t.Fatalf("unexpected postgres dsn: %q", cfg.PostgresDSN)
+	}
+	if cfg.Migrations != "./migrations/postgres" {
+		t.Fatalf("unexpected migrations dir: %q", cfg.Migrations)
+	}
+}
+
+func TestLoadStorageFromEnv_ParsesCachedBundleBackend(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("MAMACORD_BUNDLE_BACKEND", "cached")
+	t.Setenv("MAMACORD_BUNDLE_STORE_DIR", "/srv/mamacord/bundles")
+	t.Setenv("MAMACORD_BUNDLE_CACHE_DIR", "/var/cache/mamacord/bundles")
+
+	cfg, err := config.LoadStorageFromEnv()
+	if err != nil {
+		t.Fatalf("LoadStorageFromEnv: %v", err)
+	}
+	if cfg.BundleBackend != config.BundleBackendCached {
+		t.Fatalf("unexpected bundle backend: %q", cfg.BundleBackend)
+	}
+	if cfg.BundleStoreDir != "/srv/mamacord/bundles" {
+		t.Fatalf("unexpected bundle store dir: %q", cfg.BundleStoreDir)
+	}
+	if cfg.BundleCacheDir != "/var/cache/mamacord/bundles" {
+		t.Fatalf("unexpected bundle cache dir: %q", cfg.BundleCacheDir)
+	}
+}
+
+func TestLoadStorageFromEnv_ParsesObjectStoreBundleBackend(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("MAMACORD_BUNDLE_BACKEND", "objectstore")
+	t.Setenv("MAMACORD_BUNDLE_STORE_DIR", "/srv/mamacord/object-store")
+	t.Setenv("MAMACORD_BUNDLE_CACHE_DIR", "/var/cache/mamacord/bundles")
+
+	cfg, err := config.LoadStorageFromEnv()
+	if err != nil {
+		t.Fatalf("LoadStorageFromEnv: %v", err)
+	}
+	if cfg.BundleBackend != config.BundleBackendObjectStore {
+		t.Fatalf("unexpected bundle backend: %q", cfg.BundleBackend)
+	}
+	if cfg.BundleStoreDir != "/srv/mamacord/object-store" {
+		t.Fatalf("unexpected bundle store dir: %q", cfg.BundleStoreDir)
+	}
+	if cfg.BundleCacheDir != "/var/cache/mamacord/bundles" {
+		t.Fatalf("unexpected bundle cache dir: %q", cfg.BundleCacheDir)
+	}
+}
+
+func TestLoadStorageFromEnv_DefaultsPostgresDSN(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("MAMACORD_STORAGE_BACKEND", "postgres")
+
+	cfg, err := config.LoadStorageFromEnv()
+	if err != nil {
+		t.Fatalf("LoadStorageFromEnv: %v", err)
+	}
+	if cfg.PostgresDSN != "postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable" {
+		t.Fatalf("unexpected postgres dsn: %q", cfg.PostgresDSN)
+	}
+}
+
+func TestLoadFromEnv_DefaultRuntimeRoles(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("DISCORD_TOKEN", "discord-token")
+
+	cfg, err := config.LoadFromEnv()
+	if err != nil {
+		t.Fatalf("LoadFromEnv: %v", err)
+	}
+
+	want := []config.RuntimeRole{
+		config.RuntimeRoleControl,
+		config.RuntimeRoleGateway,
+		config.RuntimeRoleScheduler,
+	}
+	if !reflect.DeepEqual(cfg.RuntimeRoles, want) {
+		t.Fatalf("unexpected runtime roles: got %#v want %#v", cfg.RuntimeRoles, want)
+	}
+}
+
+func TestLoadFromEnv_ParsesRuntimeRoles(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("DISCORD_TOKEN", "discord-token")
+	t.Setenv("MAMACORD_RUNTIME_ROLES", "scheduler,control")
+
+	cfg, err := config.LoadFromEnv()
+	if err != nil {
+		t.Fatalf("LoadFromEnv: %v", err)
+	}
+
+	want := []config.RuntimeRole{
+		config.RuntimeRoleControl,
+		config.RuntimeRoleScheduler,
+	}
+	if !reflect.DeepEqual(cfg.RuntimeRoles, want) {
+		t.Fatalf("unexpected runtime roles: got %#v want %#v", cfg.RuntimeRoles, want)
+	}
+}
+
+func TestLoadFromEnv_ControlRoleDoesNotRequireDiscordToken(t *testing.T) {
+	resetConfigEnv(t)
+	t.Setenv("MAMACORD_RUNTIME_ROLES", "control")
+
+	cfg, err := config.LoadFromEnv()
+	if err != nil {
+		t.Fatalf("LoadFromEnv: %v", err)
+	}
+	if cfg.DiscordToken != "" {
+		t.Fatalf("expected empty discord token for control-only runtime, got %q", cfg.DiscordToken)
 	}
 }
 
@@ -234,6 +370,7 @@ func TestShippedSchemaURLs(t *testing.T) {
 	t.Parallel()
 
 	const schemaBaseURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/"
+	repoRoot := filepath.Clean(filepath.Join("..", ".."))
 
 	cases := []struct {
 		path string
@@ -243,17 +380,6 @@ func TestShippedSchemaURLs(t *testing.T) {
 		{path: "config/trusted_keys.json", key: "$schema", want: schemaBaseURL + "trusted_keys.schema.v1.json"},
 		{path: "config/permissions.json", key: "$schema", want: schemaBaseURL + "permissions.schema.v1.json"},
 		{path: "config/modules.json", key: "$schema", want: schemaBaseURL + "modules.schema.v1.json"},
-		{path: "examples/plugins/example/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/fun/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/fun/signature.json", key: "$schema", want: schemaBaseURL + "signature.schema.v1.json"},
-		{path: "plugins/info/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/info/signature.json", key: "$schema", want: schemaBaseURL + "signature.schema.v1.json"},
-		{path: "plugins/manager/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/manager/signature.json", key: "$schema", want: schemaBaseURL + "signature.schema.v1.json"},
-		{path: "plugins/moderation/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/moderation/signature.json", key: "$schema", want: schemaBaseURL + "signature.schema.v1.json"},
-		{path: "plugins/wellness/plugin.json", key: "$schema", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "plugins/wellness/signature.json", key: "$schema", want: schemaBaseURL + "signature.schema.v1.json"},
 		{path: "schemas/messages.schema.v1.json", key: "$id", want: schemaBaseURL + "messages.schema.v1.json"},
 		{path: "schemas/modules.schema.v1.json", key: "$id", want: schemaBaseURL + "modules.schema.v1.json"},
 		{path: "schemas/permissions.schema.v1.json", key: "$id", want: schemaBaseURL + "permissions.schema.v1.json"},
@@ -262,7 +388,40 @@ func TestShippedSchemaURLs(t *testing.T) {
 		{path: "schemas/trusted_keys.schema.v1.json", key: "$id", want: schemaBaseURL + "trusted_keys.schema.v1.json"},
 	}
 
-	repoRoot := filepath.Clean(filepath.Join("..", ".."))
+	exampleBundleDir := examplePluginDir(t, repoRoot)
+	cases = append(cases, struct {
+		path string
+		key  string
+		want string
+	}{
+		path: repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.json")),
+		key:  "$schema",
+		want: schemaBaseURL + "plugin.schema.v1.json",
+	})
+
+	for _, pluginID := range bundledFirstPartyPluginIDs() {
+		bundleDir := bundledFirstPartyPluginDir(t, repoRoot, pluginID)
+		cases = append(cases,
+			struct {
+				path string
+				key  string
+				want string
+			}{
+				path: repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.json")),
+				key:  "$schema",
+				want: schemaBaseURL + "plugin.schema.v1.json",
+			},
+			struct {
+				path string
+				key  string
+				want string
+			}{
+				path: repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "signature.json")),
+				key:  "$schema",
+				want: schemaBaseURL + "signature.schema.v1.json",
+			},
+		)
+	}
 
 	for _, tc := range cases {
 		tc := tc
@@ -295,6 +454,7 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 	t.Parallel()
 
 	repoRoot := filepath.Clean(filepath.Join("..", ".."))
+	exampleBundleDir := examplePluginDir(t, repoRoot)
 
 	luarcPath := filepath.Join(repoRoot, ".luarc.json")
 	luarcBytes, err := os.ReadFile(luarcPath)
@@ -329,24 +489,24 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 		t.Fatalf("workspace.library does not include ./sdk/lua/bot_api.lua")
 	}
 
-	for _, relPath := range []string{
+	paths := []string{
 		"config/trusted_keys.json",
-		"examples/plugins/example/plugin.json",
-		"examples/plugins/example/plugin.lua",
-		"examples/plugins/example/lib/counter.lua",
-		"examples/plugins/example/locales/en-US/messages.json",
-		"examples/plugins/example/locales/en-GB/messages.json",
-		"plugins/fun/plugin.json",
-		"plugins/fun/plugin.lua",
-		"plugins/info/plugin.json",
-		"plugins/info/plugin.lua",
-		"plugins/manager/plugin.json",
-		"plugins/manager/plugin.lua",
-		"plugins/moderation/plugin.json",
-		"plugins/moderation/plugin.lua",
-		"plugins/wellness/plugin.json",
-		"plugins/wellness/plugin.lua",
-	} {
+		filepath.Join("examples", "plugins", "example", bundles.StateFileName),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.json")),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.lua")),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "lib", "counter.lua")),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "locales", "en-US", "messages.json")),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "locales", "en-GB", "messages.json")),
+	}
+	for _, pluginID := range bundledFirstPartyPluginIDs() {
+		bundleDir := bundledFirstPartyPluginDir(t, repoRoot, pluginID)
+		paths = append(paths,
+			filepath.Join("plugins", pluginID, bundles.StateFileName),
+			repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.json")),
+			repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.lua")),
+		)
+	}
+	for _, relPath := range paths {
 		fullPath := filepath.Join(repoRoot, relPath)
 		if _, err := os.Stat(fullPath); err != nil {
 			t.Fatalf("Stat(%q): %v", fullPath, err)
@@ -362,27 +522,27 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 			continue
 		}
 
-		funLocalePath := filepath.Join(repoRoot, "plugins", "fun", "locales", entry.Name(), "messages.json")
+		funLocalePath := filepath.Join(bundledFirstPartyPluginDir(t, repoRoot, "fun"), "locales", entry.Name(), "messages.json")
 		if _, err := os.Stat(funLocalePath); err != nil {
 			t.Fatalf("Stat(%q): %v", funLocalePath, err)
 		}
 
-		wellnessLocalePath := filepath.Join(repoRoot, "plugins", "wellness", "locales", entry.Name(), "messages.json")
+		wellnessLocalePath := filepath.Join(bundledFirstPartyPluginDir(t, repoRoot, "wellness"), "locales", entry.Name(), "messages.json")
 		if _, err := os.Stat(wellnessLocalePath); err != nil {
 			t.Fatalf("Stat(%q): %v", wellnessLocalePath, err)
 		}
 
-		infoLocalePath := filepath.Join(repoRoot, "plugins", "info", "locales", entry.Name(), "messages.json")
+		infoLocalePath := filepath.Join(bundledFirstPartyPluginDir(t, repoRoot, "info"), "locales", entry.Name(), "messages.json")
 		if _, err := os.Stat(infoLocalePath); err != nil {
 			t.Fatalf("Stat(%q): %v", infoLocalePath, err)
 		}
 
-		moderationLocalePath := filepath.Join(repoRoot, "plugins", "moderation", "locales", entry.Name(), "messages.json")
+		moderationLocalePath := filepath.Join(bundledFirstPartyPluginDir(t, repoRoot, "moderation"), "locales", entry.Name(), "messages.json")
 		if _, err := os.Stat(moderationLocalePath); err != nil {
 			t.Fatalf("Stat(%q): %v", moderationLocalePath, err)
 		}
 
-		managerLocalePath := filepath.Join(repoRoot, "plugins", "manager", "locales", entry.Name(), "messages.json")
+		managerLocalePath := filepath.Join(bundledFirstPartyPluginDir(t, repoRoot, "manager"), "locales", entry.Name(), "messages.json")
 		if _, err := os.Stat(managerLocalePath); err != nil {
 			t.Fatalf("Stat(%q): %v", managerLocalePath, err)
 		}
@@ -439,11 +599,14 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 	}
 
 	for _, relPath := range []string{
-		"migrations/sqlite/001_init.up.sql",
-		"migrations/sqlite/002_guilds_users.up.sql",
-		"migrations/sqlite/003_wellness.up.sql",
-		"migrations/sqlite/004_modules.up.sql",
-		"migrations/sqlite/005_admin_sessions.up.sql",
+		"migrations/postgres/001_init.up.sql",
+		"migrations/postgres/002_guilds_users.up.sql",
+		"migrations/postgres/003_wellness.up.sql",
+		"migrations/postgres/004_modules.up.sql",
+		"migrations/postgres/005_admin_sessions.up.sql",
+		"migrations/postgres/006_discord_oauth.up.sql",
+		"migrations/postgres/007_marketplace.up.sql",
+		"migrations/postgres/008_plugin_bundle_registry.up.sql",
 	} {
 		fullPath := filepath.Join(repoRoot, relPath)
 		if _, err := os.Stat(fullPath); err != nil {
@@ -452,11 +615,45 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 	}
 }
 
+func bundledFirstPartyPluginIDs() []string {
+	return []string{"fun", "info", "manager", "moderation", "wellness"}
+}
+
+func bundledFirstPartyPluginDir(t *testing.T, repoRoot string, pluginID string) string {
+	t.Helper()
+
+	dir, err := bundles.NewLocalRepository().ResolveActiveDir(filepath.Join(repoRoot, "plugins", pluginID))
+	if err != nil {
+		t.Fatalf("ResolveActiveDir(%q): %v", pluginID, err)
+	}
+	return dir
+}
+
+func examplePluginDir(t *testing.T, repoRoot string) string {
+	t.Helper()
+
+	dir, err := bundles.NewLocalRepository().ResolveActiveDir(filepath.Join(repoRoot, "examples", "plugins", "example"))
+	if err != nil {
+		t.Fatalf("ResolveActiveDir(example): %v", err)
+	}
+	return dir
+}
+
+func repoRelativePath(t *testing.T, repoRoot string, fullPath string) string {
+	t.Helper()
+
+	relPath, err := filepath.Rel(repoRoot, fullPath)
+	if err != nil {
+		t.Fatalf("filepath.Rel(%q, %q): %v", repoRoot, fullPath, err)
+	}
+	return relPath
+}
+
 func TestMigrationLayoutAndSchemaHygiene(t *testing.T) {
 	t.Parallel()
 
 	repoRoot := filepath.Clean(filepath.Join("..", ".."))
-	migrationsDir := filepath.Join(repoRoot, "migrations", "sqlite")
+	migrationsDir := filepath.Join(repoRoot, "migrations", "postgres")
 
 	entries, err := os.ReadDir(migrationsDir)
 	if err != nil {
@@ -483,9 +680,9 @@ func resetConfigEnv(t *testing.T) {
 
 	for _, name := range []string{
 		"DISCORD_TOKEN",
-		"SQLITE_PATH",
+		"MAMACORD_STORAGE_BACKEND",
+		"MAMACORD_POSTGRES_DSN",
 		"MIGRATIONS_DIR",
-		"MAMACORD_MIGRATION_BACKUPS_DIR",
 		"MAMACORD_OPS_ADDR",
 		"MAMACORD_ADMIN_ADDR",
 		"MAMACORD_PUBLIC_DASHBOARD_ORIGIN",

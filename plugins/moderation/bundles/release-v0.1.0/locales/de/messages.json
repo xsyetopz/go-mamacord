@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Gib jemandem eine sanfte Verwarnung (und bei Bedarf einen kurzen Time-out)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Wen soll Mama verwarnen?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Was ist passiert?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Eine Verwarnung aufheben und einen Neuanfang erlauben."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Bei wem soll die Verwarnung entfernt werden?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Nicht du, {{.Pet}}. {{.Mommy}} will dich auch beschuetzen."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}, {{.Mommy}} verwarnte keine Bots oder Systemnutzer."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Genug für jetzt, {{.Pet}}. {{.User}} hat schon das Verwarnungslimit."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Okay, {{.Pet}}. Ich habe eine Verwarnung für {{.User}} notiert: `{{.Reason}}`.{{if .TimeoutMinutes}} Ich habe auch einen Time-out für {{.TimeoutMinutes}} Minuten gesetzt.{{end}}{{if .TimeoutFailed}} Ich habe versucht, einen Time-out zu setzen, aber es ging nicht.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hey {{.Pet}}. {{.Mommy}} braucht, dass du langsamer machst und freundlicher bist. Grund: `{{.Reason}}`.{{if .TimeoutMinutes}} Du bist {{.TimeoutMinutes}} Minuten im Time-out, damit du runterkommst.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Nicht du, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Ich konnte keine Verwarnungen für {{.User}} finden, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Welche Verwarnung soll {{.Mommy}} entfernen, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Such dir eine aus, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Diese Auswahl ist abgelaufen, {{.Pet}}. Führe `/unwarn` nochmal aus."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Alles erledigt, {{.Pet}}~. {{.User}} hat wieder eine weiße Weste. ❤️"
+  }
+]

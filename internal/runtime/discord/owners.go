@@ -28,10 +28,15 @@ type ownerState struct {
 }
 
 func newOwnerState(configuredUserID *uint64) ownerState {
-	return ownerState{
+	state := ownerState{
 		configuredUserID: cloneOptionalUint64(configuredUserID),
 		source:           ownerSourceUnresolved,
 	}
+	if state.configuredUserID != nil {
+		state.effectiveUserID = cloneOptionalUint64(state.configuredUserID)
+		state.source = ownerSourceConfigFallback
+	}
+	return state
 }
 
 func cloneOptionalUint64(value *uint64) *uint64 {

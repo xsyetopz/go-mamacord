@@ -6,9 +6,10 @@ import (
 	"strings"
 
 	"github.com/xsyetopz/go-mamacord/internal/commands"
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog"
-	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
+	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
@@ -19,23 +20,23 @@ func (b *Bot) refreshRuntimeCatalog(ctx context.Context) error {
 		return err
 	}
 
-	modules := map[string]commandapi.ModuleInfo{}
-	builtinCommands := map[string]commandapi.SlashCommand{}
-	order := []commandapi.SlashCommand{}
-	pluginCommands := map[string]discordplugin.Route{}
-	pluginUserCommands := map[string]discordplugin.Route{}
-	pluginMessageCommands := map[string]discordplugin.Route{}
-	pluginRoutes := map[string]discordplugin.Route{}
+	modules := map[string]moduleapi.Info{}
+	builtinCommands := map[string]slashcmd.Command{}
+	order := []slashcmd.Command{}
+	pluginCommands := map[string]discordpluginbridge.Route{}
+	pluginUserCommands := map[string]discordpluginbridge.Route{}
+	pluginMessageCommands := map[string]discordpluginbridge.Route{}
+	pluginRoutes := map[string]discordpluginbridge.Route{}
 
 	for _, desc := range commands.Catalog() {
-		cmds := desc.Commands()
+		cmds := catalog.BuiltinCommands(desc)
 		defaultEnabled := catalog.BuiltinDefaultEnabled(desc, b.moduleSeed)
 		enabled := catalog.ResolveBuiltinModuleEnabled(desc, b.moduleSeed, states)
-		info := commandapi.ModuleInfo{
+		info := moduleapi.Info{
 			ID:             desc.ID,
 			Name:           desc.Name,
-			Kind:           commandapi.ModuleKindCoreBuiltin,
-			Runtime:        commandapi.ModuleRuntimeGo,
+			Kind:           moduleapi.KindCoreBuiltin,
+			Runtime:        moduleapi.RuntimeGo,
 			Enabled:        enabled,
 			DefaultEnabled: defaultEnabled,
 			Toggleable:     desc.Toggleable,
@@ -85,12 +86,12 @@ func (b *Bot) refreshRuntimeCatalog(ctx context.Context) error {
 
 func (b *Bot) appendPluginModules(
 	ctx context.Context,
-	modules map[string]commandapi.ModuleInfo,
-	pluginRoutes map[string]discordplugin.Route,
-	pluginCommands map[string]discordplugin.Route,
-	pluginUserCommands map[string]discordplugin.Route,
-	pluginMessageCommands map[string]discordplugin.Route,
-	builtinCommands map[string]commandapi.SlashCommand,
+	modules map[string]moduleapi.Info,
+	pluginRoutes map[string]discordpluginbridge.Route,
+	pluginCommands map[string]discordpluginbridge.Route,
+	pluginUserCommands map[string]discordpluginbridge.Route,
+	pluginMessageCommands map[string]discordpluginbridge.Route,
+	builtinCommands map[string]slashcmd.Command,
 	host *pluginhost.Host,
 	states map[string]store.ModuleState,
 ) {
@@ -99,7 +100,7 @@ func (b *Bot) appendPluginModules(
 	}
 
 	for _, info := range host.Infos() {
-		pluginRoutes[info.ID] = discordplugin.Route{Host: host, PluginID: info.ID}
+		pluginRoutes[info.ID] = discordpluginbridge.Route{Host: host, PluginID: info.ID}
 		kind := catalog.ModuleKindForPlugin(info.ID)
 
 		defaultEnabled := catalog.PluginDefaultEnabled(info.ID, b.moduleSeed)
@@ -108,11 +109,11 @@ func (b *Bot) appendPluginModules(
 			enabled = state.Enabled
 		}
 
-		moduleInfo := commandapi.ModuleInfo{
+		moduleInfo := moduleapi.Info{
 			ID:             info.ID,
 			Name:           strings.TrimSpace(info.Name),
 			Kind:           kind,
-			Runtime:        commandapi.ModuleRuntimeLua,
+			Runtime:        moduleapi.RuntimeLua,
 			Enabled:        enabled,
 			DefaultEnabled: defaultEnabled,
 			Toggleable:     true,
@@ -139,14 +140,14 @@ func (b *Bot) appendPluginModules(
 					b.logger.WarnContext(ctx, "duplicate plugin user command, skipping", slog.String("command", name), slog.String("module", info.ID))
 					continue
 				}
-				pluginUserCommands[name] = discordplugin.Route{Host: host, PluginID: info.ID}
+				pluginUserCommands[name] = discordpluginbridge.Route{Host: host, PluginID: info.ID}
 				continue
 			case pluginhost.CommandTypeMessage:
 				if _, exists := pluginMessageCommands[name]; exists {
 					b.logger.WarnContext(ctx, "duplicate plugin message command, skipping", slog.String("command", name), slog.String("module", info.ID))
 					continue
 				}
-				pluginMessageCommands[name] = discordplugin.Route{Host: host, PluginID: info.ID}
+				pluginMessageCommands[name] = discordpluginbridge.Route{Host: host, PluginID: info.ID}
 				continue
 			}
 			if _, exists := builtinCommands[name]; exists {
@@ -157,7 +158,7 @@ func (b *Bot) appendPluginModules(
 				b.logger.WarnContext(ctx, "duplicate plugin command, skipping", slog.String("command", name), slog.String("module", info.ID))
 				continue
 			}
-			pluginCommands[name] = discordplugin.Route{Host: host, PluginID: info.ID}
+			pluginCommands[name] = discordpluginbridge.Route{Host: host, PluginID: info.ID}
 		}
 	}
 }

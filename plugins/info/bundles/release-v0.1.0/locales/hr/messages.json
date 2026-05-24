@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "Saznaj tko sam (i koju verziju pokrećem)."
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "Potraži korisnike, servere, uloge i kanale."
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "Potraži korisnika."
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "Koji korisnik? (Ostavi prazno da potražiš sebe.)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "Potraži ovaj server."
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "Potraži ulogu."
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "Koju ulogu mama treba pogledati?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "Potraži kanal."
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "Koji kanal mama treba pogledati?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 Bot"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ System"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 Jezik"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 Stvoreno"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 Pridružio/la se"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ Uloge"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ Uloge"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 Emojis"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ Naljepnice"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 Članovi"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 Kanali"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 Stvoreno"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ Spominjanje"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 Position"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 Izdvojeno"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 Spominjivo"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 Upravljano"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 Dozvole"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 Stvoreno"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 Spominjanje"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 Vrsta"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ Kategorija"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 Dozvole"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 Stvoreno"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} nije mogla dohvatiti informacije o tom korisniku, {{.Pet}}."
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} nije mogla dohvatiti informacije o ovom serveru, {{.Pet}}."
+  }
+]

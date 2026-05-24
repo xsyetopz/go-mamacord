@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Setează-ți fusul orar ca mementourile mamei să ajungă la timp."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Setează-ți fusul orar (IANA, ex. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Arată fusul tău orar curent."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Șterge fusul orar salvat."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Nume fus orar (ex. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... nu recunosc fusul acesta orar: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Bine, {{.Pet}}~ voi folosi `{{.Timezone}}` pentru mementourile tale. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Încă nu ai setat un fus orar, {{.Pet}}. Folosește `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Acum ești setat pe `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Totul e șters, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Spune-i mamei cum te simți azi."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Starea ta: 1 (greu) până la 5 (grozav)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Arată check-in-urile recente în loc să salvezi unul nou."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Dă-i lui {{.Mommy}} un număr de la 1 la 5, {{.Pet}}... sau pune `history=true` ca să vezi ultimele check-in-uri."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Trebuie să fie 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Mulțumesc că mi-ai spus, {{.Pet}}~ am salvat `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Încă nu ai check-in-uri, {{.Pet}}. Să începi cu pași mici e curajos."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Iată check-in-urile tale recente, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Setează memento-uri blânde (mama te va îndemna ușor)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Creează un memento nou."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Listează mementourile tale."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Șterge un memento."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Program cron (ex. `0 9 * * *`) sau `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Ce fel de memento este?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Notă scurtă (opțional, max 120 caractere)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Unde să trimită mama? (dm sau channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Ce canal? (doar dacă delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID memento."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Programul acesta nu pare corect, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Dacă alegi delivery=channel, alege și un canal, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Totul e setat, {{.Pet}}~ te îndemn data viitoare la {{.NextRun}} - memento `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Încă nu ai mementouri, {{.Pet}}. Folosește `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Iată mementourile tale, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Alege un memento pentru mama..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Ce memento ar trebui să șteargă {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Meniul a expirat, {{.Pet}}. Rulează `/remind delete` din nou."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Nu umbla, {{.Pet}}. Nu e al tău."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Nu am găsit acel memento, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Șters. Bravo că ai grijă de tine, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hei {{.Pet}}. Memento blând: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "bea puțină apă"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "întinde-te puțin"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "respiră încet"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "ia-ți medicamentele"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "începe să te pregătești de somn"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "fă un check-in rapid"
+  }
+]

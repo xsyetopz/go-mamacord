@@ -14,8 +14,8 @@ go run ./cmd/mamacord dev
 That:
 
 - reads `.env.dev` (only `.env.dev` / `.env.prod` are supported)
-- creates/opens the SQLite DB at `SQLITE_PATH` (default `./data/mamacord.sqlite`)
-- applies pending SQLite migrations automatically
+- connects to Postgres using `MAMACORD_POSTGRES_DSN`
+- applies pending Postgres migrations automatically
 - starts the Discord bot
 
 If you want to edit `.env.dev` manually instead:

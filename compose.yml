@@ -1,17 +1,69 @@
+x-mamacord-common: &mamacord-common
+  build:
+    context: .
+  restart: unless-stopped
+  depends_on:
+    postgres:
+      condition: service_healthy
+  env_file:
+    - .env.prod
+  environment: &mamacord-environment
+    MAMACORD_STORAGE_BACKEND: postgres
+    MAMACORD_POSTGRES_DSN: postgres://mamacord:secret@postgres:5432/mamacord?sslmode=disable
+    LOCALES_DIR: /app/locales
+    MAMACORD_BUNDLED_PLUGINS_DIR: /app/plugins
+    MAMACORD_USER_PLUGINS_DIR: /data/plugins
+    MAMACORD_MARKETPLACE_CACHE_DIR: /data/marketplace_cache
+    MAMACORD_BUNDLE_STORE_DIR: /data/bundles/store
+    MAMACORD_BUNDLE_CACHE_DIR: /data/bundles/cache
+    MAMACORD_PERMISSIONS_FILE: /app/config/permissions.json
+  volumes: &mamacord-volumes
+    - ./data:/data
+    - ./plugins:/data/plugins
+    - ./config:/app/config:ro
+
 services:
-  mamacord:
-    build:
-      context: .
+  postgres:
+    image: postgres:18-bookworm
     restart: unless-stopped
-    env_file:
-      - .env.prod
     environment:
-      SQLITE_PATH: /data/mamacord.sqlite
-      MIGRATIONS_DIR: /app/migrations/sqlite
-      LOCALES_DIR: /app/locales
-      PLUGINS_DIR: /app/plugins
-      MAMACORD_PERMISSIONS_FILE: /app/config/permissions.json
+      POSTGRES_DB: mamacord
+      POSTGRES_USER: mamacord
+      POSTGRES_PASSWORD: secret
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mamacord -d mamacord"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     volumes:
-      - ./data:/data
-      - ./plugins:/app/plugins
-      - ./config:/app/config:ro
+      - postgres-data:/var/lib/postgresql/data
+
+  mamacord:
+    <<: *mamacord-common
+    environment:
+      <<: *mamacord-environment
+      MAMACORD_RUNTIME_ROLES: ${MAMACORD_RUNTIME_ROLES:-control,gateway,scheduler}
+
+  mamacord-control:
+    <<: *mamacord-common
+    profiles: ["split"]
+    environment:
+      <<: *mamacord-environment
+      MAMACORD_RUNTIME_ROLES: control
+
+  mamacord-gateway:
+    <<: *mamacord-common
+    profiles: ["split"]
+    environment:
+      <<: *mamacord-environment
+      MAMACORD_RUNTIME_ROLES: gateway
+
+  mamacord-scheduler:
+    <<: *mamacord-common
+    profiles: ["split"]
+    environment:
+      <<: *mamacord-environment
+      MAMACORD_RUNTIME_ROLES: scheduler
+
+volumes:
+  postgres-data:

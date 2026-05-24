@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
+  "id": "fun",
+  "name": "Fun",
+  "version": "0.1.0",
+  "permissions": {
+    "storage": {
+      "kv": true
+    },
+    "network": {
+      "http": true
+    }
+  }
+}

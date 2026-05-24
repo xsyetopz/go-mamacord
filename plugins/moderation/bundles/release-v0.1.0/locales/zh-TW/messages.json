@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "給某人一個溫柔的警告（需要時讓他冷靜一下）。"
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "要警告谁？"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "發生了什麼？"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "移除一個警告，讓他們重新來過。"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "要給谁移除警告？"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "不行，{{.Pet}}。{{.Mommy}}也要保護你。"
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}，{{.Mommy}}不會對機器人或系統使用者用這些。"
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "夠了，{{.Pet}}。{{.User}}已经到警告上限了。"
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "好啦，{{.Pet}}。我給 {{.User}} 记了一次警告：`{{.Reason}}`。{{if .TimeoutMinutes}}我也讓他們冷靜 {{.TimeoutMinutes}} 分钟。{{end}}{{if .TimeoutFailed}}我想讓他們冷靜一下，但沒成功。{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "嗨，{{.Pet}}。{{.Mommy}}需要你慢一点、溫柔一点。你因為 `{{.Reason}}` 被警告了。{{if .TimeoutMinutes}}你需要冷靜 {{.TimeoutMinutes}} 分钟。{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "不行，{{.Pet}}。"
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.Pet}}，我沒找到 {{.User}} 的任何警告。"
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "{{.Pet}}，{{.Mommy}}要移除哪一条警告？"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "選一個吧，{{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "這個選項過期了，{{.Pet}}。再執行一次 `/unwarn`。"
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "好了，{{.Pet}}～ {{.User}}的警告已移除。 ❤️"
+  }
+]

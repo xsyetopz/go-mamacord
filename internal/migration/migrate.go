@@ -14,8 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
 )
 
 type Kind string
@@ -26,13 +24,11 @@ const (
 )
 
 type Options struct {
-	Dir       string
-	BackupDir string
+	Dir string
 }
 
 type Runner struct {
-	dir       string
-	backupDir string
+	dir string
 }
 
 type Migration struct {
@@ -76,37 +72,9 @@ func New(opts Options) (Runner, error) {
 		return Runner{}, errors.New("migrations dir is required")
 	}
 
-	backupDir := strings.TrimSpace(opts.BackupDir)
-	if backupDir == "" {
-		backupDir = filepath.Join(filepath.Dir(dir), "migration_backups")
-	}
-
 	return Runner{
-		dir:       dir,
-		backupDir: backupDir,
+		dir: dir,
 	}, nil
-}
-
-func (r Runner) UpPath(ctx context.Context, dbPath string) (Status, error) {
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: dbPath})
-	if err != nil {
-		return Status{}, err
-	}
-	defer db.Close()
-
-	// Production policy: migrations are up-only. Before we apply any pending
-	// migrations, take a backup so rollback is always "restore backup", not "down".
-	status, err := r.Status(ctx, db)
-	if err != nil {
-		return Status{}, err
-	}
-	if len(status.Pending) != 0 {
-		if _, err := r.runBackup(ctx, db, dbPath, fmt.Sprintf("auto-pre-up-v%03d", status.CurrentVersion)); err != nil {
-			return Status{}, err
-		}
-	}
-
-	return r.Up(ctx, db)
 }
 
 func (r Runner) Up(ctx context.Context, db *sql.DB) (Status, error) {
@@ -149,16 +117,6 @@ func (r Runner) Up(ctx context.Context, db *sql.DB) (Status, error) {
 	return buildStatus(defs, applied), nil
 }
 
-func (r Runner) StatusPath(ctx context.Context, dbPath string) (Status, error) {
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: dbPath})
-	if err != nil {
-		return Status{}, err
-	}
-	defer db.Close()
-
-	return r.Status(ctx, db)
-}
-
 func (r Runner) Status(ctx context.Context, db *sql.DB) (Status, error) {
 	defs, err := r.loadDefinitions()
 	if err != nil {
@@ -177,21 +135,6 @@ func (r Runner) Status(ctx context.Context, db *sql.DB) (Status, error) {
 	}
 
 	return buildStatus(defs, applied), nil
-}
-
-func (r Runner) BackupPath(ctx context.Context, dbPath string) (string, error) {
-	db, err := sqlite.Open(ctx, sqlite.Options{Path: dbPath})
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
-
-	status, err := r.Status(ctx, db)
-	if err != nil {
-		return "", err
-	}
-
-	return r.runBackup(ctx, db, dbPath, fmt.Sprintf("manual-v%03d", status.CurrentVersion))
 }
 
 func (r Runner) loadDefinitions() ([]Migration, error) {
@@ -281,7 +224,7 @@ CREATE TABLE IF NOT EXISTS schema_migration_state (
 
 	const historyTable = `
 CREATE TABLE IF NOT EXISTS schema_migration_history (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id BIGSERIAL PRIMARY KEY,
 	version INTEGER NOT NULL,
 	name TEXT NOT NULL,
 	direction TEXT NOT NULL,
@@ -377,7 +320,7 @@ func applyUp(ctx context.Context, db *sql.DB, def Migration) error {
 	if _, err := tx.ExecContext(
 		ctx,
 		`INSERT INTO schema_migration_state(version, name, kind, filename, checksum, applied_at)
-		 VALUES (?, ?, ?, ?, ?, ?)`,
+		 VALUES ($1, $2, $3, $4, $5, $6)`,
 		def.Version,
 		def.Name,
 		string(def.Kind),
@@ -391,7 +334,7 @@ func applyUp(ctx context.Context, db *sql.DB, def Migration) error {
 	if _, err := tx.ExecContext(
 		ctx,
 		`INSERT INTO schema_migration_history(version, name, direction, kind, filename, checksum, applied_at)
-		 VALUES (?, ?, 'up', ?, ?, ?, ?)`,
+		 VALUES ($1, $2, 'up', $3, $4, $5, $6)`,
 		def.Version,
 		def.Name,
 		string(def.Kind),
@@ -408,30 +351,6 @@ func applyUp(ctx context.Context, db *sql.DB, def Migration) error {
 
 	return nil
 }
-
-func (r Runner) runBackup(ctx context.Context, db *sql.DB, dbPath, label string) (string, error) {
-	if strings.TrimSpace(dbPath) == "" {
-		return "", errors.New("sqlite path is required for backups")
-	}
-	if err := os.MkdirAll(r.backupDir, 0o750); err != nil {
-		return "", fmt.Errorf("create migration backup dir %q: %w", r.backupDir, err)
-	}
-
-	base := strings.TrimSuffix(filepath.Base(dbPath), filepath.Ext(dbPath))
-	timestamp := time.Now().UTC().Format("20060102-150405")
-	backupPath := filepath.Join(r.backupDir, fmt.Sprintf("%s-%s-%s.sqlite", base, label, timestamp))
-
-	if _, err := db.ExecContext(ctx, "PRAGMA wal_checkpoint(FULL)"); err != nil {
-		return "", fmt.Errorf("checkpoint sqlite before backup: %w", err)
-	}
-	query := fmt.Sprintf("VACUUM INTO %s", sqliteStringLiteral(backupPath))
-	if _, err := db.ExecContext(ctx, query); err != nil {
-		return "", fmt.Errorf("vacuum into %q: %w", backupPath, err)
-	}
-
-	return backupPath, nil
-}
-
 func readMigrationFile(path string) (string, string, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
@@ -506,8 +425,4 @@ func highestAppliedVersion(applied map[int]AppliedMigration) int {
 		}
 	}
 	return maxVersion
-}
-
-func sqliteStringLiteral(value string) string {
-	return "'" + strings.ReplaceAll(value, "'", "''") + "'"
 }

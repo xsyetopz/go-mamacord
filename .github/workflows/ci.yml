@@ -28,6 +28,71 @@ jobs:
               -X github.com/xsyetopz/go-mamacord/internal/buildinfo.Repository=https://github.com/${GITHUB_REPOSITORY}" \
             ./cmd/mamacord
 
+      - name: Split-role doctor smoke
+        run: |
+          MAMACORD_RUNTIME_ROLES=control ./mamacord doctor >/tmp/mamacord-doctor-control.txt
+          grep -q "runtime_roles: control" /tmp/mamacord-doctor-control.txt
+          grep -q "control_role_enabled: true" /tmp/mamacord-doctor-control.txt
+          grep -q "gateway_role_enabled: false" /tmp/mamacord-doctor-control.txt
+          grep -q "scheduler_role_enabled: false" /tmp/mamacord-doctor-control.txt
+
+          DISCORD_TOKEN=test-token MAMACORD_RUNTIME_ROLES=gateway ./mamacord doctor >/tmp/mamacord-doctor-gateway.txt
+          grep -q "runtime_roles: gateway" /tmp/mamacord-doctor-gateway.txt
+          grep -q "admin_api_enabled: false" /tmp/mamacord-doctor-gateway.txt
+
+          DISCORD_TOKEN=test-token MAMACORD_RUNTIME_ROLES=scheduler ./mamacord doctor >/tmp/mamacord-doctor-scheduler.txt
+          grep -q "runtime_roles: scheduler" /tmp/mamacord-doctor-scheduler.txt
+          grep -q "admin_api_enabled: false" /tmp/mamacord-doctor-scheduler.txt
+
+          DISCORD_TOKEN=test-token MAMACORD_STORAGE_BACKEND=postgres MAMACORD_POSTGRES_DSN=postgres://bot:secret@db:5432/mamacord?sslmode=disable ./mamacord doctor >/tmp/mamacord-doctor-postgres.txt
+          grep -q "storage_backend: postgres" /tmp/mamacord-doctor-postgres.txt
+          grep -q "migrations_dir: ./migrations/postgres" /tmp/mamacord-doctor-postgres.txt
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg BUILD_VERSION=${GITHUB_SHA} \
+            --build-arg BUILD_REPOSITORY=https://github.com/${GITHUB_REPOSITORY} \
+            -t go-mamacord:ci \
+            .
+
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-bookworm
+        env:
+          POSTGRES_DB: mamacord
+          POSTGRES_USER: mamacord
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U mamacord -d mamacord"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run Postgres-backed integration packages
+        env:
+          MAMACORD_TEST_POSTGRES_DSN: postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable
+        run: |
+          go test ./internal/migration \
+            ./internal/storage/postgres \
+            ./internal/storagebootstrap \
+            ./internal/app \
+            ./internal/adminapi \
+            ./internal/marketplace \
+            ./internal/runtime/plugins/lua \
+            -count=1 -v
+
   web:
     runs-on: ubuntu-latest
     steps:

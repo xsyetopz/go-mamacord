@@ -1,0 +1,34 @@
+[
+  {
+    "id": "cmd.example.desc",
+    "translation": "Example Lua plugin command"
+  },
+  {
+    "id": "example.not_in_guild.title",
+    "translation": "Not in a server"
+  },
+  {
+    "id": "example.not_in_guild.body",
+    "translation": "This command must be used in a server."
+  },
+  {
+    "id": "example.counter",
+    "translation": "Counter: {{.Count}}"
+  },
+  {
+    "id": "example.set.title",
+    "translation": "Set counter"
+  },
+  {
+    "id": "example.set.label",
+    "translation": "New value"
+  },
+  {
+    "id": "example.invalid.title",
+    "translation": "Invalid number"
+  },
+  {
+    "id": "example.invalid.body",
+    "translation": "`{{.Raw}}` is not a number."
+  }
+]

@@ -8,7 +8,7 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
@@ -20,7 +20,7 @@ func (b *Bot) onComponent(e *events.ComponentInteractionCreate) {
 	b.incInteraction()
 
 	locale := e.Locale()
-	t := commandapi.Translator{Registry: b.i18n, Locale: locale, UserID: uint64(e.User().ID)}
+	t := commandtext.Translator{Registry: b.i18n, Locale: locale.Code(), UserID: uint64(e.User().ID)}
 
 	customID := e.Data.CustomID()
 	if !b.takeComponentCooldown(e, t, customID, time.Now()) {
@@ -32,7 +32,7 @@ func (b *Bot) onComponent(e *events.ComponentInteractionCreate) {
 
 func (b *Bot) takeComponentCooldown(
 	e *events.ComponentInteractionCreate,
-	t commandapi.Translator,
+	t commandtext.Translator,
 	customID string,
 	now time.Time,
 ) bool {
@@ -54,7 +54,7 @@ func (b *Bot) takeComponentCooldown(
 func (b *Bot) handlePluginComponent(
 	ctx context.Context,
 	e *events.ComponentInteractionCreate,
-	t commandapi.Translator,
+	t commandtext.Translator,
 	locale discord.Locale,
 	customID string,
 ) {

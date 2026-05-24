@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Stel je tijdzone in zodat mama's reminders op het juiste moment komen."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Stel je tijdzone in (IANA, zoals Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Laat je huidige tijdzone zien."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Wis je opgeslagen tijdzone."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Naam van de tijdzone (bijv. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... Ik herken die tijdzone niet: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Oké, {{.Pet}}~. Ik gebruik `{{.Timezone}}` voor je reminders. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Je hebt nog geen tijdzone ingesteld, {{.Pet}}. Gebruik `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Op dit moment sta je op `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Alles gewist, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Vertel mama hoe het vandaag met je gaat."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Je stemming: 1 (zwaar) tot 5 (super)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Toon je recente check-ins in plaats van een nieuwe te loggen."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Geef {{.Mommy}} een cijfer van 1 tot 5, {{.Pet}}... of zet `history=true` om je laatste check-ins te zien."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Dat moet 1..5 zijn, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Dankjewel dat je het me vertelde, {{.Pet}}~. Ik heb `{{.Mood}}/5` opgeslagen. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Nog geen check-ins, {{.Pet}}. Klein beginnen is dapper."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Hier zijn je recente check-ins, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Stel zachte reminders in (mama tikt je voorzichtig aan)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Maak een nieuwe reminder."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Laat je reminders zien."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Verwijder een reminder."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron-schema (bijv. `0 9 * * *`) of `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Wat voor reminder is het?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Korte notitie (optioneel, max. 120 tekens)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Waar moet mama 'm sturen? (dm of channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Welk kanaal? (alleen als delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "Reminder-ID."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Dat schema ziet er niet goed uit, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Als je bezorging via kanaal kiest, kies ook een kanaal, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Helemaal goed, {{.Pet}}~. Ik geef je het volgende seintje om {{.NextRun}} — reminder `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Nog geen reminders, {{.Pet}}. Gebruik `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Hier zijn je reminders, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Kies een reminder voor mama..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Welke reminder moet {{.Mommy}} verwijderen, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Dat menu is verlopen, {{.Pet}}. Doe `/remind delete` nog een keer."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Handen af, {{.Pet}}. Die is niet van jou."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Ik kon die reminder niet vinden, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Verwijderd. Goed bezig dat je voor jezelf zorgt, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hé {{.Pet}}. Zachte reminder: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "drink wat water"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "rek je even uit"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "haal rustig adem"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "neem je medicatie"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "begin rustig af te bouwen voor het slapen"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "doe een korte check-in"
+  }
+]

@@ -52,3 +52,28 @@ func TestResolveOwnerFromApplication(t *testing.T) {
 		}
 	})
 }
+
+func TestNewOwnerStateUsesConfigFallbackUntilDiscordResolution(t *testing.T) {
+	t.Parallel()
+
+	configured := uint64(55)
+	state := newOwnerState(&configured)
+	if state.source != ownerSourceConfigFallback {
+		t.Fatalf("unexpected owner source: got %q want %q", state.source, ownerSourceConfigFallback)
+	}
+	if state.effectiveUserID == nil || *state.effectiveUserID != configured {
+		t.Fatalf("unexpected effective owner id: %#v", state.effectiveUserID)
+	}
+}
+
+func TestNewOwnerStateWithoutConfiguredOwnerStartsUnresolved(t *testing.T) {
+	t.Parallel()
+
+	state := newOwnerState(nil)
+	if state.source != ownerSourceUnresolved {
+		t.Fatalf("unexpected owner source: got %q want %q", state.source, ownerSourceUnresolved)
+	}
+	if state.effectiveUserID != nil {
+		t.Fatalf("expected unresolved owner, got %#v", state.effectiveUserID)
+	}
+}

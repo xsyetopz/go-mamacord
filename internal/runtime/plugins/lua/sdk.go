@@ -351,8 +351,13 @@ func (v *VM) luaDiscordSendDM(l *lua.LState) int {
 		l.RaiseError("invalid send_dm spec")
 		return 0
 	}
+	encoded, err := EncodeValue(message)
+	if err != nil {
+		l.RaiseError("invalid send_dm spec")
+		return 0
+	}
 
-	result, execErr := v.discord.SendDM(v.ctx(), v.plugin, userID, message)
+	result, execErr := v.discord.SendDM(v.ctx(), v.plugin, userID, encoded)
 	if execErr != nil {
 		l.Push(lua.LNil)
 		l.Push(lua.LString(execErr.Error()))
@@ -386,8 +391,13 @@ func (v *VM) luaDiscordSendChannel(l *lua.LState) int {
 		l.RaiseError("invalid send_channel spec")
 		return 0
 	}
+	encoded, err := EncodeValue(message)
+	if err != nil {
+		l.RaiseError("invalid send_channel spec")
+		return 0
+	}
 
-	result, execErr := v.discord.SendChannel(v.ctx(), v.plugin, channelID, message)
+	result, execErr := v.discord.SendChannel(v.ctx(), v.plugin, channelID, encoded)
 	if execErr != nil {
 		l.Push(lua.LNil)
 		l.Push(lua.LString(execErr.Error()))

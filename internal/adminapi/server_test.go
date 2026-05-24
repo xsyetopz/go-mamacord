@@ -258,3 +258,99 @@ func TestHandleSetupWithoutSession(t *testing.T) {
 		t.Fatalf("expected owner_source=discord, got %#v", payload["owner_source"])
 	}
 }
+
+func TestHandleGuildChannelsReturns503WhenDiscordRuntimeUnavailable(t *testing.T) {
+	t.Parallel()
+
+	server, err := New(Options{
+		Addr:   "127.0.0.1:0",
+		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Service: Service{
+			OAuth: fakeOAuthClient{},
+		},
+		SessionSecret: strings.Repeat("x", 32),
+		ClientID:      "cid",
+		ClientSecret:  "secret",
+		OwnerStatus: func() OwnerStatus {
+			return OwnerStatus{
+				Configured:      true,
+				Resolved:        true,
+				Source:          "discord",
+				EffectiveUserID: optionalUint64(42),
+			}
+		},
+		OAuthClient: fakeOAuthClient{},
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+	if err := server.putSession(context.Background(), session{
+		ID:          "session-token",
+		UserID:      42,
+		Username:    "owner",
+		Name:        "Owner",
+		AccessToken: "token",
+		CSRFToken:   "csrf",
+		IsOwner:     true,
+		ExpiresAt:   4102444800,
+	}); err != nil {
+		t.Fatalf("putSession: %v", err)
+	}
+
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/guilds/channels?guild_id=1", nil)
+	req.AddCookie(&http.Cookie{
+		Name:  sessionCookieName,
+		Value: server.signCookieValue(sessionCookieName, "session-token"),
+	})
+	server.handler().ServeHTTP(rec, req)
+	if rec.Code != http.StatusServiceUnavailable {
+		t.Fatalf("unexpected status: %d body=%s", rec.Code, rec.Body.String())
+	}
+
+	var payload map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &payload); err != nil {
+		t.Fatalf("json.Unmarshal: %v", err)
+	}
+	if got, _ := payload["error"].(string); !strings.Contains(got, "discord runtime") {
+		t.Fatalf("expected discord runtime error, got %#v", payload)
+	}
+}
+
+func TestAdminOwnerRoutesRequireSession(t *testing.T) {
+	t.Parallel()
+
+	server, err := New(Options{
+		Addr:          "127.0.0.1:0",
+		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Service:       Service{},
+		SessionSecret: strings.Repeat("x", 32),
+		ClientID:      "cid",
+		ClientSecret:  "secret",
+		OwnerStatus: func() OwnerStatus {
+			return OwnerStatus{
+				Configured:      true,
+				Resolved:        true,
+				Source:          "discord",
+				EffectiveUserID: optionalUint64(42),
+			}
+		},
+		OAuthClient: fakeOAuthClient{},
+	})
+	if err != nil {
+		t.Fatalf("New: %v", err)
+	}
+
+	for _, path := range []string{
+		"/api/owner/plugins/search",
+		"/api/owner/config/modules",
+		"/api/owner/migrations/status",
+	} {
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		server.handler().ServeHTTP(rec, req)
+		if rec.Code != http.StatusUnauthorized {
+			t.Fatalf("%s status=%d body=%s", path, rec.Code, rec.Body.String())
+		}
+	}
+}

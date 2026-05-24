@@ -12,16 +12,31 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/adminapi"
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
-	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	discordplatform "github.com/xsyetopz/go-mamacord/internal/runtime/discord"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
+	"github.com/xsyetopz/go-mamacord/internal/storagebootstrap"
 )
+
+var (
+	newDiscordBotRuntime = discordplatform.New
+	startDiscordBot      = func(ctx context.Context, bot *discordplatform.Bot) error {
+		if bot == nil {
+			return nil
+		}
+		return bot.Start(ctx)
+	}
+)
+
+type appStore interface {
+	commandruntime.Store
+	Close() error
+}
 
 type Dependencies struct {
 	Logger *slog.Logger
@@ -32,7 +47,8 @@ type App struct {
 	logger *slog.Logger
 	cfg    config.Config
 
-	store       *sqlitestore.Store
+	store       appStore
+	bundleRepo  bundles.Repository
 	marketplace *marketplace.Manager
 	i18n        i18n.Registry
 	bot         *discordplatform.Bot
@@ -44,6 +60,23 @@ type App struct {
 	migrationVersion int
 
 	discordStartErr atomic.Pointer[string]
+}
+
+type startupSequence struct {
+	controlEnabled bool
+	discordEnabled bool
+
+	initStorage          func(context.Context) error
+	initBundleRepository func() error
+	validatePluginTrust  func(context.Context) error
+	initI18n             func() error
+	initMarketplace      func() error
+	initOpsServer        func() error
+	initAdminServer      func() error
+	startOps             func() error
+	startAdmin           func() error
+	initDiscordBot       func() error
+	startDiscordBot      func(context.Context) error
 }
 
 func New(deps Dependencies) (*App, error) {
@@ -63,49 +96,130 @@ func New(deps Dependencies) (*App, error) {
 
 func (a *App) Start(ctx context.Context) error {
 	a.startedAt = time.Now()
-	if err := a.initStorage(ctx); err != nil {
-		return err
-	}
-	if err := a.validatePluginTrust(ctx); err != nil {
-		return err
-	}
-	if err := a.initI18n(); err != nil {
-		return err
-	}
-	if err := a.initDiscordBot(); err != nil {
-		return err
-	}
-	if err := a.initOpsServer(); err != nil {
-		return err
-	}
-	if err := a.initAdminServer(); err != nil {
-		return err
-	}
-	if a.ops != nil {
-		if err := a.ops.Start(); err != nil {
-			return err
+	phase, err := runStartupSequence(ctx, startupSequence{
+		controlEnabled: a.cfg.HasRuntimeRole(config.RuntimeRoleControl),
+		discordEnabled: a.cfg.UsesDiscordRuntime(),
+		initStorage:    a.initStorage,
+		initBundleRepository: func() error {
+			return a.initBundleRepository()
+		},
+		validatePluginTrust: a.validatePluginTrust,
+		initI18n: func() error {
+			return a.initI18n()
+		},
+		initMarketplace: func() error {
+			return a.initMarketplace()
+		},
+		initOpsServer: func() error {
+			return a.initOpsServer()
+		},
+		initAdminServer: func() error {
+			return a.initAdminServer()
+		},
+		startOps: func() error {
+			if a.ops != nil {
+				return a.ops.Start()
+			}
+			return nil
+		},
+		startAdmin: func() error {
+			if a.admin != nil {
+				return a.admin.Start()
+			}
+			return nil
+		},
+		initDiscordBot: func() error {
+			return a.initDiscordBot()
+		},
+		startDiscordBot: func(ctx context.Context) error {
+			return startDiscordBot(ctx, a.bot)
+		},
+	})
+	if err != nil {
+		if phase != "" {
+			return a.keepControlPlaneRunning(ctx, phase, err)
 		}
-	}
-	if a.admin != nil {
-		if err := a.admin.Start(); err != nil {
-			return err
-		}
+		return err
 	}
 
-	if err := a.bot.Start(ctx); err != nil {
-		// Dev ergonomics: keep the admin API up even if Discord rejects our gateway
-		// connection (missing intents, bad token, etc). Production should still
-		// fail fast so the process restarts and the error is visible.
-		if a.cfg.ProdMode {
-			return err
-		}
-		msg := err.Error()
-		a.discordStartErr.Store(&msg)
-		a.logger.ErrorContext(ctx, "discord bot failed to start; keeping admin API running", slog.String("err", err.Error()))
-		<-ctx.Done()
-		return ctx.Err()
-	}
+	<-ctx.Done()
+	return ctx.Err()
+}
 
+func runStartupSequence(ctx context.Context, seq startupSequence) (string, error) {
+	if seq.initStorage != nil {
+		if err := seq.initStorage(ctx); err != nil {
+			return "", err
+		}
+	}
+	if seq.initBundleRepository != nil {
+		if err := seq.initBundleRepository(); err != nil {
+			return "", err
+		}
+	}
+	if seq.validatePluginTrust != nil {
+		if err := seq.validatePluginTrust(ctx); err != nil {
+			return "", err
+		}
+	}
+	if seq.initI18n != nil {
+		if err := seq.initI18n(); err != nil {
+			return "", err
+		}
+	}
+	if seq.initMarketplace != nil {
+		if err := seq.initMarketplace(); err != nil {
+			return "", err
+		}
+	}
+	if seq.initOpsServer != nil {
+		if err := seq.initOpsServer(); err != nil {
+			return "", err
+		}
+	}
+	if seq.controlEnabled && seq.initAdminServer != nil {
+		if err := seq.initAdminServer(); err != nil {
+			return "", err
+		}
+	}
+	if seq.startOps != nil {
+		if err := seq.startOps(); err != nil {
+			return "", err
+		}
+	}
+	if seq.controlEnabled && seq.startAdmin != nil {
+		if err := seq.startAdmin(); err != nil {
+			return "", err
+		}
+	}
+	if seq.discordEnabled {
+		if seq.initDiscordBot != nil {
+			if err := seq.initDiscordBot(); err != nil {
+				return "initialize", err
+			}
+		}
+		if seq.startDiscordBot != nil {
+			if err := seq.startDiscordBot(ctx); err != nil {
+				return "start", err
+			}
+		}
+	}
+	return "", nil
+}
+
+func (a *App) keepControlPlaneRunning(ctx context.Context, phase string, err error) error {
+	if err == nil {
+		return nil
+	}
+	msg := err.Error()
+	a.discordStartErr.Store(&msg)
+	a.logger.ErrorContext(ctx, "discord bot failed; keeping control plane running",
+		slog.String("phase", strings.TrimSpace(phase)),
+		slog.String("err", err.Error()),
+	)
+	if a.admin == nil && a.ops == nil {
+		return err
+	}
 	<-ctx.Done()
 	return ctx.Err()
 }
@@ -130,34 +244,24 @@ func (a *App) initStorage(ctx context.Context) error {
 	if a.store != nil {
 		return nil
 	}
-
-	runner, err := migrate.New(migrate.Options{
-		Dir:       a.cfg.Migrations,
-		BackupDir: a.cfg.MigrationBackups,
-	})
+	store, version, err := storagebootstrap.OpenRuntimeStore(ctx, a.cfg)
 	if err != nil {
 		return err
 	}
-	status, runErr := runner.UpPath(ctx, a.cfg.SQLitePath)
-	if runErr != nil {
-		return runErr
-	}
-	a.migrationVersion = status.CurrentVersion
-
-	db, err := sqlite.Open(ctx, sqlite.Options{
-		Path: a.cfg.SQLitePath,
-	})
-	if err != nil {
-		return err
-	}
-
-	store, err := sqlitestore.New(db)
-	if err != nil {
-		_ = db.Close()
-		return err
-	}
-
 	a.store = store
+	a.migrationVersion = version
+	return nil
+}
+
+func (a *App) initBundleRepository() error {
+	if a.bundleRepo != nil {
+		return nil
+	}
+	repo, err := bundles.Open(a.cfg)
+	if err != nil {
+		return err
+	}
+	a.bundleRepo = repo
 	return nil
 }
 
@@ -186,8 +290,9 @@ func (a *App) validatePluginTrust(ctx context.Context) error {
 			pathLabel = "./config/trusted_keys.json"
 		}
 		return fmt.Errorf(
-			"prod mode requires at least one trusted signer in %s or SQLite; bundled plugins expect a trusted public key file there, and custom plugins should be signed with mamacord gen-signing-key + sign-plugin",
+			"prod mode requires at least one trusted signer in %s or the configured %s store; bundled plugins expect a trusted public key file there, and custom plugins should be signed with mamacord gen-signing-key + sign-plugin",
 			pathLabel,
+			a.cfg.StorageBackend,
 		)
 	}
 	return nil
@@ -203,31 +308,62 @@ func (a *App) initI18n() error {
 	return nil
 }
 
+func (a *App) initMarketplace() error {
+	if a.marketplace != nil {
+		return nil
+	}
+	if err := a.initBundleRepository(); err != nil {
+		return err
+	}
+	if a.store == nil {
+		return errors.New("store must be initialized before marketplace")
+	}
+	manager, err := marketplace.New(marketplace.Options{
+		Logger:            a.logger,
+		Store:             a.store,
+		Bundles:           a.bundleRepo,
+		BundledPluginsDir: a.cfg.BundledPluginsDir,
+		UserPluginsDir:    a.cfg.UserPluginsDir,
+		TrustedKeysFile:   a.cfg.TrustedKeysFile,
+		CacheDir:          a.cfg.MarketplaceCacheDir,
+		ProdMode:          a.cfg.ProdMode,
+		AllowUnsigned:     a.cfg.AllowUnsignedPlugins,
+	})
+	if err != nil {
+		return err
+	}
+	a.marketplace = manager
+	return nil
+}
+
 func (a *App) initDiscordBot() error {
+	if !a.cfg.UsesDiscordRuntime() {
+		return nil
+	}
 	if a.bot != nil {
 		return nil
+	}
+	if err := a.initBundleRepository(); err != nil {
+		return err
 	}
 	if a.store == nil {
 		return errors.New("store must be initialized before discord bot")
 	}
-	if a.marketplace == nil {
-		manager, err := marketplace.New(marketplace.Options{
-			Logger:            a.logger,
-			Store:             a.store,
-			BundledPluginsDir: a.cfg.BundledPluginsDir,
-			UserPluginsDir:    a.cfg.UserPluginsDir,
-			TrustedKeysFile:   a.cfg.TrustedKeysFile,
-			CacheDir:          a.cfg.MarketplaceCacheDir,
-			ProdMode:          a.cfg.ProdMode,
-			AllowUnsigned:     a.cfg.AllowUnsignedPlugins,
-		})
-		if err != nil {
-			return err
-		}
-		a.marketplace = manager
+	if err := a.initMarketplace(); err != nil {
+		return err
 	}
 
-	bot, err := discordplatform.New(discordplatform.Dependencies{
+	bot, err := newDiscordBotRuntime(a.discordBotDependencies())
+	if err != nil {
+		return err
+	}
+
+	a.bot = bot
+	return nil
+}
+
+func (a *App) discordBotDependencies() discordplatform.Dependencies {
+	return discordplatform.Dependencies{
 		Logger: a.logger,
 		Token:  a.cfg.DiscordToken,
 
@@ -236,8 +372,11 @@ func (a *App) initDiscordBot() error {
 		CommandRegistrationMode:  a.cfg.CommandRegistrationMode,
 		CommandGuildIDs:          a.cfg.CommandGuildIDs,
 		CommandRegisterAllGuilds: a.cfg.CommandRegisterAllGuilds,
+		EnableGateway:            a.cfg.HasRuntimeRole(config.RuntimeRoleGateway),
+		EnableScheduler:          a.cfg.HasRuntimeRole(config.RuntimeRoleScheduler),
 		BundledPluginsDir:        a.cfg.BundledPluginsDir,
 		UserPluginsDir:           a.cfg.UserPluginsDir,
+		Bundles:                  a.bundleRepo,
 		PermissionsFile:          a.cfg.PermissionsFile,
 		ModulesFile:              a.cfg.ModulesFile,
 		AllowUnsignedPlugins:     a.cfg.AllowUnsignedPlugins,
@@ -254,13 +393,7 @@ func (a *App) initDiscordBot() error {
 		Store:       a.store,
 		Metrics:     a.metrics,
 		Marketplace: a.marketplace,
-	})
-	if err != nil {
-		return err
 	}
-
-	a.bot = bot
-	return nil
 }
 
 func (a *App) initOpsServer() error {
@@ -277,25 +410,16 @@ func (a *App) initOpsServer() error {
 }
 
 func (a *App) initAdminServer() error {
-	if a.admin != nil || a.cfg.AdminAddr == "" {
+	if a.admin != nil || !a.cfg.ControlAPIEnabled() {
 		return nil
 	}
-	if a.bot == nil {
-		return errors.New("discord bot must be initialized before admin server")
+	if err := a.initBundleRepository(); err != nil {
+		return err
 	}
 	oauthClient := adminapi.NewDiscordOAuthClient(
 		a.cfg.DashboardClientID,
 		a.cfg.DashboardClientSecret,
 	)
-	ownerStatus := func() adminapi.OwnerStatus {
-		status := a.bot.OwnerStatus()
-		return adminapi.OwnerStatus{
-			Configured:      status.Configured,
-			Resolved:        status.Resolved,
-			Source:          status.Source,
-			EffectiveUserID: status.EffectiveUserID,
-		}
-	}
 
 	server, err := adminapi.New(adminapi.Options{
 		Addr:          a.cfg.AdminAddr,
@@ -306,123 +430,41 @@ func (a *App) initAdminServer() error {
 		OAuthClient:   oauthClient,
 		SessionStore:  a.store.AdminSessions(),
 		Service: adminapi.Service{
-			Logger:        a.logger,
-			Config:        a.cfg,
-			Snapshot:      a.opsSnapshot,
-			ModuleAdmin:   a.bot.ModuleAdmin(),
-			PluginAdmin:   a.bot.PluginAdmin(),
-			Marketplace:   a.marketplace,
-			Store:         a.store,
-			BuildInfo:     buildinfo.Current,
-			OAuth:         oauthClient,
-			OwnerStatus:   ownerStatus,
-			KnownGuildIDs: a.bot.KnownGuildIDs,
-			BotHasGuild:   a.bot.HasGuild,
-			ListGuildChannels: func(ctx context.Context, guildID uint64) ([]adminapi.GuildChannelInfo, error) {
-				items, err := a.bot.ListGuildChannels(ctx, guildID)
-				if err != nil {
-					return nil, err
-				}
-				out := make([]adminapi.GuildChannelInfo, 0, len(items))
-				for _, item := range items {
-					out = append(out, adminapi.GuildChannelInfo{
-						ID:       adminapi.Snowflake(item.ID),
-						Name:     item.Name,
-						Type:     item.Type,
-						ParentID: adminapi.Snowflake(item.ParentID),
-					})
-				}
-				return out, nil
-			},
-			ListGuildRoles: func(ctx context.Context, guildID uint64) ([]adminapi.GuildRoleInfo, error) {
-				items, err := a.bot.ListGuildRoles(ctx, guildID)
-				if err != nil {
-					return nil, err
-				}
-				out := make([]adminapi.GuildRoleInfo, 0, len(items))
-				for _, item := range items {
-					out = append(out, adminapi.GuildRoleInfo{
-						ID:          adminapi.Snowflake(item.ID),
-						Name:        item.Name,
-						Color:       item.Color,
-						Position:    item.Position,
-						Managed:     item.Managed,
-						Mentionable: item.Mentionable,
-					})
-				}
-				return out, nil
-			},
-			SearchGuildMembers: func(ctx context.Context, guildID uint64, query string, limit int) ([]adminapi.GuildMemberInfo, error) {
-				items, err := a.bot.SearchGuildMembers(ctx, guildID, query, limit)
-				if err != nil {
-					return nil, err
-				}
-				out := make([]adminapi.GuildMemberInfo, 0, len(items))
-				for _, item := range items {
-					roleIDs := make([]adminapi.Snowflake, 0, len(item.RoleIDs))
-					for _, roleID := range item.RoleIDs {
-						roleIDs = append(roleIDs, adminapi.Snowflake(roleID))
-					}
-					out = append(out, adminapi.GuildMemberInfo{
-						UserID:      adminapi.Snowflake(item.UserID),
-						Username:    item.Username,
-						DisplayName: item.DisplayName,
-						AvatarURL:   item.AvatarURL,
-						Bot:         item.Bot,
-						JoinedAt:    item.JoinedAt,
-						RoleIDs:     roleIDs,
-					})
-				}
-				return out, nil
-			},
-			ListGuildEmojis: func(ctx context.Context, guildID uint64) ([]adminapi.GuildEmojiInfo, error) {
-				items, err := a.bot.ListGuildEmojis(ctx, guildID)
-				if err != nil {
-					return nil, err
-				}
-				out := make([]adminapi.GuildEmojiInfo, 0, len(items))
-				for _, item := range items {
-					out = append(out, adminapi.GuildEmojiInfo{
-						ID:       adminapi.Snowflake(item.ID),
-						Name:     item.Name,
-						Animated: item.Animated,
-					})
-				}
-				return out, nil
-			},
-			ListGuildStickers: func(ctx context.Context, guildID uint64) ([]adminapi.GuildStickerInfo, error) {
-				items, err := a.bot.ListGuildStickers(ctx, guildID)
-				if err != nil {
-					return nil, err
-				}
-				out := make([]adminapi.GuildStickerInfo, 0, len(items))
-				for _, item := range items {
-					out = append(out, adminapi.GuildStickerInfo{
-						ID:          adminapi.Snowflake(item.ID),
-						Name:        item.Name,
-						Description: item.Description,
-						Tags:        item.Tags,
-					})
-				}
-				return out, nil
-			},
-			SetSlowmode:         a.bot.SetSlowmode,
-			SetNickname:         a.bot.SetNickname,
-			TimeoutMember:       a.bot.TimeoutMember,
-			CreateRole:          a.bot.CreateRole,
-			EditRole:            a.bot.EditRole,
-			DeleteRole:          a.bot.DeleteRole,
-			AddRole:             a.bot.AddRole,
-			RemoveRole:          a.bot.RemoveRole,
-			PurgeMessages:       a.bot.PurgeMessages,
-			CreateEmojiUpload:   a.bot.CreateEmojiUpload,
-			EditEmoji:           a.bot.EditEmoji,
-			DeleteEmoji:         a.bot.DeleteEmoji,
-			CreateStickerUpload: a.bot.CreateStickerUpload,
-			EditSticker:         a.bot.EditSticker,
-			DeleteSticker:       a.bot.DeleteSticker,
+			Logger:              a.logger,
+			Config:              a.cfg,
+			Bundles:             a.bundleRepo,
+			Snapshot:            a.opsSnapshot,
+			ModuleAdmin:         adminModuleAdmin{app: a},
+			PluginAdmin:         adminPluginAdmin{app: a},
+			Marketplace:         a.marketplace,
+			Store:               a.store,
+			BuildInfo:           buildinfo.Current,
+			OAuth:               oauthClient,
+			OwnerStatus:         a.ownerStatus,
+			KnownGuildIDs:       a.knownGuildIDs,
+			BotHasGuild:         a.botHasGuild,
+			ListGuildChannels:   a.listGuildChannels,
+			ListGuildRoles:      a.listGuildRoles,
+			SearchGuildMembers:  a.searchGuildMembers,
+			ListGuildEmojis:     a.listGuildEmojis,
+			ListGuildStickers:   a.listGuildStickers,
+			SetSlowmode:         a.setSlowmode,
+			SetNickname:         a.setNickname,
+			TimeoutMember:       a.timeoutMember,
+			CreateRole:          a.createRole,
+			EditRole:            a.editRole,
+			DeleteRole:          a.deleteRole,
+			AddRole:             a.addRole,
+			RemoveRole:          a.removeRole,
+			PurgeMessages:       a.purgeMessages,
+			CreateEmojiUpload:   a.createEmojiUpload,
+			EditEmoji:           a.editEmoji,
+			DeleteEmoji:         a.deleteEmoji,
+			CreateStickerUpload: a.createStickerUpload,
+			EditSticker:         a.editSticker,
+			DeleteSticker:       a.deleteSticker,
 		},
-		OwnerStatus: ownerStatus,
+		OwnerStatus: a.ownerStatus,
 	})
 	if err != nil {
 		return err
@@ -436,6 +478,7 @@ func (a *App) opsSnapshot() ops.Snapshot {
 		StartedAt:        a.startedAt,
 		MigrationVersion: a.migrationVersion,
 		ProdMode:         a.cfg.ProdMode,
+		Ready:            !a.cfg.UsesDiscordRuntime(),
 	}
 	if msg := a.discordStartErr.Load(); msg != nil {
 		snap.DiscordStartError = strings.TrimSpace(*msg)

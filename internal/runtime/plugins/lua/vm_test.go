@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"io"
 	"log/slog"
 	"net/http"
@@ -14,18 +15,38 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
-	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
 	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
-	"github.com/xsyetopz/go-mamacord/internal/sqlite"
-	sqlitestore "github.com/xsyetopz/go-mamacord/internal/storage/sqlite"
+	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
 type roundTripperFunc func(*http.Request) (*http.Response, error)
 
 func (fn roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return fn(req)
+}
+
+func bundledFirstPartyPluginDir(t *testing.T, pluginID string) string {
+	t.Helper()
+
+	dir, err := bundles.NewLocalRepository().ResolveActiveDir(filepath.FromSlash("../../../../plugins/" + pluginID))
+	if err != nil {
+		t.Fatalf("ResolveActiveDir(%q): %v", pluginID, err)
+	}
+	return dir
+}
+
+func examplePluginDir(t *testing.T) string {
+	t.Helper()
+
+	dir, err := bundles.NewLocalRepository().ResolveActiveDir(filepath.FromSlash("../../../../examples/plugins/example"))
+	if err != nil {
+		t.Fatalf("ResolveActiveDir(example): %v", err)
+	}
+	return dir
 }
 
 type fakeInteraction struct {
@@ -40,30 +61,31 @@ func (f *fakeInteraction) Defer(ephemeral bool) error {
 }
 
 type fakeDiscordExecutor struct {
-	sendDMErr         error
-	sendChannelErr    error
-	timeoutErr        error
-	getMessageErr     error
-	sendDMCalls       int
-	sendChannelCalls  int
-	timeoutCalls      int
-	getMessageCalls   int
-	crosspostCalls    int
-	pinCalls          int
-	unpinCalls        int
-	addReactionCalls  int
-	removeOwnCalls    int
-	removeUserCalls   int
-	clearCalls        int
-	clearEmojiCalls   int
-	getReactionsCalls int
-	lastChannel       uint64
-	lastGuild         uint64
-	lastUser          uint64
-	lastMessageID     uint64
-	lastEmoji         string
-	lastUntil         time.Time
-	lastMessage       any
+	sendDMErr          error
+	sendChannelErr     error
+	timeoutErr         error
+	getMessageErr      error
+	sendDMCalls        int
+	sendChannelCalls   int
+	timeoutCalls       int
+	getMessageCalls    int
+	crosspostCalls     int
+	pinCalls           int
+	unpinCalls         int
+	addReactionCalls   int
+	removeOwnCalls     int
+	removeUserCalls    int
+	clearCalls         int
+	clearEmojiCalls    int
+	getReactionsCalls  int
+	lastChannel        uint64
+	lastGuild          uint64
+	lastUser           uint64
+	lastMessageID      uint64
+	lastEmoji          string
+	lastUntil          time.Time
+	lastMessage        luaplugin.EncodedValue
+	lastWebhookMessage luaplugin.EncodedValue
 }
 
 func (f *fakeDiscordExecutor) SelfUser(context.Context) (luaplugin.UserResult, error) {
@@ -187,7 +209,7 @@ func (f *fakeDiscordExecutor) TimeoutMember(_ context.Context, guildID, userID u
 	return f.timeoutErr
 }
 
-func (f *fakeDiscordExecutor) SendDM(_ context.Context, _ string, userID uint64, message any) (luaplugin.MessageResult, error) {
+func (f *fakeDiscordExecutor) SendDM(_ context.Context, _ string, userID uint64, message luaplugin.EncodedValue) (luaplugin.MessageResult, error) {
 	f.sendDMCalls++
 	f.lastUser = userID
 	f.lastMessage = message
@@ -201,7 +223,7 @@ func (f *fakeDiscordExecutor) SendDM(_ context.Context, _ string, userID uint64,
 	}, nil
 }
 
-func (f *fakeDiscordExecutor) SendChannel(_ context.Context, _ string, channelID uint64, message any) (luaplugin.MessageResult, error) {
+func (f *fakeDiscordExecutor) SendChannel(_ context.Context, _ string, channelID uint64, message luaplugin.EncodedValue) (luaplugin.MessageResult, error) {
 	f.sendChannelCalls++
 	f.lastChannel = channelID
 	f.lastMessage = message
@@ -390,8 +412,9 @@ func (f *fakeDiscordExecutor) EditWebhook(context.Context, luaplugin.WebhookEdit
 
 func (f *fakeDiscordExecutor) DeleteWebhook(context.Context, uint64) error { return nil }
 
-func (f *fakeDiscordExecutor) ExecuteWebhook(context.Context, string, luaplugin.WebhookExecuteSpec) (luaplugin.MessageResult, error) {
-	return luaplugin.MessageResult{}, nil
+func (f *fakeDiscordExecutor) ExecuteWebhook(_ context.Context, _ string, spec luaplugin.WebhookExecuteSpec) (luaplugin.MessageResult, error) {
+	f.lastWebhookMessage = spec.Message
+	return luaplugin.MessageResult{MessageID: 404, ChannelID: 505}, nil
 }
 
 func (f *fakeDiscordExecutor) CreateEmoji(context.Context, luaplugin.EmojiCreateSpec) (luaplugin.EmojiResult, error) {
@@ -424,7 +447,7 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 	db := openTestDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
-	store, err := sqlitestore.New(db)
+	store, err := postgresstore.New(db)
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
@@ -436,7 +459,8 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("example", filepath.FromSlash("../../../../examples/plugins/example/locales")); err != nil {
+	pluginDir := examplePluginDir(t)
+	if err = reg.LoadPluginLocales("example", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 	s, locErr := reg.Localize(i18n.Config{
@@ -449,7 +473,7 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 		t.Fatalf("plugin localize failed: %q (%v)", s, locErr)
 	}
 
-	script := filepath.FromSlash("../../../../examples/plugins/example/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "example",
@@ -543,6 +567,177 @@ func TestDescriptorRoutesAndKV(t *testing.T) {
 	}
 }
 
+func TestCallAutocompleteReturnsEncodedValue(t *testing.T) {
+	t.Parallel()
+
+	var logs bytes.Buffer
+	logger := slog.New(slog.NewTextHandler(&logs, &slog.HandlerOptions{}))
+
+	dir := t.TempDir()
+	script := filepath.Join(dir, "plugin.lua")
+	if err := os.WriteFile(script, []byte(`
+return bot.plugin({
+  autocompletes = {
+    topic_lookup = function(ctx)
+      return {
+        choices = {
+          { name = "alpha", value = "a" },
+          { name = "beta", value = 2 },
+        },
+      }
+    end,
+  },
+})
+`), 0o644); err != nil {
+		t.Fatalf("write plugin: %v", err)
+	}
+
+	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
+		Logger:    logger,
+		PluginID:  "autocomplete",
+		PluginDir: dir,
+	})
+	if err != nil {
+		t.Fatalf("NewFromFile(autocomplete): %v", err)
+	}
+	t.Cleanup(vm.Close)
+
+	got, err := vm.CallAutocomplete(context.Background(), "topic_lookup", luaplugin.Payload{
+		Locale: "en-US",
+		Options: map[string]any{
+			"__command": "lookup",
+			"__option":  "topic",
+			"__value":   "a",
+		},
+	})
+	if err != nil {
+		t.Fatalf("CallAutocomplete: %v", err)
+	}
+
+	var decoded struct {
+		Choices []struct {
+			Name  string `json:"name"`
+			Value any    `json:"value"`
+		} `json:"choices"`
+	}
+	if err := json.Unmarshal(got, &decoded); err != nil {
+		t.Fatalf("decode autocomplete payload: %v", err)
+	}
+	if len(decoded.Choices) != 2 {
+		t.Fatalf("unexpected choice count: got %d want 2", len(decoded.Choices))
+	}
+	if decoded.Choices[0].Name != "alpha" {
+		t.Fatalf("unexpected first choice: %#v", decoded.Choices[0])
+	}
+}
+
+func TestCallEncodedRouteReturnsEncodedValue(t *testing.T) {
+	t.Parallel()
+
+	var logs bytes.Buffer
+	logger := slog.New(slog.NewTextHandler(&logs, &slog.HandlerOptions{}))
+
+	dir := t.TempDir()
+	script := filepath.Join(dir, "plugin.lua")
+	if err := os.WriteFile(script, []byte(`
+return bot.plugin({
+  commands = {
+    bot.command("inspect", {
+      description = "Inspect route encoding.",
+      run = function(ctx)
+        return {
+          content = "inspect:" .. ctx.user_id,
+          ephemeral = true,
+        }
+      end,
+    }),
+  },
+})
+`), 0o644); err != nil {
+		t.Fatalf("write plugin: %v", err)
+	}
+
+	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
+		Logger:    logger,
+		PluginID:  "encodedroute",
+		PluginDir: dir,
+	})
+	if err != nil {
+		t.Fatalf("NewFromFile(encodedroute): %v", err)
+	}
+	t.Cleanup(vm.Close)
+
+	got, hasValue, err := vm.CallEncodedRoute(context.Background(), luaplugin.RouteCommand, "inspect", luaplugin.Payload{
+		UserID: "42",
+		Locale: "en-US",
+	})
+	if err != nil {
+		t.Fatalf("CallEncodedRoute: %v", err)
+	}
+	if !hasValue {
+		t.Fatal("expected encoded route value")
+	}
+
+	var decoded map[string]any
+	if err := json.Unmarshal(got, &decoded); err != nil {
+		t.Fatalf("decode encoded route payload: %v", err)
+	}
+	if decoded["content"] != "inspect:42" {
+		t.Fatalf("unexpected encoded route payload: %#v", decoded)
+	}
+}
+
+func TestCallEncodedHandleReturnsEncodedValue(t *testing.T) {
+	t.Parallel()
+
+	var logs bytes.Buffer
+	logger := slog.New(slog.NewTextHandler(&logs, &slog.HandlerOptions{}))
+
+	dir := t.TempDir()
+	script := filepath.Join(dir, "plugin.lua")
+	if err := os.WriteFile(script, []byte(`
+function Handle(cmd, ctx)
+  return {
+    content = cmd .. ":" .. ctx.user_id,
+    ephemeral = true,
+  }
+end
+
+return nil
+`), 0o644); err != nil {
+		t.Fatalf("write plugin: %v", err)
+	}
+
+	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
+		Logger:    logger,
+		PluginID:  "legacy",
+		PluginDir: dir,
+	})
+	if err != nil {
+		t.Fatalf("NewFromFile(legacy): %v", err)
+	}
+	t.Cleanup(vm.Close)
+
+	got, hasValue, err := vm.CallEncodedHandle(context.Background(), "Handle", "legacy", luaplugin.Payload{
+		UserID: "42",
+		Locale: "en-US",
+	})
+	if err != nil {
+		t.Fatalf("CallEncodedHandle: %v", err)
+	}
+	if !hasValue {
+		t.Fatal("expected encoded handle value")
+	}
+
+	var decoded map[string]any
+	if err := json.Unmarshal(got, &decoded); err != nil {
+		t.Fatalf("decode encoded handle payload: %v", err)
+	}
+	if decoded["content"] != "legacy:42" {
+		t.Fatalf("unexpected encoded handle payload: %#v", decoded)
+	}
+}
+
 func TestFunPluginRoutes(t *testing.T) {
 	t.Parallel()
 
@@ -553,11 +748,12 @@ func TestFunPluginRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("fun", filepath.FromSlash("../../../../plugins/fun/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "fun")
+	if err = reg.LoadPluginLocales("fun", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
-	script := filepath.FromSlash("../../../../plugins/fun/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "fun",
@@ -711,7 +907,7 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	db := openTestDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
-	store, err := sqlitestore.New(db)
+	store, err := postgresstore.New(db)
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
@@ -723,11 +919,12 @@ func TestWellnessPluginRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("wellness", filepath.FromSlash("../../../../plugins/wellness/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "wellness")
+	if err = reg.LoadPluginLocales("wellness", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
-	script := filepath.FromSlash("../../../../plugins/wellness/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "wellness",
@@ -875,12 +1072,13 @@ func TestInfoPluginRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("info", filepath.FromSlash("../../../../plugins/info/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "info")
+	if err = reg.LoadPluginLocales("info", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
 	executor := &fakeDiscordExecutor{}
-	script := filepath.FromSlash("../../../../plugins/info/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "info",
@@ -892,8 +1090,8 @@ func TestInfoPluginRoutes(t *testing.T) {
 				Guilds:  true,
 			},
 		},
-		Discord: executor,
-		I18n:    &reg,
+		Bridge: luaplugin.Bridge{Discord: executor},
+		I18n:   &reg,
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(info): %v", err)
@@ -1097,7 +1295,7 @@ func TestModerationPluginRoutes(t *testing.T) {
 	db := openTestDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
-	store, err := sqlitestore.New(db)
+	store, err := postgresstore.New(db)
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
@@ -1109,11 +1307,12 @@ func TestModerationPluginRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("moderation", filepath.FromSlash("../../../../plugins/moderation/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "moderation")
+	if err = reg.LoadPluginLocales("moderation", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
-	script := filepath.FromSlash("../../../../plugins/moderation/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	discordExecutor := &fakeDiscordExecutor{}
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
@@ -1129,9 +1328,9 @@ func TestModerationPluginRoutes(t *testing.T) {
 				Members:  true,
 			},
 		},
-		Discord: discordExecutor,
-		Store:   store,
-		I18n:    &reg,
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
+		Store:  store,
+		I18n:   &reg,
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(moderation): %v", err)
@@ -1273,7 +1472,7 @@ func TestModerationPluginWarnTimeoutFailure(t *testing.T) {
 	db := openTestDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
-	store, err := sqlitestore.New(db)
+	store, err := postgresstore.New(db)
 	if err != nil {
 		t.Fatalf("store: %v", err)
 	}
@@ -1285,12 +1484,13 @@ func TestModerationPluginWarnTimeoutFailure(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("moderation", filepath.FromSlash("../../../../plugins/moderation/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "moderation")
+	if err = reg.LoadPluginLocales("moderation", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
 	discordExecutor := &fakeDiscordExecutor{timeoutErr: io.EOF}
-	script := filepath.FromSlash("../../../../plugins/moderation/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "moderation",
@@ -1305,9 +1505,9 @@ func TestModerationPluginWarnTimeoutFailure(t *testing.T) {
 				Members:  true,
 			},
 		},
-		Discord: discordExecutor,
-		Store:   store,
-		I18n:    &reg,
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
+		Store:  store,
+		I18n:   &reg,
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(moderation): %v", err)
@@ -1422,7 +1622,7 @@ return bot.plugin({
 				Messages: true,
 			},
 		},
-		Discord: discordExecutor,
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(sendtest): %v", err)
@@ -1453,6 +1653,99 @@ return bot.plugin({
 	}
 	if discordExecutor.lastUser != 42 || discordExecutor.lastChannel != 77 {
 		t.Fatalf("unexpected send targets: user=%d channel=%d", discordExecutor.lastUser, discordExecutor.lastChannel)
+	}
+	lastMessage, err := discordExecutor.lastMessage.Decode()
+	if err != nil {
+		t.Fatalf("decode last sent message: %v", err)
+	}
+	lastMessageMap, ok := lastMessage.(map[string]any)
+	if !ok {
+		t.Fatalf("expected encoded last message object, got %T", lastMessage)
+	}
+	if lastMessageMap["content"] != "channel test" {
+		t.Fatalf("unexpected encoded last message: %#v", lastMessageMap)
+	}
+}
+
+func TestDiscordExecuteWebhookEncodesMessagePayload(t *testing.T) {
+	t.Parallel()
+
+	var logs bytes.Buffer
+	logger := slog.New(slog.NewTextHandler(&logs, &slog.HandlerOptions{}))
+	discordExecutor := &fakeDiscordExecutor{}
+
+	dir := t.TempDir()
+	script := filepath.Join(dir, "plugin.lua")
+	if err := os.WriteFile(script, []byte(`
+return bot.plugin({
+  commands = {
+    bot.command("webhooktest", {
+      description = "Send a webhook message.",
+      run = function(ctx)
+        local result, err = bot.discord.execute_webhook({
+          webhook_id = "1",
+          token = "token",
+        }, {
+          content = "webhook test",
+        })
+        if result == nil or err ~= nil then
+          error("webhook failed")
+        end
+        return bot.ui.reply({
+          content = result.message_id .. ":" .. result.channel_id,
+          ephemeral = true,
+        })
+      end,
+    }),
+  },
+})
+`), 0o644); err != nil {
+		t.Fatalf("write plugin: %v", err)
+	}
+
+	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
+		Logger:    logger,
+		PluginID:  "webhooktest",
+		PluginDir: dir,
+		Permissions: permissions.Permissions{
+			Discord: permissions.DiscordPermissions{
+				Webhooks: true,
+			},
+		},
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
+	})
+	if err != nil {
+		t.Fatalf("NewFromFile(webhooktest): %v", err)
+	}
+	t.Cleanup(vm.Close)
+
+	got, hasValue, err := vm.CallRoute(context.Background(), luaplugin.RouteCommand, "webhooktest", luaplugin.Payload{
+		Locale: "en-US",
+	})
+	if err != nil {
+		t.Fatalf("CallRoute(webhooktest): %v", err)
+	}
+	if !hasValue {
+		t.Fatalf("expected webhooktest value")
+	}
+	gotMap, ok := got.(map[string]any)
+	if !ok {
+		t.Fatalf("expected object, got %T", got)
+	}
+	if gotMap["content"] != "404:505" {
+		t.Fatalf("unexpected content: %#v", gotMap)
+	}
+
+	lastMessage, err := discordExecutor.lastWebhookMessage.Decode()
+	if err != nil {
+		t.Fatalf("decode last webhook message: %v", err)
+	}
+	lastMessageMap, ok := lastMessage.(map[string]any)
+	if !ok {
+		t.Fatalf("expected encoded webhook message object, got %T", lastMessage)
+	}
+	if lastMessageMap["content"] != "webhook test" {
+		t.Fatalf("unexpected encoded webhook message: %#v", lastMessageMap)
 	}
 }
 
@@ -1569,7 +1862,7 @@ return bot.plugin({
 				Reactions: true,
 			},
 		},
-		Discord: discordExecutor,
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(discordapi): %v", err)
@@ -1630,12 +1923,13 @@ func TestManagerPluginRoutes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("i18n: %v", err)
 	}
-	if err = reg.LoadPluginLocales("manager", filepath.FromSlash("../../../../plugins/manager/locales")); err != nil {
+	pluginDir := bundledFirstPartyPluginDir(t, "manager")
+	if err = reg.LoadPluginLocales("manager", filepath.Join(pluginDir, "locales")); err != nil {
 		t.Fatalf("plugin i18n: %v", err)
 	}
 
 	discordExecutor := &fakeDiscordExecutor{}
-	script := filepath.FromSlash("../../../../plugins/manager/plugin.lua")
+	script := filepath.Join(pluginDir, "plugin.lua")
 	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
 		Logger:    logger,
 		PluginID:  "manager",
@@ -1650,8 +1944,8 @@ func TestManagerPluginRoutes(t *testing.T) {
 				Stickers: true,
 			},
 		},
-		Discord: discordExecutor,
-		I18n:    &reg,
+		Bridge: luaplugin.Bridge{Discord: discordExecutor},
+		I18n:   &reg,
 	})
 	if err != nil {
 		t.Fatalf("NewFromFile(manager): %v", err)
@@ -1731,23 +2025,5 @@ func TestManagerPluginRoutes(t *testing.T) {
 
 func openTestDB(t *testing.T) *sql.DB {
 	t.Helper()
-	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "test.sqlite")
-
-	runner, err := migrate.New(migrate.Options{
-		Dir:       filepath.FromSlash("../../../../migrations/sqlite"),
-		BackupDir: filepath.Join(dir, "migration_backups"),
-	})
-	if err != nil {
-		t.Fatalf("migrate.New: %v", err)
-	}
-	if _, err := runner.UpPath(context.Background(), dbPath); err != nil {
-		t.Fatalf("runner.UpPath: %v", err)
-	}
-
-	db, err := sqlite.Open(context.Background(), sqlite.Options{Path: dbPath})
-	if err != nil {
-		t.Fatalf("open db: %v", err)
-	}
-	return db
+	return postgrestest.OpenMigratedDB(t)
 }

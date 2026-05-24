@@ -79,13 +79,14 @@ type InstallRequest struct {
 }
 
 type InstallResult struct {
-	PluginID       string         `json:"plugin_id"`
-	SourceID       string         `json:"source_id"`
-	TargetDir      string         `json:"target_dir"`
-	GitRevision    string         `json:"git_revision"`
-	SignatureState SignatureState `json:"signature_state"`
-	Enabled        bool           `json:"enabled"`
-	LocalModified  bool           `json:"local_modified"`
+	PluginID          string         `json:"plugin_id"`
+	SourceID          string         `json:"source_id"`
+	PluginRoot        string         `json:"plugin_root"`
+	BundleRelativeDir string         `json:"bundle_relative_dir,omitempty"`
+	GitRevision       string         `json:"git_revision"`
+	SignatureState    SignatureState `json:"signature_state"`
+	Enabled           bool           `json:"enabled"`
+	LocalModified     bool           `json:"local_modified"`
 }
 
 type UpdateRequest struct {
@@ -95,12 +96,13 @@ type UpdateRequest struct {
 }
 
 type UpdateResult struct {
-	PluginID       string         `json:"plugin_id"`
-	SourceID       string         `json:"source_id"`
-	TargetDir      string         `json:"target_dir"`
-	GitRevision    string         `json:"git_revision"`
-	SignatureState SignatureState `json:"signature_state"`
-	Forced         bool           `json:"forced"`
+	PluginID          string         `json:"plugin_id"`
+	SourceID          string         `json:"source_id"`
+	PluginRoot        string         `json:"plugin_root"`
+	BundleRelativeDir string         `json:"bundle_relative_dir,omitempty"`
+	GitRevision       string         `json:"git_revision"`
+	SignatureState    SignatureState `json:"signature_state"`
+	Forced            bool           `json:"forced"`
 }
 
 type UninstallRequest struct {

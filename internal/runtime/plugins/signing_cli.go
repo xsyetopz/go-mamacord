@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 )
 
 const SignatureSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json"
@@ -129,7 +131,7 @@ func SignDir(dir string, keyID string, privateKey ed25519.PrivateKey) (Signature
 		return Signature{}, nil, errors.New("invalid ed25519 private key")
 	}
 
-	hash, err := HashDir(dir)
+	hash, err := bundles.HashDir(dir)
 	if err != nil {
 		return Signature{}, nil, err
 	}

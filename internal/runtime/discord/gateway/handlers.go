@@ -11,7 +11,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
@@ -30,7 +30,7 @@ type PluginEmitter interface {
 
 type Handlers struct {
 	Logger                   *slog.Logger
-	Store                    commandapi.Store
+	Store                    commandruntime.Store
 	I18n                     i18n.Registry
 	Client                   *bot.Client
 	CommandRegisterAllGuilds bool

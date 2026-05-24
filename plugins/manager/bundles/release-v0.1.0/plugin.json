@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
+  "id": "manager",
+  "name": "Manager",
+  "version": "0.1.0",
+  "permissions": {
+    "storage": {
+      "kv": true
+    },
+    "discord": {
+      "channels": true,
+      "messages": true,
+      "roles": true,
+      "emojis": true,
+      "stickers": true
+    }
+  }
+}

@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Nustatyk laiko juostą, kad mamytės priminimai ateitų laiku."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Nustatyk savo laiko juostą (IANA, pvz. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Parodyk dabartinę laiko juostą."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Išvalyk išsaugotą laiko juostą."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Laiko juostos pavadinimas (pvz. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... aš neatpažįstu tos laiko juostos: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Gerai, {{.Pet}}~. Naudosiu `{{.Timezone}}` tavo priminimams. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Tu dar nenustatei laiko juostos, {{.Pet}}. Naudok `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Dabar tavo laiko juosta yra `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Išvalyta, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Pasakyk mamytei, kaip tu šiandien laikaisi."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Tavo nuotaika: nuo 1 (sunku) iki 5 (puiku)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Parodyk savo naujausius check-in vietoj naujo įrašo."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Duok {{.Mommy}} skaičių nuo 1 iki 5, {{.Pet}}... arba nustatyk `history=true`, kad pamatytum paskutinius check-in."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Turi būti 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Ačiū, kad pasakei, {{.Pet}}~. Išsaugojau `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Dar nėra check-in, {{.Pet}}. Pradėti nuo mažo yra drąsu."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Štai tavo naujausi check-in, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Nustatyk švelnius priminimus (mamytė švelniai primins)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Sukurk naują priminimą."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Parodyk savo priminimus."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Ištrink priminimą."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron grafikas (pvz. `0 9 * * *`) arba `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Kokio tipo priminimas?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Trumpa pastaba (nebūtina, max 120 simbolių)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Kur mamytė turi siųsti? (dm arba channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Kuris kanalas? (tik jei delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "Priminimo ID."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Tas grafikas atrodo neteisingas, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Jei renkiesi siuntimą į kanalą, pasirink ir kanalą, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Viskas paruošta, {{.Pet}}~. Kitą kartą švelniai priminsiu {{.NextRun}} — priminimas `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Dar nėra priminimų, {{.Pet}}. Naudok `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Štai tavo priminimai, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Pasirink priminimą mamytei..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Kurį priminimą {{.Mommy}} turėtų ištrinti, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Tas meniu nebegalioja, {{.Pet}}. Paleisk `/remind delete` dar kartą."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Rankas šalin, {{.Pet}}. Tai ne tavo."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Neradau tokio priminimo, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Ištrinta. Šaunu, kad rūpiniesi savimi, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Ei {{.Pet}}. Švelnus priminimas: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "išgerk vandens"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "truputį prasitempk"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "lėtai įkvėpk"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "išgerk vaistus"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "pradėk ruoštis miegui"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "padaryk trumpą check-in"
+  }
+]

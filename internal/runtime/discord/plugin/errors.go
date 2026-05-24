@@ -5,11 +5,11 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 )
 
-func ErrorMessage(prodMode bool, t commandapi.Translator, err error) discord.MessageCreate {
+func ErrorMessage(prodMode bool, t commandtext.Translator, err error) discord.MessageCreate {
 	if prodMode {
 		return interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true)
 	}

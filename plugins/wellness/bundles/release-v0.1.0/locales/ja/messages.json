@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "タイムゾーンを設定して、リマインダーがちゃんと届くようにしようね。"
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "タイムゾーンを設定するよ(IANA、例: Europe/Tallinn)。"
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "今のタイムゾーンを表示するよ。"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "保存したタイムゾーンを消すよ。"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "タイムゾーン名(例: Europe/Tallinn)。"
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "うーん、{{.Pet}}... そのタイムゾーンは分からないよ: `{{.Timezone}}`。"
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "うん、{{.Pet}}〜。リマインダーは `{{.Timezone}}` で送るね。 ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "{{.Pet}}、まだタイムゾーンを設定してないよ。`/timezone set` を使ってね。"
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "{{.Pet}}、今は `{{.Timezone}}` になってるよ。"
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "消したよ、{{.Pet}}〜。 ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "今日の調子をママに教えて。"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "気分: 1(しんどい) - 5(いい感じ)。"
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "新しく記録せず、最近のチェックインを見るよ。"
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "{{.Pet}}、1から5の数字を教えて... それか `history=true` で最近のチェックインを見るよ。"
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "{{.Pet}}、1..5 じゃないとだめだよ。"
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "教えてくれてありがとう、{{.Pet}}〜。`{{.Mood}}/5` を保存したよ。 ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "{{.Pet}}、まだ記録がないよ。小さく始めるのはえらい。"
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "{{.Pet}}、最近のチェックインだよ:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "やさしいリマインダーを設定するよ(ママがそっと教えるね)。"
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "新しいリマインダーを作るよ。"
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "リマインダー一覧を表示するよ。"
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "リマインダーを削除するよ。"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron(例: `0 9 * * *`)または `@hourly`。"
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "リマインダーの種類は？"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "短いメモ(任意、最大120文字)。"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "どこに送る？(dm または channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "どのチャンネル？(delivery=channel のときだけ)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "リマインダーID。"
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "{{.Pet}}、そのスケジュールは変かも: `{{.Schedule}}`。"
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "{{.Pet}}、チャンネルに送るならチャンネルも選んでね。"
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "できたよ、{{.Pet}}〜。次は {{.NextRun}} にそっと教えるね - `{{.ID}}` ({{.Kind}}, {{.Delivery}})。 ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "{{.Pet}}、リマインダーはまだないよ。`/remind create` を使ってね。"
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "{{.Pet}}、リマインダー一覧:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "リマインダーを選んでね..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Pet}}、どれを消す？"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "{{.Pet}}、そのメニューは期限切れ。もう一度 `/remind delete` してね。"
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "だめだよ、{{.Pet}}。それは君のじゃないの。"
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "{{.Pet}}、そのリマインダーが見つからないよ。"
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "消したよ〜。えらいね、{{.Pet}}。 ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "やあ、{{.Pet}}。やさしいリマインド: {{.Kind}}。{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "お水を飲む"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "少し伸びをする"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "ゆっくり深呼吸"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "お薬を飲む"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "そろそろ寝る準備"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "ちょっとチェックイン"
+  }
+]

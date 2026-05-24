@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
@@ -93,14 +94,14 @@ func TestVerifyDirSignatureAndHashDir(t *testing.T) {
 		t.Fatalf("GenerateKey: %v", err)
 	}
 
-	hashBefore, err := pluginhost.HashDir(dir)
+	hashBefore, err := bundles.HashDir(dir)
 	if err != nil {
 		t.Fatalf("HashDir(before): %v", err)
 	}
 
 	mustWriteFile(t, filepath.Join(dir, "signature.json"), []byte(`{"ignored":true}`))
 
-	hashAfter, err := pluginhost.HashDir(dir)
+	hashAfter, err := bundles.HashDir(dir)
 	if err != nil {
 		t.Fatalf("HashDir(after): %v", err)
 	}
@@ -276,7 +277,11 @@ func TestTrackedOfficialPluginSignaturesVerify(t *testing.T) {
 		t.Run(rel, func(t *testing.T) {
 			t.Parallel()
 
-			dir := filepath.Join(repoRoot, rel)
+			rootDir := filepath.Join(repoRoot, rel)
+			dir, err := bundles.NewLocalRepository().ResolveActiveDir(rootDir)
+			if err != nil {
+				t.Fatalf("ResolveActiveDir(%q): %v", rootDir, err)
+			}
 			sig, err := pluginhost.ReadSignature(filepath.Join(dir, "signature.json"))
 			if err != nil {
 				t.Fatalf("ReadSignature(%q): %v", dir, err)

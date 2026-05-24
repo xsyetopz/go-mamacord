@@ -102,16 +102,17 @@ type MarketplaceSourceSyncStore interface {
 }
 
 type PluginInstall struct {
-	PluginID         string
-	InstallKind      string
-	SourceID         string
-	GitURL           string
-	GitRef           string
-	GitRevision      string
-	SourcePath       string
-	InstalledAt      time.Time
-	InstalledBy      *uint64
-	InstalledHashB64 string
+	PluginID          string
+	InstallKind       string
+	SourceID          string
+	GitURL            string
+	GitRef            string
+	GitRevision       string
+	SourcePath        string
+	BundleRelativeDir string
+	InstalledAt       time.Time
+	InstalledBy       *uint64
+	InstalledHashB64  string
 }
 
 type PluginInstallStore interface {

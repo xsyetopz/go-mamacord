@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "시간대를 설정해서 리마인더가 제시간에 가게 해요."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "시간대를 설정해요(IANA, 예: Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "현재 시간대를 보여줘요."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "저장된 시간대를 지워요."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "시간대 이름(예: Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "음, {{.Pet}}... 그 시간대는 잘 모르겠어요: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "좋아요, {{.Pet}}~ 리마인더는 `{{.Timezone}}`로 보낼게요. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "{{.Pet}}、아직 시간대를 설정하지 않았어요. `/timezone set`를 써요."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "{{.Pet}}、지금은 `{{.Timezone}}`에요."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "지웠어요, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "오늘 어땠는지 엄마에게 말해줘요."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "기분: 1(힘듦) - 5(좋음)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "새로 기록하지 않고 최근 체크인을 보여줘요."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "{{.Pet}}、1부터 5까지 숫자를 말해줘요... 아니면 `history=true`로 최근 체크인을 봐요."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "{{.Pet}}、1..5여야 해요."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "말해줘서 고마워요, {{.Pet}}~ `{{.Mood}}/5` 저장했어요. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "{{.Pet}}、아직 기록이 없어요. 작게 시작하는 건 용감해요."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "{{.Pet}}、최근 체크인이에요:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "부드러운 리마인더를 설정해요(엄마가 살짝 알려줄게요)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "새 리마인더를 만들어요."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "리마인더 목록을 보여줘요."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "리마인더를 삭제해요."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron 일정(예: `0 9 * * *`) 또는 `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "어떤 리마인더예요?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "짧은 메모(선택, 최대 120자)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "어디로 보낼까요? (dm 또는 channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "어느 채널로? (delivery=channel 일 때만)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "리마인더 ID."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "{{.Pet}}、그 일정은 이상해 보여요: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "{{.Pet}}、채널로 보낼 거면 채널도 골라줘요."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "됐어요, {{.Pet}}~ 다음은 {{.NextRun}}에 살짝 알려줄게요 - `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "{{.Pet}}、리마인더가 아직 없어요. `/remind create`를 써요."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "{{.Pet}}、리마인더 목록이에요:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "리마인더를 골라요..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Pet}}、어떤 걸 지울까요?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "{{.Pet}}、그 메뉴는 만료됐어요. `/remind delete`를 다시 해요."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "안 돼요, {{.Pet}}. 그건 네 것이 아니에요."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "{{.Pet}}、그 리마인더를 찾지 못했어요."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "지웠어요~ 잘했어요, {{.Pet}}. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "안녕, {{.Pet}}. 부드러운 리마인드: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "물 마시기"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "가볍게 스트레칭"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "천천히 숨 쉬기"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "약 먹기"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "잠 잘 준비"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "짧게 체크인"
+  }
+]

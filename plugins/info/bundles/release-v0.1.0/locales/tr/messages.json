@@ -1,0 +1,182 @@
+[
+  {
+    "id": "cmd.about.name",
+    "translation": "about"
+  },
+  {
+    "id": "cmd.about.desc",
+    "translation": "Benim ne olduğumu (ve hangi sürümü çalıştırdığımı) öğren."
+  },
+  {
+    "id": "cmd.lookup.name",
+    "translation": "lookup"
+  },
+  {
+    "id": "cmd.lookup.desc",
+    "translation": "Kullanıcıları, sunucuları, rolleri ve kanalları sorgula."
+  },
+  {
+    "id": "cmd.lookup.sub.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.desc",
+    "translation": "Bir kullanıcıyı sorgula."
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.lookup.sub.user.opt.user.desc",
+    "translation": "Hangi kullanıcı? (Boş bırakırsan kendine bakarım.)"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.name",
+    "translation": "guild"
+  },
+  {
+    "id": "cmd.lookup.sub.guild.desc",
+    "translation": "Bu sunucuyu sorgula."
+  },
+  {
+    "id": "cmd.lookup.sub.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.desc",
+    "translation": "Bir rolü sorgula."
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.lookup.sub.role.opt.role.desc",
+    "translation": "Annecik hangi role baksın?"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.desc",
+    "translation": "Bir kanalı sorgula."
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.lookup.sub.channel.opt.channel.desc",
+    "translation": "Annecik hangi kanala baksın?"
+  },
+  {
+    "id": "info.lookup.user.field.bot",
+    "translation": "🤖 Bot"
+  },
+  {
+    "id": "info.lookup.user.field.system",
+    "translation": "🖥️ Sistem"
+  },
+  {
+    "id": "info.lookup.user.field.locale",
+    "translation": "🌐 Dil"
+  },
+  {
+    "id": "info.lookup.user.field.created",
+    "translation": "📅 Oluşturuldu"
+  },
+  {
+    "id": "info.lookup.user.field.joined",
+    "translation": "📥 Katıldı"
+  },
+  {
+    "id": "info.lookup.user.field.roles",
+    "translation": "🛡️ Roller"
+  },
+  {
+    "id": "info.lookup.guild.field.roles",
+    "translation": "🛡️ Roller"
+  },
+  {
+    "id": "info.lookup.guild.field.emojis",
+    "translation": "😃 Emojiler"
+  },
+  {
+    "id": "info.lookup.guild.field.stickers",
+    "translation": "🖼️ Stickerlar"
+  },
+  {
+    "id": "info.lookup.guild.field.members",
+    "translation": "👥 Üyeler"
+  },
+  {
+    "id": "info.lookup.guild.field.channels",
+    "translation": "🌐 Kanallar"
+  },
+  {
+    "id": "info.lookup.guild.field.created",
+    "translation": "📅 Oluşturuldu"
+  },
+  {
+    "id": "info.lookup.role.field.mention",
+    "translation": "🏷️ Mention"
+  },
+  {
+    "id": "info.lookup.role.field.position",
+    "translation": "📌 Konum"
+  },
+  {
+    "id": "info.lookup.role.field.hoist",
+    "translation": "📌 Öne çıkar"
+  },
+  {
+    "id": "info.lookup.role.field.mentionable",
+    "translation": "🔔 Mentionlanabilir"
+  },
+  {
+    "id": "info.lookup.role.field.managed",
+    "translation": "🤖 Yönetilen"
+  },
+  {
+    "id": "info.lookup.role.field.permissions",
+    "translation": "🔐 İzinler"
+  },
+  {
+    "id": "info.lookup.role.field.created",
+    "translation": "📅 Oluşturuldu"
+  },
+  {
+    "id": "info.lookup.channel.field.mention",
+    "translation": "🔗 Mention"
+  },
+  {
+    "id": "info.lookup.channel.field.type",
+    "translation": "📁 Tür"
+  },
+  {
+    "id": "info.lookup.channel.field.parent",
+    "translation": "🗂️ Kategori"
+  },
+  {
+    "id": "info.lookup.channel.field.permissions",
+    "translation": "🔐 İzinler"
+  },
+  {
+    "id": "info.lookup.channel.field.created",
+    "translation": "📅 Oluşturuldu"
+  },
+  {
+    "id": "info.about.title",
+    "translation": "mamacord {{.Version}}"
+  },
+  {
+    "id": "info.lookup.user.error",
+    "translation": "{{.Mommy}} o kullanıcının bilgisini alamadı, {{.Pet}}."
+  },
+  {
+    "id": "info.lookup.guild.error",
+    "translation": "{{.Mommy}} bu sunucunun bilgisini alamadı, {{.Pet}}."
+  }
+]

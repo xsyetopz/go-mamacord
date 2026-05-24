@@ -1,0 +1,158 @@
+[
+  {
+    "id": "cmd.flip.name",
+    "translation": "flip"
+  },
+  {
+    "id": "cmd.flip.desc",
+    "translation": "拋硬币。"
+  },
+  {
+    "id": "cmd.roll.name",
+    "translation": "roll"
+  },
+  {
+    "id": "cmd.roll.desc",
+    "translation": "擲骰子。"
+  },
+  {
+    "id": "cmd.roll.opt.number.name",
+    "translation": "number"
+  },
+  {
+    "id": "cmd.roll.opt.number.desc",
+    "translation": "骰子数量。"
+  },
+  {
+    "id": "cmd.roll.opt.sides.name",
+    "translation": "sides"
+  },
+  {
+    "id": "cmd.roll.opt.sides.desc",
+    "translation": "每個骰子的面數。"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.name",
+    "translation": "modifier"
+  },
+  {
+    "id": "cmd.roll.opt.modifier.desc",
+    "translation": "要加的修正值（可選）。"
+  },
+  {
+    "id": "cmd.8ball.name",
+    "translation": "8ball"
+  },
+  {
+    "id": "cmd.8ball.desc",
+    "translation": "問魔法 8 號球一個問題。"
+  },
+  {
+    "id": "cmd.8ball.opt.question.name",
+    "translation": "question"
+  },
+  {
+    "id": "cmd.8ball.opt.question.desc",
+    "translation": "要問的問題。"
+  },
+  {
+    "id": "cmd.hug.name",
+    "translation": "hug"
+  },
+  {
+    "id": "cmd.hug.desc",
+    "translation": "給一個暖暖的拥抱。"
+  },
+  {
+    "id": "cmd.hug.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.hug.opt.user.desc",
+    "translation": "要抱谁？"
+  },
+  {
+    "id": "cmd.pat.name",
+    "translation": "pat"
+  },
+  {
+    "id": "cmd.pat.desc",
+    "translation": "給一個輕輕的摸头。"
+  },
+  {
+    "id": "cmd.pat.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.pat.opt.user.desc",
+    "translation": "要摸谁？"
+  },
+  {
+    "id": "cmd.poke.name",
+    "translation": "poke"
+  },
+  {
+    "id": "cmd.poke.desc",
+    "translation": "輕輕戳一下。"
+  },
+  {
+    "id": "cmd.poke.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.poke.opt.user.desc",
+    "translation": "要戳谁？"
+  },
+  {
+    "id": "cmd.shrug.name",
+    "translation": "shrug"
+  },
+  {
+    "id": "cmd.shrug.desc",
+    "translation": "發送一個耸肩。"
+  },
+  {
+    "id": "cmd.shrug.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.shrug.opt.message.desc",
+    "translation": "要附带的文字（可選）。"
+  },
+  {
+    "id": "fun.flip.result",
+    "translation": ":coin: {{.Pet}}，猜正反？{{.User}} 拋出了 `{{.Result}}`。"
+  },
+  {
+    "id": "fun.roll.invalid_sides",
+    "translation": "這個骰子面數不支援，{{.Pet}}：`{{.Sides}}`。試試 4、6、8、10、12 或 20。"
+  },
+  {
+    "id": "fun.roll.result",
+    "translation": ":game_die: {{.Pet}}，{{.User}} 擲了 `{{.Notation}}`，結果是 `{{.Total}}`。"
+  },
+  {
+    "id": "fun.8ball.question_error",
+    "translation": "{{.Pet}}，這不像是開放式問題：`{{.Question}}`"
+  },
+  {
+    "id": "fun.8ball.result",
+    "translation": ":8ball: {{.Answer}}，{{.Pet}}。"
+  },
+  {
+    "id": "fun.kawaii.footer",
+    "translation": "由 Kawaii API 提供"
+  },
+  {
+    "id": "fun.kawaii.error",
+    "translation": "{{.Pet}}，{{.Mommy}}沒能拿到 GIF。"
+  },
+  {
+    "id": "fun.kawaii.self_error",
+    "translation": "不可以選你自己，{{.Pet}}。"
+  },
+  {
+    "id": "fun.kawaii.user_mention_only",
+    "translation": "{{.Emoji}} {{.User}}"
+  }
+]

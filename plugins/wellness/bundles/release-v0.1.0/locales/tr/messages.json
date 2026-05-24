@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Zaman dilimini ayarla ki anneciğin hatırlatmaları doğru zamanda gelsin."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Zaman dilimini ayarla (IANA, örn. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Şu anki zaman dilimini göster."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Kaydedilmiş zaman dilimini temizle."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Zaman dilimi adı (örn. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... o zaman dilimini tanımıyorum: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Tamam, {{.Pet}}~ hatırlatmaların için `{{.Timezone}}` kullanacağım. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Henüz bir zaman dilimi ayarlamadın, {{.Pet}}. `/timezone set` kullan."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Şu an `{{.Timezone}}` ayarlı, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Hepsi temiz, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Bugün nasılsın, anneciğe anlat."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Modun: 1 (zor) ile 5 (harika)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Yeni kaydetmek yerine son check-in'lerini göster."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "{{.Mommy}}'ye 1 ile 5 arasında bir sayı ver, {{.Pet}}... ya da son check-in'lerini görmek için `history=true` yap."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "1..5 olmalı, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Söylediğin için teşekkürler, {{.Pet}}~ `{{.Mood}}/5` kaydettim. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Henüz check-in yok, {{.Pet}}. Küçük başlamak cesurca."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Son check-in'lerin burada, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Nazik hatırlatmalar kur (annecik usulca dürter)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Yeni bir hatırlatma oluştur."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Hatırlatmalarını listele."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Bir hatırlatmayı sil."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron programı (örn. `0 9 * * *`) veya `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Ne tür bir hatırlatma?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Kısa not (isteğe bağlı, max 120 karakter)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Annecik nereye göndersin? (dm veya channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Hangi kanal? (sadece delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "Hatırlatma ID."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "O program doğru görünmüyor, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "delivery=channel seçersen bir kanal da seç, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Hepsi tamam, {{.Pet}}~ bir sonraki dürtme {{.NextRun}} - hatırlatma `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Henüz hatırlatma yok, {{.Pet}}. `/remind create` kullan."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Hatırlatmaların burada, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Annecik için bir hatırlatma seç..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Mommy}} hangisini silsin, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "O menü süresi doldu, {{.Pet}}. `/remind delete` tekrar çalıştır."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Ellerini çek, {{.Pet}}. O senin değil."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "O hatırlatmayı bulamadım, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Silindi. Kendine iyi baktın, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hey {{.Pet}}. Nazik hatırlatma: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "biraz su iç"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "biraz esne"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "yavaşça nefes al"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "ilaçlarını al"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "uykuya hazırlan"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "hızlı bir check-in yap"
+  }
+]

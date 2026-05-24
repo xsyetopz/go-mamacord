@@ -3,6 +3,7 @@ package adminapi
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -31,4 +32,15 @@ func asPublicError(err error) (*PublicError, bool) {
 		return pe, true
 	}
 	return nil, false
+}
+
+func discordRuntimeUnavailable(feature string) error {
+	message := "discord runtime is unavailable"
+	if feature = strings.TrimSpace(feature); feature != "" {
+		message += " for " + feature
+	}
+	return &PublicError{
+		Status:  http.StatusServiceUnavailable,
+		Message: message,
+	}
 }

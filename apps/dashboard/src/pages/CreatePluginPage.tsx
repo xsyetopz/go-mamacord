@@ -13,6 +13,14 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import { PageHeader } from "../components/PageHeader";
 import type { PermissionsShape, ScaffoldState } from "../dashboard";
 
+function scaffoldBundleRelativeDir(version: string): string {
+	const rawVersion = version.trim() || "0.1.0";
+	const cleaned = `manual-v${rawVersion}`
+		.replace(/[^A-Za-z0-9._-]+/g, "-")
+		.replace(/^[._-]+|[._-]+$/g, "");
+	return `bundles/${cleaned || "manual"}`;
+}
+
 type Props = {
 	scaffold: ScaffoldState;
 	permissions: PermissionsShape;
@@ -42,11 +50,13 @@ export function CreatePluginPage({
 }: Props) {
 	const pluginID = scaffold.id.trim() || "sample";
 	const locale = scaffold.locale.trim() || "en-US";
+	const bundleDir = scaffoldBundleRelativeDir(scaffold.version);
 	const files = [
-		`plugins/${pluginID}/plugin.json`,
-		`plugins/${pluginID}/plugin.lua`,
-		`plugins/${pluginID}/commands/hello.lua`,
-		`plugins/${pluginID}/locales/${locale}/messages.json`,
+		`plugins/${pluginID}/.mamacord-bundle.json`,
+		`plugins/${pluginID}/${bundleDir}/plugin.json`,
+		`plugins/${pluginID}/${bundleDir}/plugin.lua`,
+		`plugins/${pluginID}/${bundleDir}/commands/hello.lua`,
+		`plugins/${pluginID}/${bundleDir}/locales/${locale}/messages.json`,
 	];
 
 	return (
@@ -134,6 +144,9 @@ export function CreatePluginPage({
 						<Text fw={700}>Summary</Text>
 						<Text size="sm">
 							Target path: <Code>{`plugins/${pluginID}`}</Code>
+						</Text>
+						<Text size="sm">
+							Active bundle: <Code>{bundleDir}</Code>
 						</Text>
 						<Text size="sm">Files to create:</Text>
 						<Stack gap={4}>

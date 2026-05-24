@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Állítsd be az időzónádat, hogy anya emlékeztetői jókor érkezzenek."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Állítsd be az időzónádat (IANA, pl. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Mutasd a jelenlegi időzónádat."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Töröld a mentett időzónádat."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Időzóna neve (pl. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... nem ismerem ezt az időzónát: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Rendben, {{.Pet}}~ `{{.Timezone}}` lesz a beállítás az emlékeztetőidhez. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Még nem állítottál be időzónát, {{.Pet}}. Használd: `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Most ez van beállítva: `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Töröltem, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Mondd el anyának, hogy vagy ma."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "A hangulatod: 1 (nehéz) – 5 (szuper)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Mutasd a legutóbbi check-injeidet az új rögzítése helyett."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Adj {{.Mommy}}-nak egy számot 1-től 5-ig, {{.Pet}}... vagy állítsd `history=true`-ra, ha a legutóbbi check-injeidet néznéd."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "1..5 között kell lennie, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Köszönöm, hogy elmondtad, {{.Pet}}~ elmentettem: `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Még nincs check-in, {{.Pet}}. A kicsi kezdet is bátor."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Itt vannak a legutóbbi check-injeid, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Állíts be gyengéd emlékeztetőket (anya finoman bök)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Hozz létre egy új emlékeztetőt."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Listázd az emlékeztetőidet."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Törölj egy emlékeztetőt."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron ütemezés (pl. `0 9 * * *`) vagy `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Milyen típusú emlékeztető?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Rövid jegyzet (opcionális, max 120 karakter)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Hová küldje anya? (dm vagy channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Melyik csatorna? (csak ha delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "Emlékeztető ID."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Ez az ütemezés nem tűnik jónak, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Ha csatornába kéred a küldést, válassz csatornát is, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Rendben, {{.Pet}}~ legközelebb finoman szólok ekkor: {{.NextRun}} — emlékeztető `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Még nincs emlékeztetőd, {{.Pet}}. Használd: `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Itt vannak az emlékeztetőid, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Válassz egy emlékeztetőt anyának..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Melyik emlékeztetőt törölje {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Ez a menü lejárt, {{.Pet}}. Futtasd újra: `/remind delete`."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Ne nyúlj hozzá, {{.Pet}}. Ez nem a tiéd."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Nem találom azt az emlékeztetőt, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Törölve. Ügyes vagy, hogy figyelsz magadra, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Szia {{.Pet}}. Gyengéd emlékeztető: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "igyál egy kis vizet"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "nyújtózz egy kicsit"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "vegyél egy lassú levegőt"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "vedd be a gyógyszereid"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "kezdj el lecsendesedni alváshoz"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "csinálj egy gyors check-int"
+  }
+]

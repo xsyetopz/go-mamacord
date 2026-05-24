@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Βάλε τη ζώνη ώρας σου ώστε τα reminders της μανούλας να έρχονται στην ώρα τους."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Βάλε τη ζώνη ώρας σου (IANA, π.χ. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Δείξε την τρέχουσα ζώνη ώρας σου."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Καθάρισε τη ζώνη ώρας που έχεις αποθηκεύσει."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Όνομα ζώνης ώρας (π.χ. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Χμμ, {{.Pet}}... δεν αναγνωρίζω αυτή τη ζώνη ώρας: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Εντάξει, {{.Pet}}~ θα χρησιμοποιώ `{{.Timezone}}` για τα reminders σου. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "Δεν έχεις βάλει ακόμα ζώνη ώρας, {{.Pet}}. Χρησιμοποίησε `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "Αυτή τη στιγμή έχεις `{{.Timezone}}`, {{.Pet}}."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Τα καθάρισα όλα, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Πες στη μανούλα πώς είσαι σήμερα."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Η διάθεσή σου: 1 (δύσκολα) έως 5 (τέλεια)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Δείξε τα πρόσφατα check-ins σου αντί να καταγράψεις νέο."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Δώσε στη {{.Mommy}} έναν αριθμό από 1 έως 5, {{.Pet}}... ή βάλε `history=true` για να δεις τα τελευταία σου check-ins."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Πρέπει να είναι 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Ευχαριστώ που μου το είπες, {{.Pet}}~ αποθήκευσα `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "Δεν έχεις check-ins ακόμα, {{.Pet}}. Το να ξεκινάς μικρά είναι γενναίο."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "Ορίστε τα πρόσφατα check-ins σου, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Φτιάξε ήρεμα reminders (η μανούλα θα σε σπρώχνει απαλά)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Δημιούργησε ένα νέο reminder."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Δείξε τα reminders σου."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Διέγραψε ένα reminder."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron πρόγραμμα (π.χ. `0 9 * * *`) ή `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Τι είδους reminder είναι;"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Σύντομη σημείωση (προαιρετικό, max 120 chars)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Πού να το στείλει η μανούλα; (dm ή channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Ποιο κανάλι; (μόνο αν delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID reminder."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "Αυτό το πρόγραμμα δεν μοιάζει σωστό, {{.Pet}}: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "Αν διαλέξεις delivery=channel, διάλεξε και κανάλι, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Έτοιμο, {{.Pet}}~ θα σε σκουντήσω ξανά στις {{.NextRun}} - reminder `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "Δεν έχεις reminders ακόμα, {{.Pet}}. Χρησιμοποίησε `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "Ορίστε τα reminders σου, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Διάλεξε ένα reminder για τη μανούλα..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "Ποιο reminder να διαγράψει η {{.Mommy}}, {{.Pet}}?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "Αυτό το μενού έληξε, {{.Pet}}. Τρέξε `/remind delete` ξανά."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Μην το αγγίζεις, {{.Pet}}. Δεν είναι δικό σου."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "Δεν βρήκα αυτό το reminder, {{.Pet}}."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Διαγράφηκε. Μπράβο που φροντίζεις τον εαυτό σου, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Γεια σου {{.Pet}}. Απαλό reminder: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "πιες λίγο νερό"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "κάνε λίγο τέντωμα"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "πάρε μια αργή ανάσα"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "πάρε τα φάρμακά σου"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "ξεκίνα να χαλαρώνεις για ύπνο"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "κάνε ένα γρήγορο check-in"
+  }
+]

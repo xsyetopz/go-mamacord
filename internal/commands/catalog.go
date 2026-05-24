@@ -1,10 +1,10 @@
 package commands
 
 import (
-	cmdadmin "github.com/xsyetopz/go-mamacord/internal/commands/admin"
-	cmdcore "github.com/xsyetopz/go-mamacord/internal/commands/core"
+	"github.com/xsyetopz/go-mamacord/internal/commands/admin"
+	"github.com/xsyetopz/go-mamacord/internal/commands/core"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandspec "github.com/xsyetopz/go-mamacord/internal/commands/spec"
 )
 
 type ModuleDescriptor struct {
@@ -12,7 +12,7 @@ type ModuleDescriptor struct {
 	Name           string
 	DefaultEnabled bool
 	Toggleable     bool
-	Commands       func() []commandapi.SlashCommand
+	Definitions    func() []commandspec.SlashCommand
 }
 
 func Catalog() []ModuleDescriptor {
@@ -22,22 +22,14 @@ func Catalog() []ModuleDescriptor {
 			Name:           "Core",
 			DefaultEnabled: true,
 			Toggleable:     false,
-			Commands:       cmdcore.Commands,
+			Definitions:    core.Definitions,
 		},
 		{
 			ID:             "admin",
 			Name:           "Admin",
 			DefaultEnabled: true,
 			Toggleable:     false,
-			Commands:       cmdadmin.Commands,
+			Definitions:    admin.Definitions,
 		},
 	}
-}
-
-func All() []commandapi.SlashCommand {
-	out := []commandapi.SlashCommand{}
-	for _, module := range Catalog() {
-		out = append(out, module.Commands()...)
-	}
-	return out
 }

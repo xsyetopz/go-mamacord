@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "किसी channel में slowmode लगाओ (थोड़ा शांत)।"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "कौन-सा channel शांत करना है?"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "messages के बीच seconds (0 करने पर हटेगा)।"
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "किसी का nickname बदलो।"
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "किसका nickname बदल रहे हैं?"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "मम्मी क्या set करे? (खाली छोड़ो तो reset होगा।)"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "channel में messages साफ़ करो।"
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "हाल की messages हटाओ।"
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "किसी message से पहले की messages हटाओ।"
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "किसी message के बाद की messages हटाओ।"
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "किसी message के आसपास की messages हटाओ।"
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "कितनी messages? (धीरे-धीरे।)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "Message ID या message link।"
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "अपने server के roles मैनेज करो।"
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "नया role बनाओ।"
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "role edit करो।"
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "role हटाओ।"
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "member को role दो।"
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "member से role हटाओ।"
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "कौन-सा role?"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "कौन-सा member?"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "role का नाम।"
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "role का color (RRGGBB)।"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "member list में अलग दिखाना है?"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "@mentions allow करें?"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "अपने server के emojis मैनेज करो।"
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "emoji बनाओ।"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "emoji का नाम बदलो।"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "emoji हटाओ।"
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "emoji का नाम।"
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "emoji image।"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Emoji mention (<:name:id>) या ID।"
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "अपने server के stickers मैनेज करो।"
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "sticker बनाओ।"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "sticker edit करो।"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "sticker हटाओ।"
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "Sticker ID या sticker link।"
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "sticker का नाम।"
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "sticker description (optional)।"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "emoji tag (Discord को चाहिए)।"
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "sticker image।"
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "ठीक है, {{.Pet}}। {{.Channel}} अब slowmode में है: `{{.Seconds}}s`।"
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "बस, {{.Pet}}~ {{.Channel}} के लिए slowmode बंद है। ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "{{.Mommy}} slowmode अपडेट नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "मैं तुम्हारा अपना nickname नहीं बदल सकती, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "ठीक है, {{.Pet}}। {{.User}} अब `{{.Nickname}}` है।"
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "ठीक है, {{.Pet}}। मैंने {{.User}} का nickname रीसेट कर दिया।"
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "{{.Mommy}} {{.User}} का nickname अपडेट नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "ये valid message ID या link नहीं लगता, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "सब साफ़, {{.Pet}}। `{{.Count}}` संदेश हटाए।"
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "{{.Mommy}} उन संदेशों को हटा नहीं पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "ये रंग ठीक नहीं है, {{.Pet}}: `{{.Colour}}` (RRGGBB चाहिए)।"
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "`@everyone` से हाथ दूर रखो, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "`@everyone` से हाथ दूर रखो, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "सब सेट, {{.Pet}}। {{.Role}} बना दिया।"
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "{{.Mommy}} `@{{.Name}}` नहीं बना पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "सब सेट, {{.Pet}}। {{.Role}} अपडेट कर दिया।"
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "{{.Mommy}} {{.Role}} edit नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "ठीक है, {{.Pet}}। `@{{.Name}}` हटा दिया।"
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "{{.Mommy}} {{.Role}} delete नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "सब सेट, {{.Pet}}। {{.User}} के पास अब {{.Role}} है।"
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "{{.Mommy}} {{.User}} को {{.Role}} नहीं दे पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "सब सेट, {{.Pet}}। {{.User}} से {{.Role}} हटा दिया।"
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "{{.Mommy}} {{.User}} से {{.Role}} हटा नहीं पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "मुझे एक attachment चाहिए, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "वो file बहुत बड़ी है, {{.Pet}} ({{.Size}} bytes; max {{.Max}})।"
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "emoji के लिए ये extension नहीं चलेगा, {{.Pet}}: `{{.Ext}}`।"
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "इस server ने emoji limit छू ली है, {{.Pet}} (max `{{.Max}}`)।"
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "{{.Mommy}} सिर्फ Discord की CDN से ही download कर सकती है, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "मैं उस image का size पढ़ नहीं पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "emoji के लिए वो image बहुत बड़ी है, {{.Pet}}: `{{.Width}}x{{.Height}}`।"
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "वो image type supported नहीं है, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "ये valid emoji नहीं लगता, {{.Pet}}: `{{.Emoji}}`।"
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "कितना प्यारा! {{.Pet}}, `:{{.Name}}:` बन गया।"
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "{{.Mommy}} `:{{.Name}}:` नहीं बना पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "ठीक है, {{.Pet}}। मैंने इसका नाम `{{.Name}}` कर दिया।"
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "{{.Mommy}} उस emoji का नाम नहीं बदल पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "ठीक है, {{.Pet}}। emoji हटा दिया।"
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "{{.Mommy}} वो emoji delete नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "मुझे एक attachment चाहिए, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "Discord को एक emoji tag चाहिए, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "वो file बहुत बड़ी है, {{.Pet}} ({{.Size}} bytes; max {{.Max}})।"
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "sticker के लिए ये extension नहीं चलेगा, {{.Pet}}: `{{.Ext}}`।"
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "इस server ने sticker limit छू ली है, {{.Pet}} (max `{{.Max}}`)।"
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "{{.Mommy}} सिर्फ Discord की CDN से ही download कर सकती है, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "मैं उस image का size पढ़ नहीं पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "sticker के लिए वो image बहुत बड़ी है, {{.Pet}}: `{{.Width}}x{{.Height}}`।"
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "वो sticker ID/link ठीक नहीं लग रहा, {{.Pet}}: `{{.ID}}`।"
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "सब तैयार, {{.Pet}}~ `{{.Name}}` बना दिया। ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "{{.Mommy}} `{{.Name}}` नहीं बना पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "सब तैयार, {{.Pet}}~ `{{.Name}}` अपडेट कर दिया। ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "{{.Mommy}} उस sticker को edit नहीं कर पाई, {{.Pet}}।"
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "ठीक है, {{.Pet}}~ स्टिकर हटा दिया। ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "{{.Mommy}} उस sticker को delete नहीं कर पाई, {{.Pet}}।"
+  }
+]

@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "Nastav si casove pasmo, aby mamine pripominky chodily ve spravny cas."
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "Nastavit casove pasmo (IANA, napr. Europe/Tallinn)."
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "Zobrazit aktualni casove pasmo."
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "Smazat ulozene casove pasmo."
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Nazev pasma (napr. Europe/Tallinn)."
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... Tohle pasmo neznam: `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "Dobre, {{.Pet}}~. Pro pripominky pouziju `{{.Timezone}}`. ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "{{.Pet}}, jeste nemas nastavene pasmo. Pouzij `/timezone set`."
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "{{.Pet}}, ted mas nastavene `{{.Timezone}}`."
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "Hotovo, {{.Pet}}~. Smazano. ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "Rekni mame, jak se dnes mas."
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "Nalada: 1 (tezke) az 5 (skvele)."
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "Ukazat posledni check-iny misto ulozeni noveho."
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "Dej {{.Mommy}} cislo od 1 do 5, {{.Pet}}... nebo nastav `history=true` pro historii."
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "Musi to byt 1..5, {{.Pet}}."
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "Diky, {{.Pet}}~. Ulozila jsem `{{.Mood}}/5`. ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "{{.Pet}}, zatim zadne zaznamy. Zacit v malem je statecne."
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "{{.Pet}}, tady jsou posledni check-iny:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "Nastav jemne pripominky (máma te jemne postouchne)."
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "Vytvorit pripominku."
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "Vypsat pripominky."
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "Smazat pripominku."
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron (napr. `0 9 * * *`) nebo `@hourly`."
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "Jaky typ pripominky?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "Kratka poznamka (volitelne, max 120 znaku)."
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "Kam poslat? (dm nebo channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "Ktery kanal? (jen kdyz delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "ID pripominky."
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "{{.Pet}}, ten rozpis vypada divne: `{{.Schedule}}`."
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "{{.Pet}}, kdyz posilas do kanalu, vyber kanal taky."
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "Hotovo, {{.Pet}}~. Priste pripomenu v {{.NextRun}} - `{{.ID}}` ({{.Kind}}, {{.Delivery}}). ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "{{.Pet}}, zatim zadne pripominky. Pouzij `/remind create`."
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "{{.Pet}}, tve pripominky:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "Vyber pripominku..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Pet}}, kterou pripominku ma {{.Mommy}} smazat?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "{{.Pet}}, tohle menu vyprselo. Spust `/remind delete` znovu."
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "Ne, {{.Pet}}. Tohle neni tvoje."
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "{{.Pet}}, tu pripominku jsem nenasla."
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "Smazano. Dobry, {{.Pet}}~. ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Ahoj {{.Pet}}. Jemna pripominka: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "napit se vody"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "trochu se protahnout"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "zhluboka se nadechnout"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "vzít si leky"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "chystat se spat"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "kratky check-in"
+  }
+]

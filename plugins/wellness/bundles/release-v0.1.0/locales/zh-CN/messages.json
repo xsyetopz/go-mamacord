@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "设置你的时区，让妈妈的提醒在合适的时间送达。"
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "设置时区（IANA，例如 Europe/Tallinn）。"
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "查看当前时区。"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "清除已保存的时区。"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "时区名称（例如 Europe/Tallinn）。"
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "{{.Pet}}，{{.Mommy}}不认识这个时区：`{{.Timezone}}`。"
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "好啦，{{.Pet}}～ {{.Mommy}}会用 `{{.Timezone}}` 来安排提醒。 ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "{{.Pet}}，你还没设置时区。用 `/timezone set`。"
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "{{.Pet}}，你现在的时区是 `{{.Timezone}}`。"
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "好了，{{.Pet}}～ 时区已清除。 ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "告诉妈妈你今天过得怎么样。"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "心情：1（很糟）到 5（很好）。"
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "查看最近记录，而不是写入新的。"
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "{{.Pet}}，给{{.Mommy}}一个 1 到 5 的数字吧。或者设置 `history=true` 看最近记录。"
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "{{.Pet}}，必须是 1 到 5。"
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "谢谢你告诉{{.Mommy}}，{{.Pet}}～ 我保存了 `{{.Mood}}/5`。 ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "{{.Pet}}，还没有记录。慢慢来就好。"
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "{{.Pet}}，这是你最近的记录：\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "设置温柔的提醒（妈妈会轻轻提醒你）。"
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "创建一个提醒。"
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "列出你的提醒。"
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "删除一个提醒。"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron 时间表（例如 `0 9 * * *`）或 `@hourly`。"
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "提醒类型。"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "短备注（可选，最多 120 字符）。"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "发送到哪里（dm 或 channel）。"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "发送到的频道（仅当 delivery=channel）。"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "提醒 ID。"
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "{{.Pet}}，这个时间表看起来不对：`{{.Schedule}}`。"
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "{{.Pet}}，如果选择发送到频道，就要选一个频道。"
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "好啦，{{.Pet}}～ 下次在 {{.NextRun}} 提醒你。提醒 `{{.ID}}`（{{.Kind}}，{{.Delivery}}）。 ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "{{.Pet}}，你还没有提醒。用 `/remind create`。"
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "{{.Pet}}，这是你的提醒：\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "选一个提醒..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Pet}}，想让{{.Mommy}}删掉哪个提醒？"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "{{.Pet}}，这个菜单过期了。再运行一次 `/remind delete`。"
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "不可以，{{.Pet}}。这不是你的。"
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "{{.Pet}}，{{.Mommy}}没找到那个提醒。"
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "删掉了～ {{.Pet}}，你做得很好。 ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "嗨，{{.Pet}}。温柔提醒：{{.Kind}}。{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "喝点水"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "伸伸懒腰"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "慢慢呼吸"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "吃药"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "准备睡觉"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "做个小小的自检"
+  }
+]

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"sort"
 
-	commandapi "github.com/xsyetopz/go-mamacord/internal/commands/api"
+	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 )
 
 const KVKey = "__guild_config"
@@ -68,7 +68,7 @@ func Default(pluginID string) PluginConfig {
 	return cfg
 }
 
-func Load(ctx context.Context, store commandapi.Store, guildID uint64, pluginID string) (PluginConfig, error) {
+func Load(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string) (PluginConfig, error) {
 	cfg := Default(pluginID)
 	if guildID == 0 || pluginID == "" {
 		return cfg, nil
@@ -120,7 +120,7 @@ func Load(ctx context.Context, store commandapi.Store, guildID uint64, pluginID 
 	return Normalize(pluginID, cfg), nil
 }
 
-func Save(ctx context.Context, store commandapi.Store, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
+func Save(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
 	if guildID == 0 || pluginID == "" {
 		return PluginConfig{}, errors.New("invalid guild plugin config target")
 	}
@@ -139,7 +139,7 @@ func Save(ctx context.Context, store commandapi.Store, guildID uint64, pluginID 
 	return cfg, nil
 }
 
-func PluginEnabled(ctx context.Context, store commandapi.Store, guildID uint64, pluginID string) (bool, error) {
+func PluginEnabled(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string) (bool, error) {
 	cfg, err := Load(ctx, store, guildID, pluginID)
 	if err != nil {
 		return false, err
@@ -147,7 +147,7 @@ func PluginEnabled(ctx context.Context, store commandapi.Store, guildID uint64, 
 	return cfg.Enabled, nil
 }
 
-func CommandEnabled(ctx context.Context, store commandapi.Store, guildID uint64, pluginID, commandName string) (bool, error) {
+func CommandEnabled(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID, commandName string) (bool, error) {
 	cfg, err := Load(ctx, store, guildID, pluginID)
 	if err != nil {
 		return false, err

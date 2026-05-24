@@ -124,7 +124,7 @@ type WebhookEditSpec struct {
 type WebhookExecuteSpec struct {
 	WebhookID uint64
 	Token     string
-	Message   any
+	Message   EncodedValue
 }
 
 func (v *VM) luaDiscordCreateChannel(l *lua.LState) int {
@@ -634,7 +634,11 @@ func (v *VM) luaDiscordExecuteWebhook(l *lua.LState) int {
 		l.RaiseError("invalid webhook message")
 		return 0
 	}
-	input.Message = message
+	input.Message, err = EncodeValue(message)
+	if err != nil {
+		l.RaiseError("invalid webhook message")
+		return 0
+	}
 	if input.WebhookID == 0 || input.Token == "" {
 		l.RaiseError("invalid webhook spec")
 		return 0

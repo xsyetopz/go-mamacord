@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -17,15 +16,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const (
-	sourceKindGit        = "git"
-	installKindGit       = "git"
-	maxPluginBytes int64 = 32 << 20
-	maxFileBytes   int64 = 8 << 20
+	sourceKindGit  = "git"
+	installKindGit = "git"
 )
 
 type Store interface {
@@ -41,6 +39,7 @@ type Store interface {
 type Options struct {
 	Logger            *slog.Logger
 	Store             Store
+	Bundles           bundles.Repository
 	BundledPluginsDir string
 	UserPluginsDir    string
 	TrustedKeysFile   string
@@ -54,6 +53,7 @@ type Options struct {
 type Manager struct {
 	logger            *slog.Logger
 	store             Store
+	bundles           bundles.Repository
 	bundledPluginsDir string
 	userPluginsDir    string
 	trustedKeysFile   string
@@ -74,6 +74,10 @@ func New(opts Options) (*Manager, error) {
 	if opts.Store == nil {
 		return nil, errors.New("store is required")
 	}
+	bundleRepo := opts.Bundles
+	if bundleRepo == nil {
+		bundleRepo = bundles.NewLocalRepository()
+	}
 	userDir := strings.TrimSpace(opts.UserPluginsDir)
 	if userDir == "" {
 		return nil, errors.New("user plugins dir is required")
@@ -93,6 +97,7 @@ func New(opts Options) (*Manager, error) {
 	return &Manager{
 		logger:            opts.Logger.With(slog.String("component", "marketplace")),
 		store:             opts.Store,
+		bundles:           bundleRepo,
 		bundledPluginsDir: strings.TrimSpace(opts.BundledPluginsDir),
 		userPluginsDir:    userDir,
 		trustedKeysFile:   strings.TrimSpace(opts.TrustedKeysFile),
@@ -258,7 +263,7 @@ func (m *Manager) Install(ctx context.Context, req InstallRequest) (InstallResul
 	if err != nil {
 		return InstallResult{}, err
 	}
-	targetDir := filepath.Join(m.userPluginsDir, candidate.PluginID)
+	targetRoot := filepath.Join(m.userPluginsDir, candidate.PluginID)
 	install, exists, err := m.store.PluginInstalls().GetPluginInstall(ctx, candidate.PluginID)
 	if err != nil {
 		return InstallResult{}, err
@@ -276,21 +281,22 @@ func (m *Manager) Install(ctx context.Context, req InstallRequest) (InstallResul
 		return InstallResult{}, fmt.Errorf("plugin %q is not signed by a trusted signer", candidate.PluginID)
 	}
 
-	hashB64, err := m.copyPluginIntoPlace(candidate.SourcePath, targetDir)
+	_, bundleRelativeDir, hashB64, err := m.copyPluginIntoPlace(candidate.SourcePath, targetRoot, candidate.GitRevision)
 	if err != nil {
 		return InstallResult{}, err
 	}
 	now := m.now().UTC()
 	record := store.PluginInstall{
-		PluginID:         candidate.PluginID,
-		InstallKind:      installKindGit,
-		SourceID:         source.SourceID,
-		GitURL:           source.GitURL,
-		GitRef:           source.GitRef,
-		GitRevision:      candidate.GitRevision,
-		SourcePath:       strings.TrimPrefix(strings.TrimPrefix(candidate.SourcePath, m.sourceCheckoutRoot(source.SourceID)), string(filepath.Separator)),
-		InstalledAt:      now,
-		InstalledHashB64: hashB64,
+		PluginID:          candidate.PluginID,
+		InstallKind:       installKindGit,
+		SourceID:          source.SourceID,
+		GitURL:            source.GitURL,
+		GitRef:            source.GitRef,
+		GitRevision:       candidate.GitRevision,
+		SourcePath:        strings.TrimPrefix(strings.TrimPrefix(candidate.SourcePath, m.sourceCheckoutRoot(source.SourceID)), string(filepath.Separator)),
+		BundleRelativeDir: bundleRelativeDir,
+		InstalledAt:       now,
+		InstalledHashB64:  hashB64,
 	}
 	if req.ActorID != nil {
 		record.InstalledBy = req.ActorID
@@ -308,12 +314,13 @@ func (m *Manager) Install(ctx context.Context, req InstallRequest) (InstallResul
 	}
 
 	return InstallResult{
-		PluginID:       candidate.PluginID,
-		SourceID:       source.SourceID,
-		TargetDir:      targetDir,
-		GitRevision:    candidate.GitRevision,
-		SignatureState: candidate.SignatureState,
-		Enabled:        false,
+		PluginID:          candidate.PluginID,
+		SourceID:          source.SourceID,
+		PluginRoot:        targetRoot,
+		BundleRelativeDir: bundleRelativeDir,
+		GitRevision:       candidate.GitRevision,
+		SignatureState:    candidate.SignatureState,
+		Enabled:           false,
 	}, nil
 }
 
@@ -339,7 +346,7 @@ func (m *Manager) Update(ctx context.Context, req UpdateRequest) (UpdateResult, 
 	targetDir := filepath.Join(m.userPluginsDir, req.PluginID)
 	localModified := false
 	if dirExists(targetDir) {
-		localModified, err = DirModified(targetDir, install.InstalledHashB64)
+		localModified, err = m.bundles.BundleModified(targetDir, install.InstalledHashB64)
 		if err != nil {
 			return UpdateResult{}, err
 		}
@@ -354,7 +361,7 @@ func (m *Manager) Update(ctx context.Context, req UpdateRequest) (UpdateResult, 
 	if candidate.SignatureState != SignatureStateTrusted && m.prodMode && !m.allowUnsigned {
 		return UpdateResult{}, fmt.Errorf("plugin %q is not signed by a trusted signer", candidate.PluginID)
 	}
-	hashB64, err := m.copyPluginIntoPlace(candidate.SourcePath, targetDir)
+	_, bundleRelativeDir, hashB64, err := m.copyPluginIntoPlace(candidate.SourcePath, targetDir, candidate.GitRevision)
 	if err != nil {
 		return UpdateResult{}, err
 	}
@@ -363,6 +370,7 @@ func (m *Manager) Update(ctx context.Context, req UpdateRequest) (UpdateResult, 
 	record.GitRef = source.GitRef
 	record.GitRevision = candidate.GitRevision
 	record.SourcePath = strings.TrimPrefix(strings.TrimPrefix(candidate.SourcePath, m.sourceCheckoutRoot(source.SourceID)), string(filepath.Separator))
+	record.BundleRelativeDir = bundleRelativeDir
 	record.InstalledAt = m.now().UTC()
 	record.InstalledHashB64 = hashB64
 	record.InstalledBy = req.ActorID
@@ -378,12 +386,13 @@ func (m *Manager) Update(ctx context.Context, req UpdateRequest) (UpdateResult, 
 		return UpdateResult{}, err
 	}
 	return UpdateResult{
-		PluginID:       candidate.PluginID,
-		SourceID:       source.SourceID,
-		TargetDir:      targetDir,
-		GitRevision:    candidate.GitRevision,
-		SignatureState: candidate.SignatureState,
-		Forced:         req.Force,
+		PluginID:          candidate.PluginID,
+		SourceID:          source.SourceID,
+		PluginRoot:        filepath.Join(m.userPluginsDir, req.PluginID),
+		BundleRelativeDir: bundleRelativeDir,
+		GitRevision:       candidate.GitRevision,
+		SignatureState:    candidate.SignatureState,
+		Forced:            req.Force,
 	}, nil
 }
 
@@ -399,8 +408,8 @@ func (m *Manager) Uninstall(ctx context.Context, req UninstallRequest) error {
 	}
 	targetDir := filepath.Join(m.userPluginsDir, req.PluginID)
 	if dirExists(targetDir) {
-		if err := os.RemoveAll(targetDir); err != nil {
-			return fmt.Errorf("remove plugin dir: %w", err)
+		if err := m.bundles.RemovePluginRoot(targetDir); err != nil {
+			return err
 		}
 	}
 	if err := m.store.PluginInstalls().DeletePluginInstall(ctx, req.PluginID); err != nil {
@@ -690,11 +699,11 @@ func (m *Manager) gitRevision(ctx context.Context, dir string) (string, error) {
 }
 
 func (m *Manager) checkInstallCollision(ctx context.Context, pluginID string, hasInstall bool) error {
-	if m.bundledPluginsDir != "" && fileExists(filepath.Join(m.bundledPluginsDir, pluginID, "plugin.json")) {
+	if m.bundledPluginsDir != "" && dirExists(filepath.Join(m.bundledPluginsDir, pluginID)) {
 		return fmt.Errorf("plugin %q conflicts with a bundled plugin", pluginID)
 	}
 	userDir := filepath.Join(m.userPluginsDir, pluginID)
-	if fileExists(filepath.Join(userDir, "plugin.json")) && !hasInstall {
+	if dirExists(userDir) && !hasInstall {
 		return fmt.Errorf("plugin %q already exists in the user plugin root", pluginID)
 	}
 	if _, ok, err := m.store.PluginInstalls().GetPluginInstall(ctx, pluginID); err != nil {
@@ -705,102 +714,19 @@ func (m *Manager) checkInstallCollision(ctx context.Context, pluginID string, ha
 	return nil
 }
 
-func (m *Manager) copyPluginIntoPlace(srcDir, targetDir string) (string, error) {
-	if err := os.MkdirAll(m.userPluginsDir, 0o755); err != nil {
-		return "", err
-	}
-	parent := filepath.Dir(targetDir)
-	tmpRoot := filepath.Join(parent, ".tmp")
-	if err := os.MkdirAll(tmpRoot, 0o755); err != nil {
-		return "", err
-	}
-	tmpDir, err := os.MkdirTemp(tmpRoot, filepath.Base(targetDir)+".")
+func (m *Manager) copyPluginIntoPlace(srcDir, targetRoot, gitRevision string) (string, string, string, error) {
+	bundle, err := m.bundles.MaterializeBundle(srcDir, targetRoot, gitRevision)
 	if err != nil {
-		return "", err
+		return "", "", "", err
 	}
-	if err := copyDirSafe(srcDir, tmpDir); err != nil {
-		_ = os.RemoveAll(tmpDir)
-		return "", err
-	}
-	hash, err := pluginhost.HashDir(tmpDir)
-	if err != nil {
-		_ = os.RemoveAll(tmpDir)
-		return "", err
-	}
-	backupDir := ""
-	if dirExists(targetDir) {
-		backupDir = filepath.Join(tmpRoot, filepath.Base(targetDir)+".old."+m.now().UTC().Format("20060102150405"))
-		if err := os.Rename(targetDir, backupDir); err != nil {
-			_ = os.RemoveAll(tmpDir)
-			return "", fmt.Errorf("move existing plugin: %w", err)
-		}
-	}
-	if err := os.Rename(tmpDir, targetDir); err != nil {
-		if backupDir != "" {
-			_ = os.Rename(backupDir, targetDir)
-		}
-		_ = os.RemoveAll(tmpDir)
-		return "", fmt.Errorf("activate plugin: %w", err)
-	}
-	if backupDir != "" {
-		_ = os.RemoveAll(backupDir)
-	}
-	return base64.StdEncoding.EncodeToString(hash[:]), nil
+	return bundle.BundleDir, bundle.BundleRelativeDir, bundle.HashB64, nil
 }
 
-func copyDirSafe(srcDir, dstDir string) error {
-	var totalBytes int64
-	return filepath.WalkDir(srcDir, func(path string, d fs.DirEntry, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if d.Type()&os.ModeSymlink != 0 {
-			return fmt.Errorf("symlinks are not allowed in marketplace plugins: %s", path)
-		}
-		rel, err := filepath.Rel(srcDir, path)
-		if err != nil {
-			return err
-		}
-		if rel == "." {
-			return nil
-		}
-		target := filepath.Join(dstDir, rel)
-		if d.IsDir() {
-			return os.MkdirAll(target, 0o755)
-		}
-		info, err := d.Info()
-		if err != nil {
-			return err
-		}
-		if info.Size() > maxFileBytes {
-			return fmt.Errorf("file %s exceeds max file size", rel)
-		}
-		totalBytes += info.Size()
-		if totalBytes > maxPluginBytes {
-			return errors.New("plugin exceeds maximum size")
-		}
-		return copyFile(path, target, info.Mode().Perm())
-	})
-}
-
-func copyFile(src, dst string, perm fs.FileMode) error {
-	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-		return err
+func (m *Manager) activeInstallDir(targetRoot string, install store.PluginInstall) (string, error) {
+	if strings.TrimSpace(install.BundleRelativeDir) != "" {
+		return m.bundles.ResolveBundleRelativeDir(targetRoot, install.BundleRelativeDir)
 	}
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-	out, err := os.OpenFile(dst, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, perm)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	if _, err := io.Copy(out, in); err != nil {
-		return err
-	}
-	return out.Close()
+	return m.bundles.ResolveBundleDir(targetRoot)
 }
 
 func sourceFromStore(source store.MarketplaceSource, sync store.MarketplaceSourceSync) Source {
@@ -904,11 +830,7 @@ func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, src 
 }
 
 func DirModified(dir, installedHashB64 string) (bool, error) {
-	hash, err := pluginhost.HashDir(dir)
-	if err != nil {
-		return false, err
-	}
-	return base64.StdEncoding.EncodeToString(hash[:]) != strings.TrimSpace(installedHashB64), nil
+	return bundles.DirModified(dir, installedHashB64)
 }
 
 func fileExists(path string) bool {
@@ -938,7 +860,7 @@ func (m *Manager) sourceCheckoutRoot(sourceID string) string {
 }
 
 func installHashForDir(dir string) string {
-	hash, err := pluginhost.HashDir(dir)
+	hash, err := bundles.HashDir(dir)
 	if err != nil {
 		return ""
 	}

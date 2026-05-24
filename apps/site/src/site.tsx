@@ -12,11 +12,11 @@ import {
 } from "@mantine/core";
 import {
 	IconBook2,
-	IconBrandTwitch,
-	IconCloudStorm,
+	IconBinaryTree2,
 	IconCodeDots,
 	IconCompass,
 	IconPlugConnected,
+	IconShieldCheck,
 } from "@tabler/icons-react";
 
 const pluginAPIs = [
@@ -83,26 +83,26 @@ export function SiteApp() {
 					<SectionCard className="site-grid-card">
 						<Stack gap="sm">
 							<ThemeIcon size={42} variant="light" color="brand">
-								<IconBrandTwitch size={20} />
+								<IconShieldCheck size={20} />
 							</ThemeIcon>
-							<Text fw={700}>Twitch integration</Text>
+							<Text fw={700}>Admin dashboard</Text>
 							<Text size="sm" c="dimmed">
-								Public stream lookups, account linking, and guild
-								live-announcement flows are designed as first-class
-								backend-backed capabilities.
+								Discord sign-in, per-server setup checks, moderation tools, and
+								owner-only module/plugin controls all run through the same admin
+								API the bot uses in development and self-hosted deployments.
 							</Text>
 						</Stack>
 					</SectionCard>
 					<SectionCard className="site-grid-card">
 						<Stack gap="sm">
 							<ThemeIcon size={42} variant="light" color="brand">
-								<IconCloudStorm size={20} />
+								<IconBinaryTree2 size={20} />
 							</ThemeIcon>
-							<Text fw={700}>Weather providers</Text>
+							<Text fw={700}>Deployment profiles</Text>
 							<Text size="sm" c="dimmed">
-								WeatherKit is the initial provider behind a normalized weather
-								interface so future providers can slot in without changing
-								plugin code.
+								The same repo supports a small single-box/SBC shape and a split
+								public-site plus admin-API shape, with signed plugins, Postgres,
+								and static frontend artifacts already wired into the project.
 							</Text>
 						</Stack>
 					</SectionCard>

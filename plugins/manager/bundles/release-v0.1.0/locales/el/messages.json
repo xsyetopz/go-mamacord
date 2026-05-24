@@ -1,0 +1,542 @@
+[
+  {
+    "id": "cmd.slowmode.name",
+    "translation": "slowmode"
+  },
+  {
+    "id": "cmd.slowmode.desc",
+    "translation": "Βάλε ένα κανάλι σε slowmode (να ηρεμήσουν τα πράγματα)."
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.slowmode.opt.channel.desc",
+    "translation": "Ποιο κανάλι χρειάζεται λίγη ηρεμία;"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.name",
+    "translation": "seconds"
+  },
+  {
+    "id": "cmd.slowmode.opt.seconds.desc",
+    "translation": "Δευτερόλεπτα ανάμεσα στα μηνύματα (0 για αφαίρεση)."
+  },
+  {
+    "id": "cmd.nick.name",
+    "translation": "nick"
+  },
+  {
+    "id": "cmd.nick.desc",
+    "translation": "Άλλαξε το ψευδώνυμο κάποιου."
+  },
+  {
+    "id": "cmd.nick.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.nick.opt.user.desc",
+    "translation": "Τίνος ψευδώνυμο αλλάζουμε;"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.name",
+    "translation": "nickname"
+  },
+  {
+    "id": "cmd.nick.opt.nickname.desc",
+    "translation": "Σε τι να το βάλει η μανούλα; (Άδειο για επαναφορά.)"
+  },
+  {
+    "id": "cmd.purge.name",
+    "translation": "purge"
+  },
+  {
+    "id": "cmd.purge.desc",
+    "translation": "Καθάρισε μηνύματα σε ένα κανάλι."
+  },
+  {
+    "id": "cmd.purge.sub.all.name",
+    "translation": "all"
+  },
+  {
+    "id": "cmd.purge.sub.all.desc",
+    "translation": "Διέγραψε πρόσφατα μηνύματα."
+  },
+  {
+    "id": "cmd.purge.sub.before.name",
+    "translation": "before"
+  },
+  {
+    "id": "cmd.purge.sub.before.desc",
+    "translation": "Διέγραψε μηνύματα πριν από ένα μήνυμα."
+  },
+  {
+    "id": "cmd.purge.sub.after.name",
+    "translation": "after"
+  },
+  {
+    "id": "cmd.purge.sub.after.desc",
+    "translation": "Διέγραψε μηνύματα μετά από ένα μήνυμα."
+  },
+  {
+    "id": "cmd.purge.sub.around.name",
+    "translation": "around"
+  },
+  {
+    "id": "cmd.purge.sub.around.desc",
+    "translation": "Διέγραψε μηνύματα γύρω από ένα μήνυμα."
+  },
+  {
+    "id": "cmd.purge.opt.count.name",
+    "translation": "count"
+  },
+  {
+    "id": "cmd.purge.opt.count.desc",
+    "translation": "Πόσα μηνύματα; (Με προσοχή.)"
+  },
+  {
+    "id": "cmd.purge.opt.message.name",
+    "translation": "message"
+  },
+  {
+    "id": "cmd.purge.opt.message.desc",
+    "translation": "ID μηνύματος ή link."
+  },
+  {
+    "id": "cmd.roles.name",
+    "translation": "roles"
+  },
+  {
+    "id": "cmd.roles.desc",
+    "translation": "Διαχειρίσου ρόλους στον server σου."
+  },
+  {
+    "id": "cmd.roles.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.roles.sub.create.desc",
+    "translation": "Δημιούργησε έναν νέο ρόλο."
+  },
+  {
+    "id": "cmd.roles.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.roles.sub.edit.desc",
+    "translation": "Επεξεργάσου έναν ρόλο."
+  },
+  {
+    "id": "cmd.roles.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.roles.sub.delete.desc",
+    "translation": "Διέγραψε έναν ρόλο."
+  },
+  {
+    "id": "cmd.roles.sub.add.name",
+    "translation": "add"
+  },
+  {
+    "id": "cmd.roles.sub.add.desc",
+    "translation": "Πρόσθεσε έναν ρόλο σε ένα μέλος."
+  },
+  {
+    "id": "cmd.roles.sub.remove.name",
+    "translation": "remove"
+  },
+  {
+    "id": "cmd.roles.sub.remove.desc",
+    "translation": "Αφαίρεσε έναν ρόλο από ένα μέλος."
+  },
+  {
+    "id": "cmd.roles.opt.role.name",
+    "translation": "role"
+  },
+  {
+    "id": "cmd.roles.opt.role.desc",
+    "translation": "Ποιος ρόλος;"
+  },
+  {
+    "id": "cmd.roles.opt.member.name",
+    "translation": "member"
+  },
+  {
+    "id": "cmd.roles.opt.member.desc",
+    "translation": "Ποιο μέλος;"
+  },
+  {
+    "id": "cmd.roles.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.roles.opt.name.desc",
+    "translation": "Όνομα ρόλου."
+  },
+  {
+    "id": "cmd.roles.opt.colour.name",
+    "translation": "colour"
+  },
+  {
+    "id": "cmd.roles.opt.colour.desc",
+    "translation": "Χρώμα ρόλου (RRGGBB)."
+  },
+  {
+    "id": "cmd.roles.opt.hoist.name",
+    "translation": "hoist"
+  },
+  {
+    "id": "cmd.roles.opt.hoist.desc",
+    "translation": "Να φαίνεται ξεχωριστά στη λίστα μελών;"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.name",
+    "translation": "mentionable"
+  },
+  {
+    "id": "cmd.roles.opt.mentionable.desc",
+    "translation": "Να επιτρέπονται @mentions;"
+  },
+  {
+    "id": "cmd.emojis.name",
+    "translation": "emojis"
+  },
+  {
+    "id": "cmd.emojis.desc",
+    "translation": "Διαχειρίσου emojis στον server σου."
+  },
+  {
+    "id": "cmd.emojis.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.emojis.sub.create.desc",
+    "translation": "Δημιούργησε ένα emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.emojis.sub.edit.desc",
+    "translation": "Μετονόμασε ένα emoji."
+  },
+  {
+    "id": "cmd.emojis.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.emojis.sub.delete.desc",
+    "translation": "Διέγραψε ένα emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.emojis.opt.name.desc",
+    "translation": "Όνομα emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.emojis.opt.file.desc",
+    "translation": "Εικόνα emoji."
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.name",
+    "translation": "emoji"
+  },
+  {
+    "id": "cmd.emojis.opt.emoji.desc",
+    "translation": "Αναφορά emoji (<:name:id>) ή ID."
+  },
+  {
+    "id": "cmd.stickers.name",
+    "translation": "stickers"
+  },
+  {
+    "id": "cmd.stickers.desc",
+    "translation": "Διαχειρίσου stickers στον server σου."
+  },
+  {
+    "id": "cmd.stickers.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.stickers.sub.create.desc",
+    "translation": "Δημιούργησε ένα sticker."
+  },
+  {
+    "id": "cmd.stickers.sub.edit.name",
+    "translation": "edit"
+  },
+  {
+    "id": "cmd.stickers.sub.edit.desc",
+    "translation": "Επεξεργάσου ένα sticker."
+  },
+  {
+    "id": "cmd.stickers.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.stickers.sub.delete.desc",
+    "translation": "Διέγραψε ένα sticker."
+  },
+  {
+    "id": "cmd.stickers.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.stickers.opt.id.desc",
+    "translation": "ID sticker ή link."
+  },
+  {
+    "id": "cmd.stickers.opt.name.name",
+    "translation": "name"
+  },
+  {
+    "id": "cmd.stickers.opt.name.desc",
+    "translation": "Όνομα sticker."
+  },
+  {
+    "id": "cmd.stickers.opt.description.name",
+    "translation": "description"
+  },
+  {
+    "id": "cmd.stickers.opt.description.desc",
+    "translation": "Περιγραφή sticker (προαιρετικό)."
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.name",
+    "translation": "emoji_tag"
+  },
+  {
+    "id": "cmd.stickers.opt.emoji_tag.desc",
+    "translation": "Emoji tag (το Discord το απαιτεί)."
+  },
+  {
+    "id": "cmd.stickers.opt.file.name",
+    "translation": "file"
+  },
+  {
+    "id": "cmd.stickers.opt.file.desc",
+    "translation": "Εικόνα sticker."
+  },
+  {
+    "id": "mgr.slowmode.set",
+    "translation": "Εντάξει, {{.Pet}}. Το {{.Channel}} είναι σε slowmode: `{{.Seconds}}s`."
+  },
+  {
+    "id": "mgr.slowmode.removed",
+    "translation": "Έτοιμο, {{.Pet}}~ Το slowmode έφυγε από το {{.Channel}}. ❤️"
+  },
+  {
+    "id": "mgr.slowmode.error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να ενημερώσει το slowmode, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.self_error",
+    "translation": "Δεν μπορώ να αλλάξω το δικό σου ψευδώνυμο, {{.Pet}}."
+  },
+  {
+    "id": "mgr.nick.set",
+    "translation": "Εντάξει, {{.Pet}}. Ο/Η {{.User}} είναι τώρα `{{.Nickname}}`."
+  },
+  {
+    "id": "mgr.nick.reset",
+    "translation": "Εντάξει, {{.Pet}}. Επανέφερα το ψευδώνυμο του/της {{.User}}."
+  },
+  {
+    "id": "mgr.nick.error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να ενημερώσει το ψευδώνυμο του/της {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.invalid_message",
+    "translation": "Αυτό δεν μοιάζει με έγκυρο ID/link μηνύματος, {{.Pet}}."
+  },
+  {
+    "id": "mgr.purge.success",
+    "translation": "Όλα καθαρά, {{.Pet}}. Διέγραψα `{{.Count}}` μήνυμα(τα)."
+  },
+  {
+    "id": "mgr.purge.error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να διαγράψει αυτά τα μηνύματα, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.invalid_colour",
+    "translation": "Αυτό το χρώμα δεν είναι σωστό, {{.Pet}}: `{{.Colour}}` (αναμένω RRGGBB)."
+  },
+  {
+    "id": "mgr.roles.cannot_edit_everyone",
+    "translation": "Μην πειράξεις το `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.cannot_delete_everyone",
+    "translation": "Μην πειράξεις το `@everyone`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.create_success",
+    "translation": "Έτοιμο, {{.Pet}}. Δημιουργήθηκε: {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.create_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να δημιουργήσει `@{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.edit_success",
+    "translation": "Έτοιμο, {{.Pet}}. Ενημερώθηκε: {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.edit_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να επεξεργαστεί {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.delete_success",
+    "translation": "Εντάξει, {{.Pet}}. Το `@{{.Name}}` έφυγε."
+  },
+  {
+    "id": "mgr.roles.delete_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να διαγράψει {{.Role}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.add_success",
+    "translation": "Έτοιμο, {{.Pet}}. Ο/Η {{.User}} έχει {{.Role}}."
+  },
+  {
+    "id": "mgr.roles.add_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να προσθέσει {{.Role}} στον/στην {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.roles.remove_success",
+    "translation": "Έτοιμο, {{.Pet}}. Αφαιρέθηκε το {{.Role}} από τον/την {{.User}}."
+  },
+  {
+    "id": "mgr.roles.remove_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να αφαιρέσει {{.Role}} από τον/την {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_missing",
+    "translation": "Χρειάζομαι ένα συνημμένο, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.file_too_large",
+    "translation": "Αυτό το αρχείο είναι πολύ μεγάλο, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.emojis.bad_extension",
+    "translation": "Αυτή η κατάληξη δεν δουλεύει για emoji, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.emojis.too_many",
+    "translation": "Αυτός ο server είναι στο όριο emoji, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.emojis.download_error",
+    "translation": "Η {{.Mommy}} μπορεί να κατεβάσει μόνο από το CDN του Discord, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.dimensions_error",
+    "translation": "Δεν μπόρεσα να διαβάσω το μέγεθος της εικόνας, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.too_large_dims",
+    "translation": "Η εικόνα είναι πολύ μεγάλη για emoji, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.emojis.bad_image",
+    "translation": "Αυτός ο τύπος εικόνας δεν υποστηρίζεται, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.invalid_emoji",
+    "translation": "Αυτό δεν μοιάζει με έγκυρο emoji, {{.Pet}}: `{{.Emoji}}`."
+  },
+  {
+    "id": "mgr.emojis.create_success",
+    "translation": "Γλυκό! {{.Pet}}, δημιουργήθηκε `:{{.Name}}:`."
+  },
+  {
+    "id": "mgr.emojis.create_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να δημιουργήσει `:{{.Name}}:`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.edit_success",
+    "translation": "Εντάξει, {{.Pet}}. Το μετονόμασα σε `{{.Name}}`."
+  },
+  {
+    "id": "mgr.emojis.edit_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να μετονομάσει αυτό το emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.emojis.delete_success",
+    "translation": "Εντάξει, {{.Pet}}. Emoji διαγράφηκε."
+  },
+  {
+    "id": "mgr.emojis.delete_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να διαγράψει αυτό το emoji, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_missing",
+    "translation": "Χρειάζομαι ένα συνημμένο, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.tags_missing",
+    "translation": "Το Discord θέλει ένα emoji tag, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.file_too_large",
+    "translation": "Αυτό το αρχείο είναι πολύ μεγάλο, {{.Pet}} ({{.Size}} bytes; max {{.Max}})."
+  },
+  {
+    "id": "mgr.stickers.bad_extension",
+    "translation": "Αυτή η κατάληξη δεν δουλεύει για sticker, {{.Pet}}: `{{.Ext}}`."
+  },
+  {
+    "id": "mgr.stickers.too_many",
+    "translation": "Αυτός ο server είναι στο όριο sticker, {{.Pet}} (max `{{.Max}}`)."
+  },
+  {
+    "id": "mgr.stickers.download_error",
+    "translation": "Η {{.Mommy}} μπορεί να κατεβάσει μόνο από το CDN του Discord, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.dimensions_error",
+    "translation": "Δεν μπόρεσα να διαβάσω το μέγεθος της εικόνας, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.too_large_dims",
+    "translation": "Η εικόνα είναι πολύ μεγάλη για sticker, {{.Pet}}: `{{.Width}}x{{.Height}}`."
+  },
+  {
+    "id": "mgr.stickers.invalid_id",
+    "translation": "Αυτό το ID/link sticker δεν μοιάζει σωστό, {{.Pet}}: `{{.ID}}`."
+  },
+  {
+    "id": "mgr.stickers.create_success",
+    "translation": "Έτοιμο, {{.Pet}}~ δημιουργήθηκε `{{.Name}}`. ❤️"
+  },
+  {
+    "id": "mgr.stickers.create_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να δημιουργήσει `{{.Name}}`, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.edit_success",
+    "translation": "Έτοιμο, {{.Pet}}~ ενημερώθηκε `{{.Name}}`. ❤️"
+  },
+  {
+    "id": "mgr.stickers.edit_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να επεξεργαστεί αυτό το sticker, {{.Pet}}."
+  },
+  {
+    "id": "mgr.stickers.delete_success",
+    "translation": "Εντάξει, {{.Pet}}~ Sticker διαγράφηκε. ❤️"
+  },
+  {
+    "id": "mgr.stickers.delete_error",
+    "translation": "Η {{.Mommy}} δεν μπόρεσε να διαγράψει αυτό το sticker, {{.Pet}}."
+  }
+]

@@ -1,0 +1,258 @@
+[
+  {
+    "id": "cmd.timezone.name",
+    "translation": "timezone"
+  },
+  {
+    "id": "cmd.timezone.desc",
+    "translation": "अपना timezone सेट करो ताकि मम्मी के reminders सही समय पर आएँ।"
+  },
+  {
+    "id": "cmd.timezone.sub.set.name",
+    "translation": "set"
+  },
+  {
+    "id": "cmd.timezone.sub.set.desc",
+    "translation": "अपना timezone सेट करो (IANA, जैसे Europe/Tallinn)।"
+  },
+  {
+    "id": "cmd.timezone.sub.show.name",
+    "translation": "show"
+  },
+  {
+    "id": "cmd.timezone.sub.show.desc",
+    "translation": "अपना current timezone दिखाओ।"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.name",
+    "translation": "clear"
+  },
+  {
+    "id": "cmd.timezone.sub.clear.desc",
+    "translation": "saved timezone साफ़ करो।"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.name",
+    "translation": "iana"
+  },
+  {
+    "id": "cmd.timezone.opt.iana.desc",
+    "translation": "Timezone नाम (जैसे Europe/Tallinn)।"
+  },
+  {
+    "id": "wellness.timezone.invalid",
+    "translation": "Hmm, {{.Pet}}... मुझे ये timezone नहीं पता: `{{.Timezone}}`।"
+  },
+  {
+    "id": "wellness.timezone.set",
+    "translation": "ठीक है, {{.Pet}}~ तुम्हारे reminders के लिए मैं `{{.Timezone}}` इस्तेमाल करूँगी। ❤️"
+  },
+  {
+    "id": "wellness.timezone.unset",
+    "translation": "तुमने अभी timezone सेट नहीं किया, {{.Pet}}। `/timezone set` इस्तेमाल करो।"
+  },
+  {
+    "id": "wellness.timezone.show",
+    "translation": "अभी तुम्हारा timezone `{{.Timezone}}` है, {{.Pet}}।"
+  },
+  {
+    "id": "wellness.timezone.cleared",
+    "translation": "सब साफ़, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "cmd.checkin.name",
+    "translation": "checkin"
+  },
+  {
+    "id": "cmd.checkin.desc",
+    "translation": "मम्मी को बताओ आज तुम कैसे हो।"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.name",
+    "translation": "mood"
+  },
+  {
+    "id": "cmd.checkin.opt.mood.desc",
+    "translation": "तुम्हारा mood: 1 (कठिन) से 5 (बहुत अच्छा)।"
+  },
+  {
+    "id": "cmd.checkin.opt.history.name",
+    "translation": "history"
+  },
+  {
+    "id": "cmd.checkin.opt.history.desc",
+    "translation": "नया लिखने की बजाय recent check-ins दिखाओ।"
+  },
+  {
+    "id": "wellness.checkin.prompt",
+    "translation": "{{.Pet}}... {{.Mommy}} को 1 से 5 के बीच एक number दो, या `history=true` करके अपने पिछले check-ins देखो।"
+  },
+  {
+    "id": "wellness.checkin.invalid_mood",
+    "translation": "ये 1..5 होना चाहिए, {{.Pet}}।"
+  },
+  {
+    "id": "wellness.checkin.saved",
+    "translation": "बताने के लिए धन्यवाद, {{.Pet}}~ मैंने `{{.Mood}}/5` सेव कर लिया। ❤️"
+  },
+  {
+    "id": "wellness.checkin.history.empty",
+    "translation": "अभी तक कोई check-ins नहीं, {{.Pet}}। धीरे-धीरे शुरू करना भी बहादुरी है।"
+  },
+  {
+    "id": "wellness.checkin.history",
+    "translation": "ये रहे तुम्हारे recent check-ins, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "cmd.remind.name",
+    "translation": "remind"
+  },
+  {
+    "id": "cmd.remind.desc",
+    "translation": "नरम reminders सेट करो (मम्मी हल्के से याद दिलाएगी)।"
+  },
+  {
+    "id": "cmd.remind.sub.create.name",
+    "translation": "create"
+  },
+  {
+    "id": "cmd.remind.sub.create.desc",
+    "translation": "नया reminder बनाओ।"
+  },
+  {
+    "id": "cmd.remind.sub.list.name",
+    "translation": "list"
+  },
+  {
+    "id": "cmd.remind.sub.list.desc",
+    "translation": "अपने reminders की list देखो।"
+  },
+  {
+    "id": "cmd.remind.sub.delete.name",
+    "translation": "delete"
+  },
+  {
+    "id": "cmd.remind.sub.delete.desc",
+    "translation": "reminder हटाओ।"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.name",
+    "translation": "schedule"
+  },
+  {
+    "id": "cmd.remind.opt.schedule.desc",
+    "translation": "Cron schedule (जैसे `0 9 * * *`) या `@hourly`।"
+  },
+  {
+    "id": "cmd.remind.opt.kind.name",
+    "translation": "kind"
+  },
+  {
+    "id": "cmd.remind.opt.kind.desc",
+    "translation": "किस तरह का reminder है?"
+  },
+  {
+    "id": "cmd.remind.opt.note.name",
+    "translation": "note"
+  },
+  {
+    "id": "cmd.remind.opt.note.desc",
+    "translation": "छोटा note (optional, max 120 chars)।"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.name",
+    "translation": "delivery"
+  },
+  {
+    "id": "cmd.remind.opt.delivery.desc",
+    "translation": "मम्मी कहाँ भेजे? (dm या channel)"
+  },
+  {
+    "id": "cmd.remind.opt.channel.name",
+    "translation": "channel"
+  },
+  {
+    "id": "cmd.remind.opt.channel.desc",
+    "translation": "कौन-सा channel? (सिर्फ़ अगर delivery=channel)"
+  },
+  {
+    "id": "cmd.remind.opt.id.name",
+    "translation": "id"
+  },
+  {
+    "id": "cmd.remind.opt.id.desc",
+    "translation": "Reminder ID।"
+  },
+  {
+    "id": "wellness.remind.bad_schedule",
+    "translation": "ये schedule सही नहीं लग रहा, {{.Pet}}: `{{.Schedule}}`।"
+  },
+  {
+    "id": "wellness.remind.channel_required",
+    "translation": "अगर delivery=channel चुना है, तो channel भी चुनो, {{.Pet}}।"
+  },
+  {
+    "id": "wellness.remind.created",
+    "translation": "सब सेट, {{.Pet}}~ अगला gentle reminder {{.NextRun}} पर — `{{.ID}}` ({{.Kind}}, {{.Delivery}})। ❤️"
+  },
+  {
+    "id": "wellness.remind.list.empty",
+    "translation": "अभी कोई reminders नहीं, {{.Pet}}। `/remind create` इस्तेमाल करो।"
+  },
+  {
+    "id": "wellness.remind.list",
+    "translation": "ये रहे तुम्हारे reminders, {{.Pet}}:\n{{.Lines}}"
+  },
+  {
+    "id": "wellness.remind.delete.placeholder",
+    "translation": "मम्मी के लिए एक reminder चुनो..."
+  },
+  {
+    "id": "wellness.remind.delete.prompt",
+    "translation": "{{.Pet}}, {{.Mommy}} किस reminder को हटाए?"
+  },
+  {
+    "id": "wellness.remind.delete.expired",
+    "translation": "ये menu expire हो गया, {{.Pet}}। `/remind delete` फिर से चलाओ।"
+  },
+  {
+    "id": "wellness.remind.delete.not_owner",
+    "translation": "हाथ दूर, {{.Pet}}। ये तुम्हारा नहीं है।"
+  },
+  {
+    "id": "wellness.remind.delete.not_found",
+    "translation": "मुझे वो reminder नहीं मिला, {{.Pet}}।"
+  },
+  {
+    "id": "wellness.remind.delete.success",
+    "translation": "हटा दिया। अपने ख्याल रखने के लिए शाबाश, {{.Pet}}~ ❤️"
+  },
+  {
+    "id": "wellness.reminder.fire",
+    "translation": "Hey {{.Pet}}। gentle reminder: {{.Kind}}.{{if .Note}} {{.Note}}{{end}}"
+  },
+  {
+    "id": "wellness.reminder.kind.hydrate",
+    "translation": "थोड़ा पानी पी लो"
+  },
+  {
+    "id": "wellness.reminder.kind.stretch",
+    "translation": "थोड़ा stretch कर लो"
+  },
+  {
+    "id": "wellness.reminder.kind.breathe",
+    "translation": "धीरे से साँस लो"
+  },
+  {
+    "id": "wellness.reminder.kind.meds",
+    "translation": "अपनी दवा ले लो"
+  },
+  {
+    "id": "wellness.reminder.kind.sleep",
+    "translation": "सोने के लिए धीरे-धीरे शांत हो जाओ"
+  },
+  {
+    "id": "wellness.reminder.kind.checkin",
+    "translation": "जल्दी-सा check-in कर लो"
+  }
+]

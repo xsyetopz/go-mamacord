@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Birine nazikçe uyarı ver (gerekirse kısa bir time-out)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Kimin uyarıya ihtiyacı var?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Ne oldu?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Bir uyarıyı kaldır ve tekrar denemesine izin ver."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Kimin uyarısı kaldırılsın?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Sen değil, {{.Pet}}. {{.Mommy}} seni de güvende istiyor."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} botları veya sistem kullanıcılarını uyarmıyor, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Şimdilik yeter, {{.Pet}}. {{.User}} zaten uyarı limitinde."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Tamam, {{.Pet}}. {{.User}} için bir uyarı kaydettim: `{{.Reason}}`.{{if .TimeoutMinutes}} Ayrıca {{.TimeoutMinutes}} dakika time-out verdim.{{end}}{{if .TimeoutFailed}} Time-out vermeyi de denedim ama yapamadım.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hey {{.Pet}}. {{.Mommy}} yavaşlamanı ve daha nazik olmanı istiyor. `{{.Reason}}` nedeniyle uyarıldın.{{if .TimeoutMinutes}} {{.TimeoutMinutes}} dakika time-out'tasın, sakinleşmen için.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Sen değil, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.User}} için uyarı bulamadım, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "{{.Mommy}} hangi uyarıyı kaldırsın, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Annecik için birini seç, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "O seçim süresi doldu, {{.Pet}}. `/unwarn` komutunu tekrar çalıştır."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Tamamdır, {{.Pet}}~ {{.User}} tertemiz oldu. ❤️"
+  }
+]

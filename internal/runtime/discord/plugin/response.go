@@ -11,6 +11,7 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 type ResponseMode int
@@ -69,8 +70,13 @@ type Action struct {
 	Modal  discord.ModalCreate
 }
 
-func ParseAction(pluginID string, raw any, defaultEphemeral bool, mode ResponseMode) (Action, error) {
-	switch v := raw.(type) {
+func ParseAction(pluginID string, raw luaplugin.EncodedValue, defaultEphemeral bool, mode ResponseMode) (Action, error) {
+	decoded, err := raw.Decode()
+	if err != nil {
+		return Action{}, fmt.Errorf("decode plugin response: %w", err)
+	}
+
+	switch v := decoded.(type) {
 	case nil:
 		return Action{Kind: ActionNone}, nil
 	case string:
@@ -78,12 +84,17 @@ func ParseAction(pluginID string, raw any, defaultEphemeral bool, mode ResponseM
 	case map[string]any:
 		return pluginActionFromMap(pluginID, v, defaultEphemeral, mode)
 	default:
-		return Action{}, fmt.Errorf("unsupported plugin response type %T", raw)
+		return Action{}, fmt.Errorf("unsupported plugin response type %T", decoded)
 	}
 }
 
-func ParseAutomationMessage(pluginID string, raw any) (discord.MessageCreate, error) {
-	switch v := raw.(type) {
+func ParseAutomationMessage(pluginID string, raw luaplugin.EncodedValue) (discord.MessageCreate, error) {
+	decoded, err := raw.Decode()
+	if err != nil {
+		return discord.MessageCreate{}, fmt.Errorf("decode plugin message: %w", err)
+	}
+
+	switch v := decoded.(type) {
 	case nil:
 		return discord.MessageCreate{}, errors.New("missing message")
 	case string:
@@ -118,7 +129,7 @@ func ParseAutomationMessage(pluginID string, raw any) (discord.MessageCreate, er
 		}
 		return msg, nil
 	default:
-		return discord.MessageCreate{}, fmt.Errorf("unsupported message type %T", raw)
+		return discord.MessageCreate{}, fmt.Errorf("unsupported message type %T", decoded)
 	}
 }
 

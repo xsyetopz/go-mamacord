@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Daj komus delikatne ostrzezenie (i krotki time-out, jesli trzeba)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Kogo ostrzec?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Co sie stalo?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Usun ostrzezenie i daj szanse zaczac od nowa."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Komu usunac ostrzezenie?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Nie ty, {{.Pet}}. {{.Mommy}} chce chronic tez ciebie."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Pet}}, {{.Mommy}} nie ostrzega botow ani kont systemowych."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "Wystarczy, {{.Pet}}. {{.User}} ma juz limit ostrzezen."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Dobrze, {{.Pet}}. Zapisalam ostrzezenie dla {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} Dodatkowo time-out na {{.TimeoutMinutes}} min.{{end}}{{if .TimeoutFailed}} Probowalam dac time-out, ale sie nie udalo.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hej {{.Pet}}. {{.Mommy}} potrzebuje, zebys zwolnil i byl milejszy. Powod: `{{.Reason}}`.{{if .TimeoutMinutes}} Mas time-out na {{.TimeoutMinutes}} min, zebys ostygl.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Nie ty, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "{{.Pet}}, nie znaleziono ostrzezen dla {{.User}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Ktore ostrzezenie {{.Mommy}} ma usunac, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Wybierz jedno, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "{{.Pet}}, to menu wygaslo. Uruchom `/unwarn` ponownie."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Gotowe, {{.Pet}}~. {{.User}} ma czysta karte. ❤️"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "cmd.warn.name",
+    "translation": "warn"
+  },
+  {
+    "id": "cmd.warn.desc",
+    "translation": "Duok kam nors švelnų įspėjimą (ir trumpą time-out, jei reikia)."
+  },
+  {
+    "id": "cmd.warn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.warn.opt.user.desc",
+    "translation": "Kam reikia įspėjimo?"
+  },
+  {
+    "id": "cmd.warn.opt.reason.name",
+    "translation": "reason"
+  },
+  {
+    "id": "cmd.warn.opt.reason.desc",
+    "translation": "Kas nutiko?"
+  },
+  {
+    "id": "cmd.unwarn.name",
+    "translation": "unwarn"
+  },
+  {
+    "id": "cmd.unwarn.desc",
+    "translation": "Pašalink įspėjimą ir suteik progą pabandyti dar kartą."
+  },
+  {
+    "id": "cmd.unwarn.opt.user.name",
+    "translation": "user"
+  },
+  {
+    "id": "cmd.unwarn.opt.user.desc",
+    "translation": "Kam nuimti įspėjimą?"
+  },
+  {
+    "id": "mod.warn.self",
+    "translation": "Not you, {{.Pet}}. {{.Mommy}} wants you safe too."
+  },
+  {
+    "id": "mod.warn.bot",
+    "translation": "{{.Mommy}} doesn't warn bots or system users, {{.Pet}}."
+  },
+  {
+    "id": "mod.warn.too_many",
+    "translation": "That's enough for now, {{.Pet}}. {{.User}} is already at the warning limit."
+  },
+  {
+    "id": "mod.warn.success",
+    "translation": "Okay, {{.Pet}}. I logged a warning for {{.User}}: `{{.Reason}}`.{{if .TimeoutMinutes}} I also put them in time-out for {{.TimeoutMinutes}} minutes.{{end}}{{if .TimeoutFailed}} I tried to time them out too, but I couldn't.{{end}}"
+  },
+  {
+    "id": "mod.warn.dm",
+    "translation": "Hey {{.Pet}}. {{.Mommy}} needs you to slow down and be kinder. You were warned for `{{.Reason}}`.{{if .TimeoutMinutes}} You're in time-out for {{.TimeoutMinutes}} minutes so you can cool off.{{end}}"
+  },
+  {
+    "id": "mod.unwarn.self",
+    "translation": "Ne tu, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.none",
+    "translation": "Neradau įspėjimų {{.User}}, {{.Pet}}."
+  },
+  {
+    "id": "mod.unwarn.prompt",
+    "translation": "Kurį įspėjimą {{.Mommy}} turėtų pašalinti, {{.Pet}}?"
+  },
+  {
+    "id": "mod.unwarn.placeholder",
+    "translation": "Pasirink vieną, {{.Pet}}..."
+  },
+  {
+    "id": "mod.unwarn.expired",
+    "translation": "Tas pasirinkimas nebegalioja, {{.Pet}}. Paleisk `/unwarn` dar kartą."
+  },
+  {
+    "id": "mod.unwarn.success",
+    "translation": "Viskas gerai, {{.Pet}}~. {{.User}} vėl pradeda nuo švaraus lapo. ❤️"
+  }
+]

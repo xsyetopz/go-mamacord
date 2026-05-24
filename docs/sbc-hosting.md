@@ -67,7 +67,7 @@ Hard rules:
 Host on device:
 
 - Discord bot
-- SQLite
+- Postgres
 
 Do not host on device:
 
@@ -85,7 +85,7 @@ Best for:
 Host on device:
 
 - Discord bot
-- SQLite
+- Postgres
 - admin API
 
 Host elsewhere:
@@ -102,7 +102,7 @@ Best for:
 Host on device:
 
 - Discord bot
-- SQLite
+- Postgres
 - admin API
 - built `apps/dashboard/dist`
 
@@ -674,6 +674,36 @@ RestartSec=3
 WantedBy=multi-user.target
 ```
 
+If you intentionally want split roles on a stronger board, duplicate the same
+unit pattern into:
+
+- `/etc/systemd/system/mamacord-control.service`
+- `/etc/systemd/system/mamacord-gateway.service`
+- `/etc/systemd/system/mamacord-scheduler.service`
+
+and add one role line per unit:
+
+```ini
+Environment=MAMACORD_RUNTIME_ROLES=control
+```
+
+```ini
+Environment=MAMACORD_RUNTIME_ROLES=gateway
+```
+
+```ini
+Environment=MAMACORD_RUNTIME_ROLES=scheduler
+```
+
+For split-role systemd deployment, keep shared state out of per-unit local
+Storage:
+
+- use `MAMACORD_STORAGE_BACKEND=postgres`
+- set `MAMACORD_POSTGRES_DSN=...`
+- set `MAMACORD_BUNDLE_BACKEND=cached`
+- set `MAMACORD_BUNDLE_STORE_DIR=/opt/mamacord/data/bundles/store`
+- set `MAMACORD_BUNDLE_CACHE_DIR=/opt/mamacord/data/bundles/cache`
+
 ### 7. Start The Service
 
 Run on `TARGET DEVICE`.
@@ -772,6 +802,8 @@ Only these env filenames are supported:
 ```dotenv
 DISCORD_TOKEN=your-token-here
 
+MAMACORD_RUNTIME_ROLES=gateway,scheduler
+
 MAMACORD_PROD_MODE=1
 MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
 # MAMACORD_TRUSTED_KEYS_FILE=./config/trusted_keys.json
@@ -781,6 +813,8 @@ MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
 
 ```dotenv
 DISCORD_TOKEN=your-token-here
+
+MAMACORD_RUNTIME_ROLES=control,gateway,scheduler
 
 MAMACORD_PROD_MODE=1
 MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
@@ -800,6 +834,8 @@ MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://example.com
 
 ```dotenv
 DISCORD_TOKEN=your-token-here
+
+MAMACORD_RUNTIME_ROLES=control,gateway,scheduler
 
 MAMACORD_PROD_MODE=1
 MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
@@ -835,18 +871,20 @@ Good news:
 What must exist on the installed machine:
 
 - `/opt/mamacord/config/trusted_keys.json`
-- `/opt/mamacord/plugins/<plugin>/signature.json` for the bundled plugins
+- `/opt/mamacord/plugins/<plugin>/.mamacord-bundle.json`
+- `/opt/mamacord/plugins/<plugin>/bundles/<revision>/signature.json` for the bundled plugins
 
 Run on `TARGET DEVICE`:
 
 ```bash
 ls -la /opt/mamacord/config/trusted_keys.json
-find /opt/mamacord/plugins -maxdepth 2 -name signature.json -print | sort
+find /opt/mamacord/plugins -maxdepth 4 -name signature.json -print | sort
 /opt/mamacord/mamacord doctor
 ```
 
 You want `doctor` to show:
 
+- `runtime_roles: gateway,scheduler` for Profile A, or `control,gateway,scheduler` for Profiles B/C
 - `prod_mode: true`
 - `allow_unsigned_plugins: false`
 - `trusted_keys_file_exists: true`
@@ -876,7 +914,7 @@ Default outputs:
 - private key: `./data/keys/your-key-id.key`
 - trusted public key entry: `./config/trusted_keys.json`
 
-Sign your plugin:
+Sign your plugin root:
 
 ```bash
 go run ./cmd/mamacord sign-plugin --dir ./plugins/<id> --key-id your-key-id --private-key-file ./data/keys/your-key-id.key
@@ -884,12 +922,13 @@ go run ./cmd/mamacord sign-plugin --dir ./plugins/<id> --key-id your-key-id --pr
 
 That creates:
 
-- `./plugins/<id>/signature.json`
+- `./plugins/<id>/bundles/<revision>/signature.json`
 
 Then install or copy these onto the target device:
 
 - `config/trusted_keys.json`
-- `plugins/<id>/signature.json`
+- `plugins/<id>/.mamacord-bundle.json`
+- `plugins/<id>/bundles/<revision>/signature.json`
 - the rest of the plugin directory
 
 You do not need to copy the private key to the target unless you want the dashboard to sign plugins there.

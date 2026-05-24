@@ -10,13 +10,23 @@ func validateNewDeps(deps Dependencies) error {
 	if deps.Logger == nil {
 		return errors.New("logger is required")
 	}
-	if strings.TrimSpace(deps.Token) == "" {
+	if deps.EnableGateway == false && deps.EnableScheduler == false {
+		return errors.New("at least one runtime role must be enabled")
+	}
+	if (deps.EnableGateway || deps.EnableScheduler) && strings.TrimSpace(deps.Token) == "" {
 		return errors.New("discord token is required")
 	}
 	if deps.Store == nil {
 		return errors.New("store is required")
 	}
 	return nil
+}
+
+func normalizeRuntimeRoleDeps(enableGateway bool, enableScheduler bool) (bool, bool) {
+	if !enableGateway && !enableScheduler {
+		return true, true
+	}
+	return enableGateway, enableScheduler
 }
 
 func normalizeCommandRegistrationMode(mode string) (string, error) {
