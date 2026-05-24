@@ -1,7 +1,0 @@
-{
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json",
-  "algorithm": "ed25519-sha256",
-  "hash_b64": "WwIlkQC/lkP2hK2wtG/P/sPoHC1/Ag+/nMzwD3k2V/8=",
-  "key_id": "official-release-2026-04",
-  "signature_b64": "3kZ4jXp75XhjO8CHHYTFLsF5+aLdWdG6sVEuEaCbZd3QmQrDwogyRciB0sghJBjy3VH/5WEbiqt47NCbn+rpCw=="
-}
