@@ -1,6 +1,5 @@
 .git
 .gitignore
-legacy
 data
 *.sqlite
 *.sqlite-wal
