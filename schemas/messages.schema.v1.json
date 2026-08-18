@@ -1,36 +1,33 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/messages.schema.v1.json",
-  "title": "mamacord messages.json (go-i18n)",
-  "type": "array",
-  "items": {
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-      "id": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": {
-        "type": "string"
-      },
-      "translation": {
-        "oneOf": [
-          {
-            "type": "string"
-          },
-          {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "required": [
-      "id",
-      "translation"
-    ]
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/messages.schema.v1.json",
+	"title": "mamacord messages.json (go-i18n)",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"additionalProperties": false,
+		"properties": {
+			"id": {
+				"type": "string",
+				"minLength": 1
+			},
+			"description": {
+				"type": "string"
+			},
+			"translation": {
+				"oneOf": [
+					{
+						"type": "string"
+					},
+					{
+						"type": "object",
+						"additionalProperties": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"required": ["id", "translation"]
+	}
 }

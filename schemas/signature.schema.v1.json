@@ -1,35 +1,30 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json",
-  "title": "mamacord plugin signature",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "$schema": {
-      "type": "string",
-      "format": "uri"
-    },
-    "key_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "hash_b64": {
-      "type": "string",
-      "minLength": 1
-    },
-    "signature_b64": {
-      "type": "string",
-      "minLength": 1
-    },
-    "algorithm": {
-      "type": "string",
-      "enum": [
-        "ed25519-sha256"
-      ]
-    }
-  },
-  "required": [
-    "key_id",
-    "signature_b64"
-  ]
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json",
+	"title": "mamacord plugin signature",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"format": "uri"
+		},
+		"key_id": {
+			"type": "string",
+			"minLength": 1
+		},
+		"hash_b64": {
+			"type": "string",
+			"minLength": 1
+		},
+		"signature_b64": {
+			"type": "string",
+			"minLength": 1
+		},
+		"algorithm": {
+			"type": "string",
+			"enum": ["ed25519-sha256"]
+		}
+	},
+	"required": ["key_id", "signature_b64"]
 }

@@ -1,94 +1,94 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.v1.json",
-  "version": "1",
-  "defaults": {
-    "storage": {
-      "kv": false,
-      "user_settings": false,
-      "checkins": false,
-      "reminders": false,
-      "warnings": false,
-      "audit": false
-    },
-    "discord": {
-      "users": false,
-      "guilds": false,
-      "channels": false,
-      "messages": false,
-      "reactions": false,
-      "members": false,
-      "roles": false,
-      "threads": false,
-      "invites": false,
-      "webhooks": false,
-      "emojis": false,
-      "stickers": false
-    },
-    "network": {
-      "http": false
-    },
-    "automation": {
-      "jobs": false,
-      "events": {
-        "member_join_leave": false,
-        "moderation": false
-      }
-    }
-  },
-  "plugins": {
-    "example": {
-      "storage": {
-        "kv": true
-      }
-    },
-    "fun": {
-      "storage": {
-        "kv": true
-      },
-      "network": {
-        "http": true
-      }
-    },
-    "wellness": {
-      "storage": {
-        "kv": true,
-        "user_settings": true,
-        "checkins": true,
-        "reminders": true
-      }
-    },
-    "moderation": {
-      "storage": {
-        "kv": true,
-        "warnings": true,
-        "audit": true
-      },
-      "discord": {
-        "messages": true,
-        "members": true
-      }
-    },
-    "info": {
-      "storage": {
-        "kv": true
-      },
-      "discord": {
-        "users": true,
-        "members": true,
-        "guilds": true
-      }
-    },
-    "manager": {
-      "storage": {
-        "kv": true
-      },
-      "discord": {
-        "channels": true,
-        "messages": true,
-        "roles": true,
-        "emojis": true,
-        "stickers": true
-      }
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.v1.json",
+	"version": "1",
+	"defaults": {
+		"storage": {
+			"kv": false,
+			"user_settings": false,
+			"checkins": false,
+			"reminders": false,
+			"warnings": false,
+			"audit": false
+		},
+		"discord": {
+			"users": false,
+			"guilds": false,
+			"channels": false,
+			"messages": false,
+			"reactions": false,
+			"members": false,
+			"roles": false,
+			"threads": false,
+			"invites": false,
+			"webhooks": false,
+			"emojis": false,
+			"stickers": false
+		},
+		"network": {
+			"http": false
+		},
+		"automation": {
+			"jobs": false,
+			"events": {
+				"member_join_leave": false,
+				"moderation": false
+			}
+		}
+	},
+	"plugins": {
+		"example": {
+			"storage": {
+				"kv": true
+			}
+		},
+		"fun": {
+			"storage": {
+				"kv": true
+			},
+			"network": {
+				"http": true
+			}
+		},
+		"wellness": {
+			"storage": {
+				"kv": true,
+				"user_settings": true,
+				"checkins": true,
+				"reminders": true
+			}
+		},
+		"moderation": {
+			"storage": {
+				"kv": true,
+				"warnings": true,
+				"audit": true
+			},
+			"discord": {
+				"messages": true,
+				"members": true
+			}
+		},
+		"info": {
+			"storage": {
+				"kv": true
+			},
+			"discord": {
+				"users": true,
+				"members": true,
+				"guilds": true
+			}
+		},
+		"manager": {
+			"storage": {
+				"kv": true
+			},
+			"discord": {
+				"channels": true,
+				"messages": true,
+				"roles": true,
+				"emojis": true,
+				"stickers": true
+			}
+		}
+	}
 }

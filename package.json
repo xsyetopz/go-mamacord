@@ -1,13 +1,13 @@
 {
-  "$schema": "https://json.schemastore.org/package.json",
-  "name": "mamacord-web-workspace",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "packageManager": "bun@1.3.14",
-  "scripts": {
-    "build:web": "bun run --filter '*' build"
-  }
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "mamacord-web-workspace",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"packageManager": "bun@1.3.14",
+	"scripts": {
+		"build:web": "bun run --filter '*' build"
+	}
 }

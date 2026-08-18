@@ -1,387 +1,357 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
-  "title": "mamacord plugin manifest",
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "$schema": {
-      "type": "string",
-      "format": "uri"
-    },
-    "id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "name": {
-      "type": "string",
-      "minLength": 1
-    },
-    "version": {
-      "type": "string",
-      "minLength": 1
-    },
-    "permissions": {
-      "$ref": "#/$defs/permissions"
-    },
-    "commands": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/command"
-      }
-    },
-    "events": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "enum": [
-          "guild_member_join",
-          "guild_member_leave",
-          "guild_ban",
-          "guild_unban"
-        ]
-      }
-    },
-    "jobs": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/job"
-      }
-    }
-  },
-  "required": [
-    "id",
-    "name",
-    "version"
-  ],
-  "$defs": {
-    "permissions": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "storage": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "kv": {
-              "type": "boolean"
-            },
-            "user_settings": {
-              "type": "boolean"
-            },
-            "checkins": {
-              "type": "boolean"
-            },
-            "reminders": {
-              "type": "boolean"
-            },
-            "warnings": {
-              "type": "boolean"
-            },
-            "audit": {
-              "type": "boolean"
-            }
-          }
-        },
-        "discord": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "users": {
-              "type": "boolean"
-            },
-            "guilds": {
-              "type": "boolean"
-            },
-            "channels": {
-              "type": "boolean"
-            },
-            "messages": {
-              "type": "boolean"
-            },
-            "reactions": {
-              "type": "boolean"
-            },
-            "members": {
-              "type": "boolean"
-            },
-            "roles": {
-              "type": "boolean"
-            },
-            "threads": {
-              "type": "boolean"
-            },
-            "invites": {
-              "type": "boolean"
-            },
-            "webhooks": {
-              "type": "boolean"
-            },
-            "emojis": {
-              "type": "boolean"
-            },
-            "stickers": {
-              "type": "boolean"
-            }
-          }
-        },
-        "network": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "http": {
-              "type": "boolean"
-            }
-          }
-        },
-        "automation": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "jobs": {
-              "type": "boolean"
-            },
-            "events": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "member_join_leave": {
-                  "type": "boolean"
-                },
-                "moderation": {
-                  "type": "boolean"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "command": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "slash",
-            "user",
-            "message"
-          ]
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "ephemeral": {
-          "type": "boolean"
-        },
-        "default_member_permissions": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/command_option"
-          }
-        },
-        "subcommands": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/subcommand"
-          }
-        },
-        "groups": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/command_group"
-          }
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "subcommand": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "ephemeral": {
-          "type": "boolean"
-        },
-        "options": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/command_option"
-          }
-        }
-      },
-      "required": [
-        "name",
-        "description"
-      ]
-    },
-    "command_group": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "subcommands": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/subcommand"
-          }
-        }
-      },
-      "required": [
-        "name",
-        "description",
-        "subcommands"
-      ]
-    },
-    "command_option": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "string",
-            "bool",
-            "int",
-            "float",
-            "user",
-            "channel",
-            "role",
-            "mentionable",
-            "attachment"
-          ]
-        },
-        "description": {
-          "type": "string",
-          "minLength": 1
-        },
-        "description_id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "required": {
-          "type": "boolean"
-        },
-        "autocomplete": {
-          "type": "string",
-          "minLength": 1
-        },
-        "choices": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/option_choice"
-          }
-        },
-        "min_value": {
-          "type": "number"
-        },
-        "max_value": {
-          "type": "number"
-        },
-        "min_length": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "max_length": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "channel_types": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "description"
-      ]
-    },
-    "option_choice": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "value": {
-          "type": [
-            "string",
-            "number"
-          ]
-        }
-      },
-      "required": [
-        "name",
-        "value"
-      ]
-    },
-    "job": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "schedule": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "id",
-        "schedule"
-      ]
-    }
-  }
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
+	"title": "mamacord plugin manifest",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string",
+			"format": "uri"
+		},
+		"id": {
+			"type": "string",
+			"minLength": 1
+		},
+		"name": {
+			"type": "string",
+			"minLength": 1
+		},
+		"version": {
+			"type": "string",
+			"minLength": 1
+		},
+		"permissions": {
+			"$ref": "#/$defs/permissions"
+		},
+		"commands": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/command"
+			}
+		},
+		"events": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"enum": [
+					"guild_member_join",
+					"guild_member_leave",
+					"guild_ban",
+					"guild_unban"
+				]
+			}
+		},
+		"jobs": {
+			"type": "array",
+			"items": {
+				"$ref": "#/$defs/job"
+			}
+		}
+	},
+	"required": ["id", "name", "version"],
+	"$defs": {
+		"permissions": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"storage": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"kv": {
+							"type": "boolean"
+						},
+						"user_settings": {
+							"type": "boolean"
+						},
+						"checkins": {
+							"type": "boolean"
+						},
+						"reminders": {
+							"type": "boolean"
+						},
+						"warnings": {
+							"type": "boolean"
+						},
+						"audit": {
+							"type": "boolean"
+						}
+					}
+				},
+				"discord": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"users": {
+							"type": "boolean"
+						},
+						"guilds": {
+							"type": "boolean"
+						},
+						"channels": {
+							"type": "boolean"
+						},
+						"messages": {
+							"type": "boolean"
+						},
+						"reactions": {
+							"type": "boolean"
+						},
+						"members": {
+							"type": "boolean"
+						},
+						"roles": {
+							"type": "boolean"
+						},
+						"threads": {
+							"type": "boolean"
+						},
+						"invites": {
+							"type": "boolean"
+						},
+						"webhooks": {
+							"type": "boolean"
+						},
+						"emojis": {
+							"type": "boolean"
+						},
+						"stickers": {
+							"type": "boolean"
+						}
+					}
+				},
+				"network": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"http": {
+							"type": "boolean"
+						}
+					}
+				},
+				"automation": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"jobs": {
+							"type": "boolean"
+						},
+						"events": {
+							"type": "object",
+							"additionalProperties": false,
+							"properties": {
+								"member_join_leave": {
+									"type": "boolean"
+								},
+								"moderation": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"command": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"type": {
+					"type": "string",
+					"enum": ["slash", "user", "message"]
+				},
+				"description": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"ephemeral": {
+					"type": "boolean"
+				},
+				"default_member_permissions": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"minLength": 1
+					}
+				},
+				"options": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/command_option"
+					}
+				},
+				"subcommands": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/subcommand"
+					}
+				},
+				"groups": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/command_group"
+					}
+				}
+			},
+			"required": ["name"]
+		},
+		"subcommand": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"ephemeral": {
+					"type": "boolean"
+				},
+				"options": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/command_option"
+					}
+				}
+			},
+			"required": ["name", "description"]
+		},
+		"command_group": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"subcommands": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/$defs/subcommand"
+					}
+				}
+			},
+			"required": ["name", "description", "subcommands"]
+		},
+		"command_option": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"type": {
+					"type": "string",
+					"enum": [
+						"string",
+						"bool",
+						"int",
+						"float",
+						"user",
+						"channel",
+						"role",
+						"mentionable",
+						"attachment"
+					]
+				},
+				"description": {
+					"type": "string",
+					"minLength": 1
+				},
+				"description_id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"required": {
+					"type": "boolean"
+				},
+				"autocomplete": {
+					"type": "string",
+					"minLength": 1
+				},
+				"choices": {
+					"type": "array",
+					"items": {
+						"$ref": "#/$defs/option_choice"
+					}
+				},
+				"min_value": {
+					"type": "number"
+				},
+				"max_value": {
+					"type": "number"
+				},
+				"min_length": {
+					"type": "integer",
+					"minimum": 0
+				},
+				"max_length": {
+					"type": "integer",
+					"minimum": 0
+				},
+				"channel_types": {
+					"type": "array",
+					"items": {
+						"type": "integer"
+					}
+				}
+			},
+			"required": ["name", "type", "description"]
+		},
+		"option_choice": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 1
+				},
+				"value": {
+					"type": ["string", "number"]
+				}
+			},
+			"required": ["name", "value"]
+		},
+		"job": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"id": {
+					"type": "string",
+					"minLength": 1
+				},
+				"schedule": {
+					"type": "string",
+					"minLength": 1
+				}
+			},
+			"required": ["id", "schedule"]
+		}
+	}
 }
