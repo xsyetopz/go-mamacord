@@ -2,7 +2,7 @@
 
 # golangci-lint v2 strict quality baseline.
 #
-# Replace github.com/xsyetopz/gophex w/ your module path.
+# Replace github.com/xsyetopz/go-mamacord w/ your module path.
 #
 # Policy:
 # - noise is allowed;
@@ -46,12 +46,12 @@ formatters:
       custom-order: true
 
     gofumpt:
-      module-path: github.com/xsyetopz/gophex
+      module-path: github.com/xsyetopz/go-mamacord
       extra-rules: true
 
     goimports:
       local-prefixes:
-        - github.com/xsyetopz/gophex
+        - github.com/xsyetopz/go-mamacord
 
     golines:
       max-len: 120
@@ -209,7 +209,7 @@ linters:
       rules:
         deprecated:
           files:
-          - "$all"
+            - "$all"
           deny:
             - pkg: github.com/golang/protobuf
               desc: Use google.golang.org/protobuf instead.
@@ -533,7 +533,7 @@ linters:
         - empty
         - stdlib
         - generic
-        - '(or|er)$'
+        - "(or|er)$"
 
     lll:
       line-length: 120
@@ -611,6 +611,7 @@ linters:
       err-error: true
       loop-other-ops: true
       strconcat: true
+      error-format: false # https://github.com/catenacyber/perfsprint/issues/62
 
     prealloc:
       simple: true
