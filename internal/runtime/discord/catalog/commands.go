@@ -2,10 +2,11 @@ package catalog
 
 import (
 	"github.com/disgoorg/disgo/discord"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog/builtin"
 
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
 
 type CommandCreateOptions struct {
@@ -20,7 +21,7 @@ func CommandCreates(opts CommandCreateOptions) []discord.ApplicationCommandCreat
 	const extraCreatesCapacity = 8
 	creates := make([]discord.ApplicationCommandCreate, 0, len(opts.Builtins)+extraCreatesCapacity)
 	for _, cmd := range opts.Builtins {
-		if create, ok := builtinCommandCreate(cmd, opts.Locales, opts.I18n); ok {
+		if create, ok := builtin.CommandCreate(cmd, opts.Locales, opts.I18n); ok {
 			creates = append(creates, create)
 		}
 	}

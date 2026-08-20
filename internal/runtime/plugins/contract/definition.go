@@ -85,35 +85,63 @@ type CogDefinition struct {
 	Modals      []ModalDefinition
 }
 
+type CommandDescription struct {
+	Description   string
+	DescriptionID string
+}
+
+type CommandResponse struct {
+	Ephemeral bool
+	Defer     DeferMode
+}
+
 type CommandDefinition struct {
-	Kind                     CommandKind
-	Route                    RouteID
-	Name                     string
-	Description              string
-	DescriptionID            string
-	Ephemeral                bool
-	Defer                    DeferMode
+	Kind  CommandKind
+	Route RouteID
+	Name  string
+	CommandDescription
+	CommandResponse
 	DefaultMemberPermissions []MemberPermission
 	Options                  []OptionDefinition
 	Children                 []CommandDefinition
 	Checks                   []CheckDefinition
 }
 
-type OptionDefinition struct {
-	Name          string
-	Kind          OptionKind
+type OptionDescription struct {
 	Description   string
 	DescriptionID string
-	Required      bool
-	Choices       []ChoiceDefinition
-	MinInteger    *int64
-	MaxInteger    *int64
-	MinNumber     *float64
-	MaxNumber     *float64
-	MinLength     *int
-	MaxLength     *int
-	ChannelKinds  []ChannelKind
-	Autocomplete  RouteID
+}
+
+type OptionSelection struct {
+	Choices      []ChoiceDefinition
+	Autocomplete RouteID
+}
+
+type IntegerOptionBounds struct {
+	MinInteger *int64
+	MaxInteger *int64
+}
+
+type NumberOptionBounds struct {
+	MinNumber *float64
+	MaxNumber *float64
+}
+
+type StringOptionBounds struct {
+	MinLength *int
+	MaxLength *int
+}
+
+type OptionDefinition struct {
+	Name string
+	Kind OptionKind
+	OptionDescription
+	Required bool
+	OptionSelection
+	IntegerOptionBounds
+	NumberOptionBounds
+	StringOptionBounds
+	ChannelKinds []ChannelKind
 }
 
 type ChoiceKind string

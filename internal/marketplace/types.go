@@ -20,13 +20,21 @@ const (
 )
 
 type Source struct {
-	SourceID     string     `json:"source_id"`
-	Kind         string     `json:"kind"`
-	GitURL       string     `json:"git_url"`
-	GitRef       string     `json:"git_ref,omitempty"`
-	GitSubdir    string     `json:"git_subdir,omitempty"`
-	TokenEnvVar  string     `json:"token_env_var,omitempty"`
-	Enabled      bool       `json:"enabled"`
+	SourceDefinition
+	SourceState
+}
+
+type SourceDefinition struct {
+	SourceID    string `json:"source_id"`
+	Kind        string `json:"kind"`
+	GitURL      string `json:"git_url"`
+	GitRef      string `json:"git_ref,omitempty"`
+	GitSubdir   string `json:"git_subdir,omitempty"`
+	TokenEnvVar string `json:"token_env_var,omitempty"`
+	Enabled     bool   `json:"enabled"`
+}
+
+type SourceState struct {
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
 	LastSyncedAt *time.Time `json:"last_synced_at,omitempty"`

@@ -1,6 +1,8 @@
 package discordruntime
 
 import (
+	"context"
+	discordexecutor "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge/executor"
 	"strings"
 
 	"github.com/disgoorg/disgo"
@@ -8,7 +10,7 @@ import (
 	"github.com/disgoorg/disgo/gateway"
 
 	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
 
 const (
@@ -48,21 +50,29 @@ func (b *Bot) initPlugins(deps Dependencies) error {
 	}
 	if len(dirs) > 0 {
 		host, err := pluginhost.NewHost(pluginhost.Options{
-			Dirs:                dirs,
-			ProdMode:            deps.ProdMode,
-			AllowUnsignedPlugin: deps.AllowUnsignedPlugins,
-			TrustedKeysFile:     deps.TrustedKeysFile,
-			Bundles:             deps.Bundles,
-			PermissionsFile:     deps.PermissionsFile,
-			Store:               deps.PluginStore,
-			Bridge: pluginhost.Bridge{
-				Discord: discordpluginbridge.StarlarkBridge{Executor: discordpluginbridge.Executor{
-					ClientProvider:      func() *bot.Client { return b.client },
-					EnsureDMChannelFunc: b.ensureDMChannel,
-				}},
+			BundleOptions: pluginhost.BundleOptions{
+				Dirs:       dirs,
+				Repository: deps.Bundles,
 			},
-			Logger: b.logger,
-			I18n:   &b.i18n,
+			AuthorityOptions: pluginhost.AuthorityOptions{
+				ProdMode:            deps.ProdMode,
+				AllowUnsignedPlugin: deps.AllowUnsignedPlugins,
+				TrustedKeysFile:     deps.TrustedKeysFile,
+				PermissionsFile:     deps.PermissionsFile,
+			},
+			RuntimeOptions: pluginhost.RuntimeOptions{
+				Store: deps.PluginStore,
+				Bridge: pluginhost.Bridge{
+					Discord: discordpluginbridge.StarlarkBridge{Executor: discordexecutor.Discord{
+						ClientProvider: func() *bot.Client { return b.client },
+						EnsureDMChannelFunc: func(ctx context.Context, userID uint64) (uint64, error) {
+							return b.automation.EnsureDMChannel(ctx, userID)
+						},
+					}},
+				},
+				Logger: b.logger,
+				I18n:   &b.i18n,
+			},
 		})
 		if err != nil {
 			return err
@@ -81,8 +91,8 @@ func (b *Bot) newClient(token string) (*bot.Client, error) {
 		)),
 		bot.WithEventListenerFunc(b.onCommand),
 		bot.WithEventListenerFunc(b.onAutocomplete),
-		bot.WithEventListenerFunc(b.onComponent),
-		bot.WithEventListenerFunc(b.onModal),
+		bot.WithEventListenerFunc(b.pluginInteractions.OnComponent),
+		bot.WithEventListenerFunc(b.pluginInteractions.OnModal),
 		bot.WithEventListenerFunc(b.onGuildJoin),
 		bot.WithEventListenerFunc(b.onGuildLeave),
 		bot.WithEventListenerFunc(b.onGuildUpdate),

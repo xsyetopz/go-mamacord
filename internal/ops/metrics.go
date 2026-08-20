@@ -8,22 +8,41 @@ import (
 )
 
 type Snapshot struct {
+	Runtime  RuntimeSnapshot
+	Modules  ModuleSnapshot
+	Plugins  PluginSnapshot
+	Commands CommandSnapshot
+	Activity ActivitySnapshot
+}
+
+type RuntimeSnapshot struct {
 	Ready            bool
 	StartedAt        time.Time
 	MigrationVersion int
 	ProdMode         bool
 	// DiscordStartError is a dev-focused diagnostic string when the Discord bot
 	// fails to connect (bad token, missing intents, etc). Empty means no error.
-	DiscordStartError   string
-	ModuleCount         int
-	EnabledModuleCount  int
-	PluginCount         int
-	EnabledPluginCount  int
-	BuiltinCommandCount int
-	SlashCommandCount   int
-	UserCommandCount    int
-	MessageCommandCount int
+	DiscordStartError string
+}
 
+type ModuleSnapshot struct {
+	Total   int
+	Enabled int
+}
+
+type PluginSnapshot struct {
+	Total   int
+	Enabled int
+}
+
+type CommandSnapshot struct {
+	Builtin int
+	Slash   int
+	User    int
+	Message int
+}
+
+type ActivitySnapshot struct {
 	InteractionsTotal   uint64
 	InteractionFailures uint64
 	PluginFailures      uint64
@@ -86,14 +105,14 @@ func (m *Metrics) FillSnapshot(s *Snapshot) {
 	if m == nil || s == nil {
 		return
 	}
-	if s.StartedAt.IsZero() {
-		s.StartedAt = m.startedAt
+	if s.Runtime.StartedAt.IsZero() {
+		s.Runtime.StartedAt = m.startedAt
 	}
-	s.InteractionsTotal = m.interactionsTotal.Load()
-	s.InteractionFailures = m.interactionFailures.Load()
-	s.PluginFailures = m.pluginFailures.Load()
-	s.AutomationFailures = m.automationFailures.Load()
-	s.ReminderFailures = m.reminderFailures.Load()
+	s.Activity.InteractionsTotal = m.interactionsTotal.Load()
+	s.Activity.InteractionFailures = m.interactionFailures.Load()
+	s.Activity.PluginFailures = m.pluginFailures.Load()
+	s.Activity.AutomationFailures = m.automationFailures.Load()
+	s.Activity.ReminderFailures = m.reminderFailures.Load()
 }
 
 func RenderPrometheus(s Snapshot, now time.Time) string {
@@ -112,7 +131,7 @@ func RenderPrometheus(s Snapshot, now time.Time) string {
 		fmt.Fprintf(&b, "%s %v\n", name, value)
 	}
 
-	startedAt := s.StartedAt.UTC()
+	startedAt := s.Runtime.StartedAt.UTC()
 	if startedAt.IsZero() {
 		startedAt = now.UTC()
 	}
@@ -122,30 +141,30 @@ func RenderPrometheus(s Snapshot, now time.Time) string {
 	}
 
 	ready := 0
-	if s.Ready {
+	if s.Runtime.Ready {
 		ready = 1
 	}
 	prodMode := 0
-	if s.ProdMode {
+	if s.Runtime.ProdMode {
 		prodMode = 1
 	}
 
 	writeMetric("Whether the application is ready to serve traffic.", "gauge", "mamacord_ready", ready)
 	writeMetric("Whether the application is running in production trust mode.", "gauge", "mamacord_prod_mode", prodMode)
 	writeMetric("Process uptime in seconds.", "gauge", "mamacord_uptime_seconds", uptime.Seconds())
-	writeMetric("Current database migration version.", "gauge", "mamacord_migration_version", s.MigrationVersion)
-	writeMetric("Current module count.", "gauge", "mamacord_modules", s.ModuleCount)
-	writeMetric("Current enabled module count.", "gauge", "mamacord_enabled_modules", s.EnabledModuleCount)
-	writeMetric("Current plugin count.", "gauge", "mamacord_plugins", s.PluginCount)
-	writeMetric("Current enabled plugin count.", "gauge", "mamacord_enabled_plugins", s.EnabledPluginCount)
-	writeMetric("Current built-in command count.", "gauge", "mamacord_builtin_commands", s.BuiltinCommandCount)
-	writeMetric("Current slash command count.", "gauge", "mamacord_slash_commands", s.SlashCommandCount)
-	writeMetric("Current user command count.", "gauge", "mamacord_user_commands", s.UserCommandCount)
-	writeMetric("Current message command count.", "gauge", "mamacord_message_commands", s.MessageCommandCount)
-	writeMetric("Total Discord interaction entries seen by the runtime.", "counter", "mamacord_interactions_total", s.InteractionsTotal)
-	writeMetric("Total Discord interaction failures.", "counter", "mamacord_interaction_failures_total", s.InteractionFailures)
-	writeMetric("Total plugin execution failures.", "counter", "mamacord_plugin_failures_total", s.PluginFailures)
-	writeMetric("Total plugin automation failures.", "counter", "mamacord_plugin_automation_failures_total", s.AutomationFailures)
-	writeMetric("Total reminder scheduler failures.", "counter", "mamacord_reminder_failures_total", s.ReminderFailures)
+	writeMetric("Current database migration version.", "gauge", "mamacord_migration_version", s.Runtime.MigrationVersion)
+	writeMetric("Current module count.", "gauge", "mamacord_modules", s.Modules.Total)
+	writeMetric("Current enabled module count.", "gauge", "mamacord_enabled_modules", s.Modules.Enabled)
+	writeMetric("Current plugin count.", "gauge", "mamacord_plugins", s.Plugins.Total)
+	writeMetric("Current enabled plugin count.", "gauge", "mamacord_enabled_plugins", s.Plugins.Enabled)
+	writeMetric("Current built-in command count.", "gauge", "mamacord_builtin_commands", s.Commands.Builtin)
+	writeMetric("Current slash command count.", "gauge", "mamacord_slash_commands", s.Commands.Slash)
+	writeMetric("Current user command count.", "gauge", "mamacord_user_commands", s.Commands.User)
+	writeMetric("Current message command count.", "gauge", "mamacord_message_commands", s.Commands.Message)
+	writeMetric("Total Discord interaction entries seen by the runtime.", "counter", "mamacord_interactions_total", s.Activity.InteractionsTotal)
+	writeMetric("Total Discord interaction failures.", "counter", "mamacord_interaction_failures_total", s.Activity.InteractionFailures)
+	writeMetric("Total plugin execution failures.", "counter", "mamacord_plugin_failures_total", s.Activity.PluginFailures)
+	writeMetric("Total plugin automation failures.", "counter", "mamacord_plugin_automation_failures_total", s.Activity.AutomationFailures)
+	writeMetric("Total reminder scheduler failures.", "counter", "mamacord_reminder_failures_total", s.Activity.ReminderFailures)
 	return b.String()
 }

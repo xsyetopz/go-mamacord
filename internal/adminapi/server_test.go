@@ -3,6 +3,9 @@ package adminapi
 import (
 	"context"
 	"encoding/json"
+	adminauth "github.com/xsyetopz/go-mamacord/internal/adminapi/auth"
+	adminguilds "github.com/xsyetopz/go-mamacord/internal/adminapi/guilds"
+	adminservice "github.com/xsyetopz/go-mamacord/internal/adminapi/service"
 	"io"
 	"log/slog"
 	"net/http"
@@ -21,12 +24,12 @@ func optionalUint64(value uint64) *uint64 {
 
 type fakeOAuthClient struct{}
 
-func (fakeOAuthClient) ExchangeCode(context.Context, string, string) (OAuthToken, error) {
-	return OAuthToken{AccessToken: "token", TokenType: "Bearer", Scope: "identify guilds"}, nil
+func (fakeOAuthClient) ExchangeCode(context.Context, string, string) (adminauth.OAuthToken, error) {
+	return adminauth.OAuthToken{AccessToken: "token", TokenType: "Bearer", Scope: "identify guilds"}, nil
 }
 
-func (fakeOAuthClient) FetchUser(context.Context, string) (OAuthUser, error) {
-	return OAuthUser{
+func (fakeOAuthClient) FetchUser(context.Context, string) (adminauth.OAuthUser, error) {
+	return adminauth.OAuthUser{
 		ID:         "42",
 		Username:   "owner",
 		GlobalName: "Owner",
@@ -34,13 +37,13 @@ func (fakeOAuthClient) FetchUser(context.Context, string) (OAuthUser, error) {
 	}, nil
 }
 
-func (fakeOAuthClient) FetchGuilds(context.Context, string) ([]OAuthGuild, error) {
-	return []OAuthGuild{
+func (fakeOAuthClient) FetchGuilds(context.Context, string) ([]adminauth.OAuthGuild, error) {
+	return []adminauth.OAuthGuild{
 		{
 			ID:          "1",
 			Name:        "Guild",
 			Owner:       true,
-			Permissions: OAuthPermissions("8"),
+			Permissions: adminauth.OAuthPermissions("8"),
 		},
 	}, nil
 }
@@ -51,12 +54,12 @@ func TestHandleMeRequiresSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       &Service{},
+		Service:       &adminservice.Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{
 				Configured:      true,
 				Resolved:        true,
 				Source:          "discord",
@@ -90,20 +93,22 @@ func TestHandleModulesWithSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:   "127.0.0.1:0",
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: &Service{
-			Config: config.Config{},
-			BuildInfo: func() buildinfo.Info {
-				return buildinfo.Info{Version: "test"}
-			},
-			Snapshot: func() ops.Snapshot {
-				return ops.Snapshot{Ready: true}
+		Service: &adminservice.Service{
+			ServiceCore: adminservice.ServiceCore{
+				Config: config.Config{},
+				BuildInfo: func() buildinfo.Info {
+					return buildinfo.Info{Version: "test"}
+				},
+				Snapshot: func() ops.Snapshot {
+					return ops.Snapshot{Runtime: ops.RuntimeSnapshot{Ready: true}}
+				},
 			},
 		},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{
 				Configured:      true,
 				Resolved:        true,
 				Source:          "discord",
@@ -115,7 +120,7 @@ func TestHandleModulesWithSession(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
-	if err := server.putSession(context.Background(), session{
+	if err := server.putSession(context.Background(), adminauth.Session{
 		ID:        "session-token",
 		UserID:    42,
 		Username:  "owner",
@@ -168,12 +173,12 @@ func TestHandleLoginReturns503WhenAuthNotConfigured(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       &Service{},
+		Service:       &adminservice.Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "",
 		ClientSecret:  "",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{Resolved: false, Source: "unresolved"}
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{Resolved: false, Source: "unresolved"}
 		},
 		OAuthClient: fakeOAuthClient{},
 	})
@@ -195,30 +200,38 @@ func TestHandleSetupWithoutSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:   "127.0.0.1:0",
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: &Service{
-			Config: config.Config{
-				AdminAddr:               "127.0.0.1:8081",
-				DashboardClientID:       "client-id",
-				DashboardClientSecret:   "client-secret",
-				DashboardSessionSecret:  strings.Repeat("x", 32),
-				DashboardSigningKeyID:   "official",
-				DashboardSigningKeyFile: "/tmp/key",
-				OwnerUserID:             optionalUint64(42),
-			},
-			OwnerStatus: func() OwnerStatus {
-				return OwnerStatus{
-					Configured:      true,
-					Resolved:        true,
-					Source:          "discord",
-					EffectiveUserID: optionalUint64(42),
-				}
+		Service: &adminservice.Service{
+			ServiceCore: adminservice.ServiceCore{
+				Config: config.Config{
+					Discord: config.DiscordConfig{
+						OwnerUserID: optionalUint64(42),
+					},
+					Runtime: config.RuntimeConfig{
+						AdminAddr: "127.0.0.1:8081",
+					},
+					Dashboard: config.DashboardConfig{
+						ClientID:       "client-id",
+						ClientSecret:   "client-secret",
+						SessionSecret:  strings.Repeat("x", 32),
+						SigningKeyID:   "official",
+						SigningKeyFile: "/tmp/key",
+					},
+				},
+				OwnerStatus: func() adminservice.OwnerStatus {
+					return adminservice.OwnerStatus{
+						Configured:      true,
+						Resolved:        true,
+						Source:          "discord",
+						EffectiveUserID: optionalUint64(42),
+					}
+				},
 			},
 		},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{
 				Configured:      true,
 				Resolved:        true,
 				Source:          "discord",
@@ -263,16 +276,17 @@ func TestHandleGuildChannelsReturns503WhenDiscordRuntimeUnavailable(t *testing.T
 	t.Parallel()
 
 	server, err := New(Options{
-		Addr:   "127.0.0.1:0",
-		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: &Service{
+		Addr:    "127.0.0.1:0",
+		Logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
+		Service: &adminservice.Service{},
+		GuildService: &adminguilds.Service{ServiceCore: adminguilds.ServiceCore{
 			OAuth: fakeOAuthClient{},
-		},
+		}},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{
 				Configured:      true,
 				Resolved:        true,
 				Source:          "discord",
@@ -284,7 +298,7 @@ func TestHandleGuildChannelsReturns503WhenDiscordRuntimeUnavailable(t *testing.T
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
-	if err := server.putSession(context.Background(), session{
+	if err := server.putSession(context.Background(), adminauth.Session{
 		ID:          "session-token",
 		UserID:      42,
 		Username:    "owner",
@@ -315,6 +329,20 @@ func TestHandleGuildChannelsReturns503WhenDiscordRuntimeUnavailable(t *testing.T
 	if got, _ := payload["error"].(string); !strings.Contains(got, "discord runtime") {
 		t.Fatalf("expected discord runtime error, got %#v", payload)
 	}
+
+	forbidden := httptest.NewRecorder()
+	forbiddenRequest := httptest.NewRequest(http.MethodGet, "/api/guilds/channels?guild_id=2", nil)
+	forbiddenRequest.AddCookie(&http.Cookie{
+		Name:  sessionCookieName,
+		Value: server.signCookieValue(sessionCookieName, "session-token"),
+	})
+	server.handler().ServeHTTP(forbidden, forbiddenRequest)
+	if forbidden.Code != http.StatusForbidden {
+		t.Fatalf("inaccessible guild status: %d body=%s", forbidden.Code, forbidden.Body.String())
+	}
+	if !strings.Contains(forbidden.Body.String(), adminguilds.ErrGuildNotAccessible.Error()) {
+		t.Fatalf("inaccessible guild error: %s", forbidden.Body.String())
+	}
 }
 
 func TestAdminOwnerRoutesRequireSession(t *testing.T) {
@@ -323,12 +351,12 @@ func TestAdminOwnerRoutesRequireSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       &Service{},
+		Service:       &adminservice.Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
-		OwnerStatus: func() OwnerStatus {
-			return OwnerStatus{
+		OwnerStatus: func() adminservice.OwnerStatus {
+			return adminservice.OwnerStatus{
 				Configured:      true,
 				Resolved:        true,
 				Source:          "discord",

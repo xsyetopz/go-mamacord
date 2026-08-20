@@ -36,7 +36,7 @@ func TestNewHandler_HealthAndReadiness(t *testing.T) {
 	})
 
 	t.Run("readyz ready", func(t *testing.T) {
-		snap.Ready = true
+		snap.Runtime.Ready = true
 		rec := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
 		handler.ServeHTTP(rec, req)
@@ -56,7 +56,7 @@ func TestNewHandler_Metrics(t *testing.T) {
 	metrics.IncPluginFailures()
 	metrics.IncAutomationFailures()
 	metrics.IncReminderFailures()
-	snap := ops.Snapshot{Ready: true}
+	snap := ops.Snapshot{Runtime: ops.RuntimeSnapshot{Ready: true}}
 	metrics.FillSnapshot(&snap)
 
 	rec := httptest.NewRecorder()

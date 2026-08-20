@@ -60,17 +60,16 @@ func (b *Bot) onInviteDelete(e *events.InviteDelete) {
 
 func (b *Bot) gatewayHandlers() discordgateway.Handlers {
 	return discordgateway.Handlers{
-		Logger:                   b.logger,
-		Restrictions:             b.restrictions,
-		Guilds:                   b.guilds,
-		Users:                    b.users,
-		GuildMembers:             b.guildMembers,
-		I18n:                     b.i18n,
-		Client:                   b.client,
-		CommandRegisterAllGuilds: b.commandRegisterAllGuilds,
-		DevGuildID:               b.devGuildID,
-		CommandCreates:           b.commandCreates,
-		PluginEvents:             b.pluginAuto,
-		IsOwner:                  b.isOwner,
+		HandlerCore: discordgateway.HandlerCore{
+			Logger: b.logger, I18n: b.i18n, Client: b.client, IsOwner: b.isOwner,
+		},
+		HandlerStores: discordgateway.HandlerStores{
+			Restrictions: b.restrictions, Guilds: b.guilds, Users: b.users, GuildMembers: b.guildMembers,
+		},
+		HandlerRegistration: discordgateway.HandlerRegistration{
+			CommandRegisterAllGuilds: b.commandRegisterAllGuilds, DevGuildID: b.devGuildID,
+			CommandCreates: b.commandCreates,
+		},
+		HandlerPlugins: discordgateway.HandlerPlugins{PluginEvents: b.pluginAuto},
 	}
 }

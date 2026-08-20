@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	discordexecutor "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge/executor"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/customid"
 	"strings"
 	"time"
 
@@ -13,22 +15,22 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/cdn"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
 
 // StarlarkBridge is the sole Discord adapter exposed to the plugin host.
-type StarlarkBridge struct{ Executor Executor }
+type StarlarkBridge struct{ Executor discordexecutor.Discord }
 
 func (bridge StarlarkBridge) GetUser(ctx context.Context, id string) (contract.UserDetailsRef, bool, error) {
 	userID, err := parseContractID(id)
 	if err != nil {
 		return contract.UserDetailsRef{}, false, err
 	}
-	if bridge.Executor.client() == nil {
+	if bridge.Executor.Client() == nil {
 		return contract.UserDetailsRef{}, false, errors.New("discord client unavailable")
 	}
-	user, err := bridge.Executor.client().Rest.GetUser(snowflake.ID(userID), rest.WithCtx(ctx))
+	user, err := bridge.Executor.Client().Rest.GetUser(snowflake.ID(userID), rest.WithCtx(ctx))
 	if err != nil || user == nil {
 		return contract.UserDetailsRef{}, false, err
 	}
@@ -51,10 +53,10 @@ func (bridge StarlarkBridge) GetMember(ctx context.Context, guildIDText, userIDT
 	if err != nil {
 		return contract.MemberDetailsRef{}, false, err
 	}
-	if bridge.Executor.client() == nil {
+	if bridge.Executor.Client() == nil {
 		return contract.MemberDetailsRef{}, false, errors.New("discord client unavailable")
 	}
-	member, err := bridge.Executor.client().Rest.GetMember(snowflake.ID(guildID), snowflake.ID(userID), rest.WithCtx(ctx))
+	member, err := bridge.Executor.Client().Rest.GetMember(snowflake.ID(guildID), snowflake.ID(userID), rest.WithCtx(ctx))
 	if err != nil || member == nil {
 		return contract.MemberDetailsRef{}, false, err
 	}
@@ -73,14 +75,14 @@ func (bridge StarlarkBridge) GetGuild(ctx context.Context, id string) (contract.
 	if err != nil {
 		return contract.GuildDetailsRef{}, false, err
 	}
-	if bridge.Executor.client() == nil {
+	if bridge.Executor.Client() == nil {
 		return contract.GuildDetailsRef{}, false, errors.New("discord client unavailable")
 	}
-	guild, err := bridge.Executor.client().Rest.GetGuild(snowflake.ID(guildID), true, rest.WithCtx(ctx))
+	guild, err := bridge.Executor.Client().Rest.GetGuild(snowflake.ID(guildID), true, rest.WithCtx(ctx))
 	if err != nil || guild == nil {
 		return contract.GuildDetailsRef{}, false, err
 	}
-	channels, err := bridge.Executor.client().Rest.GetGuildChannels(snowflake.ID(guildID), rest.WithCtx(ctx))
+	channels, err := bridge.Executor.Client().Rest.GetGuildChannels(snowflake.ID(guildID), rest.WithCtx(ctx))
 	if err != nil {
 		return contract.GuildDetailsRef{}, false, err
 	}
@@ -88,7 +90,7 @@ func (bridge StarlarkBridge) GetGuild(ctx context.Context, id string) (contract.
 	if members <= 0 {
 		members = guild.MemberCount
 	}
-	ref := contract.GuildDetailsRef{Guild: contract.GuildRef{ID: guild.ID.String(), Name: strings.TrimSpace(guild.Name)}, OwnerID: guild.OwnerID.String(), RolesCount: len(guild.Roles), EmojisCount: len(guild.Emojis), StickersCount: len(guild.Stickers), MemberCount: members, ChannelsCount: len(channels), CreatedAt: guild.CreatedAt().UTC().Unix()}
+	ref := contract.GuildDetailsRef{Guild: contract.GuildRef{ID: guild.ID.String(), Name: strings.TrimSpace(guild.Name)}, GuildProfile: contract.GuildProfile{OwnerID: guild.OwnerID.String()}, GuildResourceCounts: contract.GuildResourceCounts{RolesCount: len(guild.Roles), EmojisCount: len(guild.Emojis), StickersCount: len(guild.Stickers), MemberCount: members, ChannelsCount: len(channels)}, CreatedAt: guild.CreatedAt().UTC().Unix()}
 	if guild.Description != nil {
 		ref.Description = strings.TrimSpace(*guild.Description)
 	}
@@ -105,7 +107,7 @@ func routerUserRef(user discord.User) contract.UserRef {
 }
 
 func (bridge StarlarkBridge) Execute(ctx context.Context, scope pluginhost.EffectScope, operation contract.Operation) error {
-	client := bridge.Executor.client()
+	client := bridge.Executor.Client()
 	if client == nil {
 		return errors.New("discord client unavailable")
 	}
@@ -128,7 +130,7 @@ func (bridge StarlarkBridge) Execute(ctx context.Context, scope pluginhost.Effec
 		if err != nil {
 			return err
 		}
-		dm, err := bridge.Executor.ensureDMChannel(ctx, id)
+		dm, err := bridge.Executor.EnsureDMChannel(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -199,7 +201,7 @@ func (bridge StarlarkBridge) Execute(ctx context.Context, scope pluginhost.Effec
 		for i, message := range messages {
 			ids[i] = message.ID
 		}
-		_, err = deleteMessages(ctx, client.Rest, snowflake.ID(id), ids, time.Now())
+		_, err = bridge.Executor.DeleteMessages(ctx, snowflake.ID(id), ids, time.Now())
 		return err
 	case *contract.CreateRoleOperation:
 		if guildID == 0 {
@@ -309,7 +311,7 @@ func (bridge StarlarkBridge) createEmoji(ctx context.Context, guildID uint64, va
 	if err != nil {
 		return err
 	}
-	body, err := fetchContractAttachment(ctx, attachment, pluginEmojiMaxFileBytes)
+	body, err := fetchContractAttachment(ctx, attachment, discordexecutor.EmojiMaxFileBytes)
 	if err != nil {
 		return err
 	}
@@ -324,7 +326,7 @@ func (bridge StarlarkBridge) createSticker(ctx context.Context, guildID uint64, 
 	if err != nil {
 		return err
 	}
-	body, err := fetchContractAttachment(ctx, attachment, pluginStickerMaxFileBytes)
+	body, err := fetchContractAttachment(ctx, attachment, discordexecutor.StickerMaxFileBytes)
 	if err != nil {
 		return err
 	}
@@ -391,7 +393,7 @@ func contractButton(pluginID string, value *contract.Button) (discord.ButtonComp
 	style := map[contract.ButtonStyle]discord.ButtonStyle{contract.ButtonPrimary: discord.ButtonStylePrimary, contract.ButtonSecondary: discord.ButtonStyleSecondary, contract.ButtonSuccess: discord.ButtonStyleSuccess, contract.ButtonDanger: discord.ButtonStyleDanger, contract.ButtonLink: discord.ButtonStyleLink}[value.Style]
 	button := discord.ButtonComponent{Style: style, Label: value.Label, URL: value.URL, Disabled: value.Disabled}
 	if value.Style != contract.ButtonLink {
-		id, err := pluginhost.BuildCustomID(pluginID, value.Handler)
+		id, err := customid.Build(pluginID, value.Handler)
 		if err != nil {
 			return button, err
 		}
@@ -407,7 +409,7 @@ func contractButton(pluginID string, value *contract.Button) (discord.ButtonComp
 	return button, nil
 }
 func contractSelect(pluginID string, value *contract.Select) (discord.InteractiveComponent, error) {
-	id, err := pluginhost.BuildCustomID(pluginID, value.Handler)
+	id, err := customid.Build(pluginID, value.Handler)
 	if err != nil {
 		return nil, err
 	}
@@ -545,13 +547,13 @@ func ContractMessageUpdate(pluginID string, patch contract.MessagePatch) (discor
 	return update, nil
 }
 func ContractModal(pluginID string, view contract.ModalView) (discord.ModalCreate, error) {
-	id, err := pluginhost.BuildCustomID(pluginID, view.Handler)
+	id, err := customid.Build(pluginID, view.Handler)
 	if err != nil {
 		return discord.ModalCreate{}, err
 	}
 	rows := make([]discord.LayoutComponent, 0, len(view.Fields))
 	for _, field := range view.Fields {
-		fieldID, e := pluginhost.BuildCustomID(pluginID, field.ID)
+		fieldID, e := customid.Build(pluginID, field.ID)
 		if e != nil {
 			return discord.ModalCreate{}, e
 		}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/ed25519"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
 	"io"
 	"os"
 	"path/filepath"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
 func TestRunDoctorCommand_PrintsSigningDiagnostics(t *testing.T) {
@@ -236,12 +236,12 @@ func TestRunSignPluginCommand_ResolvesActiveBundleDir(t *testing.T) {
 		t.Fatalf("WriteState: %v", err)
 	}
 
-	publicKey, privateKey, err := pluginhost.GenerateEd25519Key()
+	publicKey, privateKey, err := signing.GenerateEd25519Key()
 	if err != nil {
 		t.Fatalf("GenerateEd25519Key: %v", err)
 	}
 	privateKeyPath := filepath.Join(dir, "keys", "owner.key")
-	if err := pluginhost.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
+	if err := signing.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
 		t.Fatalf("WriteEd25519PrivateKeyFile: %v", err)
 	}
 
@@ -263,11 +263,11 @@ func TestRunSignPluginCommand_ResolvesActiveBundleDir(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(pluginRoot, "signature.json")); !os.IsNotExist(err) {
 		t.Fatalf("expected no root signature.json, got err=%v", err)
 	}
-	sig, err := pluginhost.ReadSignature(signaturePath)
+	sig, err := signing.ReadSignature(signaturePath)
 	if err != nil {
 		t.Fatalf("ReadSignature: %v", err)
 	}
-	if err := pluginhost.VerifyDirSignature(bundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
+	if err := signing.VerifyDirSignature(bundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
 		t.Fatalf("VerifyDirSignature: %v", err)
 	}
 	if !strings.Contains(output, "signature: "+signaturePath) {
@@ -290,12 +290,12 @@ func TestRunSignPluginCommand_RejectsFlatPluginRoot(t *testing.T) {
 		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
-	_, privateKey, err := pluginhost.GenerateEd25519Key()
+	_, privateKey, err := signing.GenerateEd25519Key()
 	if err != nil {
 		t.Fatalf("GenerateEd25519Key: %v", err)
 	}
 	privateKeyPath := filepath.Join(dir, "keys", "owner.key")
-	if err := pluginhost.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
+	if err := signing.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
 		t.Fatalf("WriteEd25519PrivateKeyFile: %v", err)
 	}
 
@@ -345,12 +345,12 @@ func TestRunSignPluginCommand_UsesConfiguredCachedBundleRepositoryArtifactDir(t 
 		t.Fatalf("MaterializeBundle: %v", err)
 	}
 
-	publicKey, privateKey, err := pluginhost.GenerateEd25519Key()
+	publicKey, privateKey, err := signing.GenerateEd25519Key()
 	if err != nil {
 		t.Fatalf("GenerateEd25519Key: %v", err)
 	}
 	privateKeyPath := filepath.Join(dir, "keys", "owner.key")
-	if err := pluginhost.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
+	if err := signing.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
 		t.Fatalf("WriteEd25519PrivateKeyFile: %v", err)
 	}
 
@@ -372,11 +372,11 @@ func TestRunSignPluginCommand_UsesConfiguredCachedBundleRepositoryArtifactDir(t 
 	if _, err := os.Stat(filepath.Join(bundle.ActiveDir, "signature.json")); err != nil {
 		t.Fatalf("expected signature in active cache dir: %v", err)
 	}
-	sig, err := pluginhost.ReadSignature(signaturePath)
+	sig, err := signing.ReadSignature(signaturePath)
 	if err != nil {
 		t.Fatalf("ReadSignature: %v", err)
 	}
-	if err := pluginhost.VerifyDirSignature(bundle.BundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
+	if err := signing.VerifyDirSignature(bundle.BundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
 		t.Fatalf("VerifyDirSignature: %v", err)
 	}
 	if !strings.Contains(output, "signature: "+signaturePath) {
@@ -421,12 +421,12 @@ func TestRunSignPluginCommand_UsesConfiguredObjectStoreBundleRepositoryArtifactD
 		t.Fatalf("MaterializeBundle: %v", err)
 	}
 
-	publicKey, privateKey, err := pluginhost.GenerateEd25519Key()
+	publicKey, privateKey, err := signing.GenerateEd25519Key()
 	if err != nil {
 		t.Fatalf("GenerateEd25519Key: %v", err)
 	}
 	privateKeyPath := filepath.Join(dir, "keys", "owner.key")
-	if err := pluginhost.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
+	if err := signing.WriteEd25519PrivateKeyFile(privateKeyPath, privateKey); err != nil {
 		t.Fatalf("WriteEd25519PrivateKeyFile: %v", err)
 	}
 
@@ -451,11 +451,11 @@ func TestRunSignPluginCommand_UsesConfiguredObjectStoreBundleRepositoryArtifactD
 	if _, err := os.Stat(filepath.Join(dir, "object-store", "sample", "bundles", "git-release-v0.1.0", "signature.json")); err != nil {
 		t.Fatalf("expected signature persisted to object-store artifact: %v", err)
 	}
-	sig, err := pluginhost.ReadSignature(signaturePath)
+	sig, err := signing.ReadSignature(signaturePath)
 	if err != nil {
 		t.Fatalf("ReadSignature: %v", err)
 	}
-	if err := pluginhost.VerifyDirSignature(bundle.BundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
+	if err := signing.VerifyDirSignature(bundle.BundleDir, sig, map[string]ed25519.PublicKey{"owner": publicKey}); err != nil {
 		t.Fatalf("VerifyDirSignature: %v", err)
 	}
 	if !strings.Contains(output, "signature: "+signaturePath) {

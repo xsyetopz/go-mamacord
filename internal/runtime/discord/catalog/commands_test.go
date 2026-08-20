@@ -1,6 +1,7 @@
 package catalog
 
 import (
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog/builtin"
 	"path/filepath"
 	"slices"
 	"testing"
@@ -15,7 +16,7 @@ import (
 func testBuiltinCommands() []slashcmd.Command {
 	out := []slashcmd.Command{}
 	for _, module := range commands.Catalog() {
-		out = append(out, BuiltinCommands(module)...)
+		out = append(out, builtin.Commands(module)...)
 	}
 	return out
 }

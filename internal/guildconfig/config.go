@@ -6,7 +6,7 @@ import (
 	"errors"
 	"sort"
 
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 const KVKey = "guild_config"
@@ -68,7 +68,7 @@ func Default(pluginID string) PluginConfig {
 	return cfg
 }
 
-func Load(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string) (PluginConfig, error) {
+func Load(ctx context.Context, pluginKV pluginstore.PluginKVStore, guildID uint64, pluginID string) (PluginConfig, error) {
 	cfg := Default(pluginID)
 	if guildID == 0 || pluginID == "" {
 		return cfg, nil
@@ -120,7 +120,7 @@ func Load(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, plu
 	return Normalize(pluginID, cfg), nil
 }
 
-func Save(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
+func Save(ctx context.Context, pluginKV pluginstore.PluginKVStore, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
 	if guildID == 0 || pluginID == "" {
 		return PluginConfig{}, errors.New("invalid guild plugin config target")
 	}
@@ -139,7 +139,7 @@ func Save(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, plu
 	return cfg, nil
 }
 
-func PluginEnabled(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string) (bool, error) {
+func PluginEnabled(ctx context.Context, pluginKV pluginstore.PluginKVStore, guildID uint64, pluginID string) (bool, error) {
 	cfg, err := Load(ctx, pluginKV, guildID, pluginID)
 	if err != nil {
 		return false, err
@@ -147,7 +147,7 @@ func PluginEnabled(ctx context.Context, pluginKV store.PluginKVStore, guildID ui
 	return cfg.Enabled, nil
 }
 
-func CommandEnabled(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID, commandName string) (bool, error) {
+func CommandEnabled(ctx context.Context, pluginKV pluginstore.PluginKVStore, guildID uint64, pluginID, commandName string) (bool, error) {
 	cfg, err := Load(ctx, pluginKV, guildID, pluginID)
 	if err != nil {
 		return false, err

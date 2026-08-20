@@ -16,21 +16,33 @@ import (
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 type Runtime struct {
-	Logger        *slog.Logger
-	Registry      i18n.Registry
-	Restrictions  store.RestrictionStore
-	ProdMode      bool
+	RuntimeCore
+	RuntimeCommands
+	RuntimeAdmins
+	IncFailure func()
+}
+
+type RuntimeCore struct {
+	Logger       *slog.Logger
+	Registry     i18n.Registry
+	Restrictions moderationstore.RestrictionStore
+	ProdMode     bool
+}
+
+type RuntimeCommands struct {
 	SlashCommands map[string]slashcmd.Command
 	HelpNames     func(locale string) []string
-	IsOwner       func(uint64) bool
-	Plugins       commandruntime.PluginAdmin
-	Marketplace   commandruntime.MarketplaceAdmin
-	Modules       moduleapi.Admin
-	IncFailure    func()
+}
+
+type RuntimeAdmins struct {
+	IsOwner     func(uint64) bool
+	Plugins     commandruntime.PluginAdmin
+	Marketplace commandruntime.MarketplaceAdmin
+	Modules     moduleapi.Admin
 }
 
 func (r Runtime) Services(locale discord.Locale) commandruntime.Services {
@@ -72,7 +84,7 @@ func (r Runtime) CheckRestrictions(
 	msgText := t.S(msgID, msgData)
 
 	userID := uint64(e.User().ID)
-	if _, ok, err := restrictions.GetRestriction(ctx, store.TargetTypeUser, userID); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeUser, userID); err != nil {
 		return false, err
 	} else if ok {
 		return true, e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", msgText, true))
@@ -83,7 +95,7 @@ func (r Runtime) CheckRestrictions(
 		return false, nil
 	}
 
-	if _, ok, err := restrictions.GetRestriction(ctx, store.TargetTypeGuild, uint64(*guildID)); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeGuild, uint64(*guildID)); err != nil {
 		return false, err
 	} else if ok {
 		return true, e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", msgText, true))

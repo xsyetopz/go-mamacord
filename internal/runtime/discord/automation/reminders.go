@@ -14,7 +14,8 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/scheduling"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
+	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
 	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
@@ -33,8 +34,8 @@ type DMEnsurer interface {
 type Reminders struct {
 	Logger        *slog.Logger
 	I18n          i18n.Registry
-	ReminderStore store.ReminderStore
-	UserSettings  store.UserSettingsStore
+	ReminderStore automationstore.ReminderStore
+	UserSettings  accountstore.UserSettingsStore
 	Client        *bot.Client
 	DMChannels    DMEnsurer
 	IncFailure    func()
@@ -64,7 +65,7 @@ func (r Reminders) PollDue(ctx context.Context, leaseID string) {
 	}
 }
 
-func (r Reminders) runOne(ctx context.Context, leaseID string, now time.Time, reminder store.Reminder) {
+func (r Reminders) runOne(ctx context.Context, leaseID string, now time.Time, reminder automationstore.Reminder) {
 	t := commandtext.Translator{
 		Registry: r.I18n,
 		Locale:   reminderDefaultLocale,
@@ -123,7 +124,7 @@ func (r Reminders) runOne(ctx context.Context, leaseID string, now time.Time, re
 func (r Reminders) finish(
 	ctx context.Context,
 	leaseID string,
-	reminder store.Reminder,
+	reminder automationstore.Reminder,
 	lastRunAt time.Time,
 	nextRunAt time.Time,
 	failureCount int,
@@ -148,7 +149,7 @@ func (r Reminders) userLocation(ctx context.Context, userID uint64) *time.Locati
 	return time.UTC
 }
 
-func (r Reminders) send(ctx context.Context, t commandtext.Translator, reminder store.Reminder) error {
+func (r Reminders) send(ctx context.Context, t commandtext.Translator, reminder automationstore.Reminder) error {
 	if r.Client == nil {
 		return errors.New("discord client not configured")
 	}
@@ -167,13 +168,13 @@ func (r Reminders) send(ctx context.Context, t commandtext.Translator, reminder 
 	msg := interactions.NoticeMessage(interactions.KindInfo, "", body, false)
 
 	switch reminder.Delivery {
-	case store.ReminderDeliveryChannel:
+	case automationstore.ReminderDeliveryChannel:
 		if reminder.ChannelID == nil || *reminder.ChannelID == 0 {
 			return errors.New("missing channel_id for channel delivery")
 		}
 		_, err := r.Client.Rest.CreateMessage(snowflake.ID(*reminder.ChannelID), msg)
 		return err
-	case store.ReminderDeliveryDM:
+	case automationstore.ReminderDeliveryDM:
 		fallthrough
 	default:
 		if r.DMChannels == nil {

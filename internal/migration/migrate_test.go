@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
+	pgtest "github.com/xsyetopz/go-mamacord/internal/storage/postgres/testkit"
 )
 
 func TestRunnerUpIdempotent(t *testing.T) {
@@ -123,7 +123,7 @@ func newRunnerAndDB(t *testing.T, dir string) (migrate.Runner, *sql.DB) {
 		t.Fatalf("migrate.New: %v", err)
 	}
 
-	return runner, postgrestest.OpenEmptyDB(t)
+	return runner, pgtest.OpenEmptyDB(t)
 }
 
 func writeMigrationUp(t *testing.T, dir string, version int, name string, kind migrate.Kind, upSQL string) {

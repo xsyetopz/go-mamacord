@@ -119,19 +119,35 @@ type ChannelRef struct {
 	CreatedAt      int64
 }
 
-type RoleRef struct {
-	ID             string
-	GuildID        string
-	Name           string
-	Position       int
-	Permissions    []MemberPermission
-	Mention        string
-	Color          int
-	Hoist          bool
-	Mentionable    bool
+type RoleIdentity struct {
+	ID      string
+	GuildID string
+	Name    string
+}
+
+type RoleAuthority struct {
+	Position    int
+	Permissions []MemberPermission
+}
+
+type RolePresentation struct {
+	Mention     string
+	Color       int
+	Hoist       bool
+	Mentionable bool
+}
+
+type RoleManagement struct {
 	Managed        bool
 	PermissionBits uint64
-	CreatedAt      int64
+}
+
+type RoleRef struct {
+	RoleIdentity
+	RoleAuthority
+	RolePresentation
+	RoleManagement
+	CreatedAt int64
 }
 
 type MemberRef struct {
@@ -173,18 +189,26 @@ type MessageRef struct {
 	Content   string
 }
 
-type OptionValue struct {
-	Name        string
-	Kind        OptionKind
-	String      string
-	Boolean     bool
-	Integer     int64
-	Number      float64
+type ScalarOptionValue struct {
+	String  string
+	Boolean bool
+	Integer int64
+	Number  float64
+}
+
+type ReferenceOptionValue struct {
 	User        *UserRef
 	Channel     *ChannelRef
 	Role        *RoleRef
 	Mentionable *MentionableRef
 	Attachment  *AttachmentRef
+}
+
+type OptionValue struct {
+	Name string
+	Kind OptionKind
+	ScalarOptionValue
+	ReferenceOptionValue
 }
 
 func (v OptionValue) Validate() error {
@@ -377,25 +401,36 @@ type StateEntry struct {
 	Version uint64
 }
 
-type Invocation struct {
-	PluginID      string
-	Generation    GenerationID
-	Route         RouteID
-	Kind          InvocationKind
-	Guild         *GuildRef
-	Channel       *ChannelRef
-	Author        *UserRef
-	BotUser       *UserRef
-	Member        *MemberRef
-	Locale        string
-	NowUnix       int64
-	RandomSeed    uint64
-	Runtime       RuntimeRef
-	State         []StateEntry
-	IsOwner       bool
+type InvocationIdentity struct {
+	PluginID   string
+	Generation GenerationID
+	Route      RouteID
+	Kind       InvocationKind
+}
+
+type InvocationActorContext struct {
+	Guild   *GuildRef
+	Channel *ChannelRef
+	Author  *UserRef
+	BotUser *UserRef
+	Member  *MemberRef
+	Locale  string
+}
+
+type InvocationExecutionContext struct {
+	NowUnix    int64
+	RandomSeed uint64
+	Runtime    RuntimeRef
+	State      []StateEntry
+	IsOwner    bool
+}
+
+type InvocationInteractionContext struct {
 	ResponseState ResponseState
 	ModalOrigin   ModalOrigin
+}
 
+type InvocationInput struct {
 	Command      *CommandInput
 	Autocomplete *AutocompleteInput
 	Component    *ComponentInput
@@ -403,6 +438,14 @@ type Invocation struct {
 	Event        *EventInput
 	Task         *TaskInput
 	Check        *CheckInput
+}
+
+type Invocation struct {
+	InvocationIdentity
+	InvocationActorContext
+	InvocationExecutionContext
+	InvocationInteractionContext
+	InvocationInput
 }
 
 func (i Invocation) DeepClone() Invocation {

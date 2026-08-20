@@ -16,18 +16,26 @@ type MemberDetailsRef struct {
 	BannerURL string
 }
 
-type GuildDetailsRef struct {
-	Guild         GuildRef
-	OwnerID       string
-	Description   string
-	IconURL       string
-	BannerURL     string
+type GuildProfile struct {
+	OwnerID     string
+	Description string
+	IconURL     string
+	BannerURL   string
+}
+
+type GuildResourceCounts struct {
 	RolesCount    int
 	EmojisCount   int
 	StickersCount int
 	MemberCount   int
 	ChannelsCount int
-	CreatedAt     int64
+}
+
+type GuildDetailsRef struct {
+	Guild GuildRef
+	GuildProfile
+	GuildResourceCounts
+	CreatedAt int64
 }
 
 type UserSettingsRef struct {
@@ -48,20 +56,36 @@ type ReminderPlanRef struct {
 	NextRunAt int64
 }
 
-type ReminderRef struct {
-	ID           string
-	Schedule     string
-	Kind         string
-	Note         string
-	Delivery     string
-	GuildID      string
-	ChannelID    string
+type ReminderDefinition struct {
+	ID       string
+	Schedule string
+	Kind     string
+	Note     string
+}
+
+type ReminderDestination struct {
+	Delivery  string
+	GuildID   string
+	ChannelID string
+}
+
+type ReminderScheduleState struct {
 	Enabled      bool
 	NextRunAt    int64
 	LastRunAt    int64
 	FailureCount int
-	CreatedAt    int64
-	UpdatedAt    int64
+}
+
+type ReminderTimestamps struct {
+	CreatedAt int64
+	UpdatedAt int64
+}
+
+type ReminderRef struct {
+	ReminderDefinition
+	ReminderDestination
+	ReminderScheduleState
+	ReminderTimestamps
 }
 
 type WarningRef struct {

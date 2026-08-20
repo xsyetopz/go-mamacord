@@ -3,7 +3,6 @@ package discordruntime
 import (
 	"errors"
 	"strings"
-	"time"
 )
 
 func validateNewDeps(deps Dependencies) error {
@@ -66,32 +65,10 @@ func normalizeCommandRegistrationMode(mode string) (string, error) {
 	}
 }
 
-func buildSlashBypass(names []string) map[string]struct{} {
-	out := map[string]struct{}{}
-	for _, name := range names {
-		n := strings.ToLower(strings.TrimSpace(name))
-		if n == "" {
-			continue
-		}
-		out[n] = struct{}{}
-	}
-	return out
-}
-
-func cloneCooldownOverrides(in map[string]time.Duration) map[string]time.Duration {
-	if len(in) == 0 {
+func cloneUint64Pointer(value *uint64) *uint64 {
+	if value == nil {
 		return nil
 	}
-	out := make(map[string]time.Duration, len(in))
-	for k, v := range in {
-		key := strings.ToLower(strings.TrimSpace(k))
-		if key == "" {
-			continue
-		}
-		out[key] = v
-	}
-	if len(out) == 0 {
-		return nil
-	}
-	return out
+	copy := *value
+	return &copy
 }

@@ -49,7 +49,7 @@ func NewHandler(snapshot SnapshotFunc) http.Handler {
 
 	mux.HandleFunc("/readyz", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-		if readSnapshot().Ready {
+		if readSnapshot().Runtime.Ready {
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("ready\n"))
 			return

@@ -13,7 +13,8 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
+	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 const (
@@ -28,18 +29,34 @@ type PluginEmitter interface {
 }
 
 type Handlers struct {
-	Logger                   *slog.Logger
-	Restrictions             store.RestrictionStore
-	Guilds                   store.GuildStore
-	Users                    store.UserStore
-	GuildMembers             store.GuildMemberStore
-	I18n                     i18n.Registry
-	Client                   *bot.Client
+	HandlerCore
+	HandlerStores
+	HandlerRegistration
+	HandlerPlugins
+}
+
+type HandlerCore struct {
+	Logger  *slog.Logger
+	I18n    i18n.Registry
+	Client  *bot.Client
+	IsOwner func(uint64) bool
+}
+
+type HandlerStores struct {
+	Restrictions moderationstore.RestrictionStore
+	Guilds       accountstore.GuildStore
+	Users        accountstore.UserStore
+	GuildMembers accountstore.GuildMemberStore
+}
+
+type HandlerRegistration struct {
 	CommandRegisterAllGuilds bool
 	DevGuildID               *uint64
 	CommandCreates           func(locales []string) []discord.ApplicationCommandCreate
-	PluginEvents             PluginEmitter
-	IsOwner                  func(uint64) bool
+}
+
+type HandlerPlugins struct {
+	PluginEvents PluginEmitter
 }
 
 func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
@@ -51,7 +68,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 	guildID := uint64(e.GuildID)
 
 	restrictions := h.Restrictions
-	if _, ok, err := restrictions.GetRestriction(ctx, store.TargetTypeGuild, guildID); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeGuild, guildID); err != nil {
 		h.logger().Error(
 			"guild restriction check failed",
 			slog.String("err", err.Error()),
@@ -67,7 +84,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 	guildName := strings.TrimSpace(e.Guild.Name)
 	ownerID := uint64(e.Guild.OwnerID)
 
-	_ = h.Guilds.UpsertGuildSeen(ctx, store.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, accountstore.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   ownerID,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -86,7 +103,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 			isSystem = owner.System
 		}
 
-		_ = h.Users.UpsertUserSeen(ctx, store.UserSeen{
+		_ = h.Users.UpsertUserSeen(ctx, accountstore.UserSeen{
 			UserID:      ownerID,
 			CreatedAt:   snowflake.ID(ownerID).Time().UTC(),
 			IsBot:       isBot,
@@ -141,7 +158,7 @@ func (h Handlers) OnGuildUpdate(e *events.GuildUpdate) {
 	now := time.Now().UTC()
 
 	guildName := strings.TrimSpace(e.Guild.Name)
-	_ = h.Guilds.UpsertGuildSeen(ctx, store.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, accountstore.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   newOwner,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -174,7 +191,7 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 	guildID := uint64(e.GuildID)
 	userID := uint64(user.ID)
 
-	_ = h.Users.UpsertUserSeen(ctx, store.UserSeen{
+	_ = h.Users.UpsertUserSeen(ctx, accountstore.UserSeen{
 		UserID:      userID,
 		CreatedAt:   user.ID.Time().UTC(),
 		IsBot:       user.Bot,
@@ -362,5 +379,5 @@ func (h Handlers) logger() *slog.Logger {
 func gatewayPluginInvocation(guildID string, user discord.User, eventName string, isOwner bool) contract.Invocation {
 	data, _ := contract.ObjectValue([]contract.Field{{Key: "guild_id", Value: contract.StringValue(guildID)}, {Key: "user_id", Value: contract.StringValue(user.ID.String())}})
 	author := contract.UserRef{ID: user.ID.String(), Username: strings.TrimSpace(user.Username), Name: strings.TrimSpace(user.EffectiveName()), AvatarURL: strings.TrimSpace(user.EffectiveAvatarURL()), Bot: user.Bot, System: user.System}
-	return contract.Invocation{Guild: &contract.GuildRef{ID: guildID}, Author: &author, IsOwner: isOwner, Kind: contract.InvocationEvent, Event: &contract.EventInput{Name: eventName, Data: data}}
+	return contract.Invocation{InvocationActorContext: contract.InvocationActorContext{Guild: &contract.GuildRef{ID: guildID}, Author: &author}, InvocationExecutionContext: contract.InvocationExecutionContext{IsOwner: isOwner}, InvocationIdentity: contract.InvocationIdentity{Kind: contract.InvocationEvent}, InvocationInput: contract.InvocationInput{Event: &contract.EventInput{Name: eventName, Data: data}}}
 }

@@ -2,10 +2,11 @@ package discordruntime
 
 import (
 	"context"
+	discordgateway "github.com/xsyetopz/go-mamacord/internal/runtime/discord/gateway"
 )
 
 func (b *Bot) Start(ctx context.Context) error {
-	b.resolveOwner(ctx)
+	b.owner.Resolve(ctx, b.client, b.logger)
 
 	if err := b.reloadModules(ctx); err != nil {
 		return err
@@ -24,7 +25,7 @@ func (b *Bot) Start(ctx context.Context) error {
 			}
 		},
 	); err != nil {
-		return decorateGatewayOpenError(err, requestedGatewayIntentsMask())
+		return discordgateway.DecorateOpenError(err, requestedGatewayIntentsMask())
 	}
 	b.ready.Store(true)
 	return nil

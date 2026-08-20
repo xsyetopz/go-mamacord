@@ -9,6 +9,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
 	"log/slog"
 	"net"
 	"net/url"
@@ -26,8 +27,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/logging"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	"github.com/xsyetopz/go-mamacord/internal/storagebootstrap"
+	bootstrap "github.com/xsyetopz/go-mamacord/internal/storage/postgres/bootstrap"
 )
 
 func main() {
@@ -83,7 +83,7 @@ func runMain() int {
 		return 1
 	}
 
-	logger, err := logging.New(cfg.LogLevel)
+	logger, err := logging.New(cfg.Runtime.LogLevel)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
@@ -123,24 +123,24 @@ func runDoctorCommand(args []string) int {
 		writeLine("env_file_source: %s", loadedEnvSource)
 	}
 
-	hasToken := strings.TrimSpace(cfg.DiscordToken) != ""
+	hasToken := strings.TrimSpace(cfg.Discord.Token) != ""
 	writeLine("discord_token: %t", hasToken)
-	writeLine("storage_backend: %s", cfg.StorageBackend)
+	writeLine("storage_backend: %s", cfg.Storage.Backend)
 	writeLine("storage_target: %s", doctorStorageTarget(cfg))
-	writeLine("migrations_dir: %s", cfg.Migrations)
+	writeLine("migrations_dir: %s", cfg.Storage.Migrations)
 	writeLine("runtime_roles: %s", strings.Join(cfg.RuntimeRoleStrings(), ","))
 	writeLine("control_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleControl))
 	writeLine("gateway_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleGateway))
 	writeLine("scheduler_role_enabled: %t", cfg.HasRuntimeRole(config.RuntimeRoleScheduler))
-	writeLine("prod_mode: %t", cfg.ProdMode)
+	writeLine("prod_mode: %t", cfg.Runtime.ProdMode)
 	writeLine("admin_api_enabled: %t", cfg.ControlAPIEnabled())
-	writeLine("allow_unsigned_plugins: %t", cfg.AllowUnsignedPlugins)
-	writeLine("trusted_keys_file: %s", cfg.TrustedKeysFile)
-	trustedKeysPath := strings.TrimSpace(cfg.TrustedKeysFile)
+	writeLine("allow_unsigned_plugins: %t", cfg.Plugins.AllowUnsigned)
+	writeLine("trusted_keys_file: %s", cfg.Plugins.TrustedKeysFile)
+	trustedKeysPath := strings.TrimSpace(cfg.Plugins.TrustedKeysFile)
 	trustedKeysExists := false
 	trustedKeysCount := 0
 	if trustedKeysPath != "" {
-		if keys, err := pluginhost.ReadTrustedKeysFile(trustedKeysPath); err == nil {
+		if keys, err := signing.ReadTrustedKeysFile(trustedKeysPath); err == nil {
 			trustedKeysExists = true
 			trustedKeysCount = len(keys)
 		} else if !os.IsNotExist(err) {
@@ -151,29 +151,29 @@ func runDoctorCommand(args []string) int {
 	writeLine("trusted_keys_count_file: %d", trustedKeysCount)
 	writeLine(
 		"dashboard_signing_configured: %t",
-		strings.TrimSpace(cfg.DashboardSigningKeyID) != "" && strings.TrimSpace(cfg.DashboardSigningKeyFile) != "",
+		strings.TrimSpace(cfg.Dashboard.SigningKeyID) != "" && strings.TrimSpace(cfg.Dashboard.SigningKeyFile) != "",
 	)
 	if cfg.ControlAPIEnabled() {
-		writeLine("admin_addr: %s", cfg.AdminAddr)
-		writeLine("setup_url: %s/api/setup", httpBaseFromAddr(cfg.AdminAddr))
+		writeLine("admin_addr: %s", cfg.Runtime.AdminAddr)
+		writeLine("setup_url: %s/api/setup", httpBaseFromAddr(cfg.Runtime.AdminAddr))
 	}
 
 	if cfg.ControlAPIEnabled() {
-		base := httpBaseFromAddr(cfg.AdminAddr)
+		base := httpBaseFromAddr(cfg.Runtime.AdminAddr)
 		writeLine("dashboard_base_url: %s", base)
 		writeLine("dashboard_oauth_redirect_url: %s/api/auth/callback", base)
-		writeLine("dashboard_client_id_set: %t", strings.TrimSpace(cfg.DashboardClientID) != "")
-		writeLine("dashboard_client_secret_set: %t", strings.TrimSpace(cfg.DashboardClientSecret) != "")
-		writeLine("dashboard_session_secret_set: %t", len(strings.TrimSpace(cfg.DashboardSessionSecret)) >= 32)
-		if cfg.DashboardSessionSecretGenerated {
+		writeLine("dashboard_client_id_set: %t", strings.TrimSpace(cfg.Dashboard.ClientID) != "")
+		writeLine("dashboard_client_secret_set: %t", strings.TrimSpace(cfg.Dashboard.ClientSecret) != "")
+		writeLine("dashboard_session_secret_set: %t", len(strings.TrimSpace(cfg.Dashboard.SessionSecret)) >= 32)
+		if cfg.Dashboard.SessionSecretGenerated {
 			writeLine("dashboard_session_secret_generated: true (dev-only, ephemeral)")
 		}
 	}
 
-	if cfg.ControlAPIEnabled() && cfg.ProdMode {
-		if strings.TrimSpace(cfg.DashboardClientID) == "" ||
-			strings.TrimSpace(cfg.DashboardClientSecret) == "" ||
-			len(strings.TrimSpace(cfg.DashboardSessionSecret)) < 32 {
+	if cfg.ControlAPIEnabled() && cfg.Runtime.ProdMode {
+		if strings.TrimSpace(cfg.Dashboard.ClientID) == "" ||
+			strings.TrimSpace(cfg.Dashboard.ClientSecret) == "" ||
+			len(strings.TrimSpace(cfg.Dashboard.SessionSecret)) < 32 {
 			writeLine("")
 			writeLine("next: admin api is enabled in prod mode but oauth/session config is incomplete")
 			writeLine("next: fill MAMACORD_DASHBOARD_* vars (client id/secret/session secret)")
@@ -264,12 +264,12 @@ func runDevCommand(ctx context.Context) int {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
-	logger, err := logging.New(cfg.LogLevel)
+	logger, err := logging.New(cfg.Runtime.LogLevel)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
-	base := httpBaseFromAddr(cfg.AdminAddr)
+	base := httpBaseFromAddr(cfg.Runtime.AdminAddr)
 	_, _ = fmt.Fprintf(os.Stdout, "admin_setup_url: %s/api/setup\n", base)
 	_, _ = fmt.Fprintf(os.Stdout, "dashboard_url: %s/\n", base)
 	_, _ = os.Stdout.WriteString("dashboard_dev: cd apps/dashboard && bun run dev\n")
@@ -369,9 +369,9 @@ func genHexSecret(nBytes int) string {
 }
 
 func doctorStorageTarget(cfg config.Config) string {
-	switch cfg.StorageBackend {
+	switch cfg.Storage.Backend {
 	case config.StorageBackendPostgres:
-		dsn := strings.TrimSpace(cfg.PostgresDSN)
+		dsn := strings.TrimSpace(cfg.Storage.PostgresDSN)
 		if dsn == "" {
 			return ""
 		}
@@ -451,7 +451,7 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 
 	switch args[0] {
 	case "status":
-		status, err := storagebootstrap.MigrationStatus(ctx, cfg)
+		status, err := bootstrap.MigrationStatus(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
@@ -459,7 +459,7 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 		printStatus(status)
 		return 0
 	case "up":
-		status, err := storagebootstrap.MigrateUp(ctx, cfg)
+		status, err := bootstrap.MigrateUp(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
@@ -536,7 +536,7 @@ func runSignPluginCommand(args []string) int {
 		return 1
 	}
 
-	privateKey, err := pluginhost.ReadEd25519PrivateKeyFile(*privateKeyFile)
+	privateKey, err := signing.ReadEd25519PrivateKeyFile(*privateKeyFile)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
@@ -559,7 +559,7 @@ func runSignPluginCommand(args []string) int {
 		return 1
 	}
 
-	sig, publicKey, err := pluginhost.SignDir(pluginDir, *keyID, privateKey)
+	sig, publicKey, err := signing.SignDir(pluginDir, *keyID, privateKey)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
@@ -568,7 +568,7 @@ func runSignPluginCommand(args []string) int {
 	target := strings.TrimSpace(*out)
 
 	payload := map[string]any{
-		"$schema":       pluginhost.SignatureSchemaURL,
+		"$schema":       signing.SignatureSchemaURL,
 		"key_id":        sig.KeyID,
 		"hash_b64":      sig.HashB64,
 		"signature_b64": sig.SignatureB64,
@@ -624,18 +624,18 @@ func runGenSigningKeyCommand(args []string) int {
 		trustPath = "./config/trusted_keys.json"
 	}
 
-	publicKey, privateKey, err := pluginhost.GenerateEd25519Key()
+	publicKey, privateKey, err := signing.GenerateEd25519Key()
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
-	if err := pluginhost.WriteEd25519PrivateKeyFile(keyPath, privateKey); err != nil {
+	if err := signing.WriteEd25519PrivateKeyFile(keyPath, privateKey); err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
 
 	publicKeyB64 := base64.StdEncoding.EncodeToString(publicKey)
-	if err := pluginhost.UpsertTrustedKeyFile(trustPath, pluginhost.TrustedKey{
+	if err := signing.UpsertTrustedKeyFile(trustPath, signing.TrustedKey{
 		KeyID:        strings.TrimSpace(*keyID),
 		PublicKeyB64: publicKeyB64,
 	}); err != nil {
@@ -687,11 +687,11 @@ func openMarketplaceManager(ctx context.Context) (*marketplace.Manager, func(), 
 	if err != nil {
 		return nil, nil, err
 	}
-	logger, err := logging.New(cfg.LogLevel)
+	logger, err := logging.New(cfg.Runtime.LogLevel)
 	if err != nil {
 		return nil, nil, err
 	}
-	store, _, err := storagebootstrap.OpenRuntimeStore(ctx, cfg)
+	store, _, err := bootstrap.OpenRuntimeStore(ctx, cfg)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -701,15 +701,14 @@ func openMarketplaceManager(ctx context.Context) (*marketplace.Manager, func(), 
 		return nil, nil, err
 	}
 	manager, err := marketplace.New(marketplace.Options{
-		Logger:            logger,
-		Store:             store,
-		Bundles:           bundleRepo,
-		BundledPluginsDir: cfg.BundledPluginsDir,
-		UserPluginsDir:    cfg.UserPluginsDir,
-		TrustedKeysFile:   cfg.TrustedKeysFile,
-		CacheDir:          cfg.MarketplaceCacheDir,
-		ProdMode:          cfg.ProdMode,
-		AllowUnsigned:     cfg.AllowUnsignedPlugins,
+		OptionDependencies: marketplace.OptionDependencies{Logger: logger, Store: store, Bundles: bundleRepo},
+		OptionPaths: marketplace.OptionPaths{
+			BundledPluginsDir: cfg.Bundles.BundledPluginsDir,
+			UserPluginsDir:    cfg.Bundles.UserPluginsDir,
+			TrustedKeysFile:   cfg.Plugins.TrustedKeysFile,
+			CacheDir:          cfg.Bundles.MarketplaceCacheDir,
+		},
+		OptionTrust: marketplace.OptionTrust{ProdMode: cfg.Runtime.ProdMode, AllowUnsigned: cfg.Plugins.AllowUnsigned},
 	})
 	if err != nil {
 		_ = store.Close()

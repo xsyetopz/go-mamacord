@@ -12,8 +12,8 @@ import (
 	"github.com/disgoorg/disgo/discord"
 
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
 
 const (
@@ -31,8 +31,8 @@ const (
 
 type automationDeps struct {
 	client                        *bot.Client
-	enabledPluginEventSubscribers func(string) []Target
-	pluginRoute                   func(string) (Target, bool)
+	enabledPluginEventSubscribers func(string) []Route
+	pluginRoute                   func(string) (Route, bool)
 	moduleEnabled                 func(string) bool
 	incAutomationFailure          func()
 	incPluginFailure              func()
@@ -44,12 +44,11 @@ type Automation struct {
 	eventSlots chan struct{}
 }
 
-func NewAutomation(logger *slog.Logger, client *bot.Client, enabled func(string) []Target, route func(string) (Target, bool), moduleEnabled func(string) bool, incAutomationFailure func(), incPluginFailure func(), ensureDMChannel func(context.Context, uint64) (uint64, error)) *Automation {
+func NewAutomation(logger *slog.Logger, client *bot.Client, enabled func(string) []Route, route func(string) (Route, bool), moduleEnabled func(string) bool, incAutomationFailure func(), incPluginFailure func()) *Automation {
 	componentLogger := slog.Default()
 	if logger != nil {
 		componentLogger = logger.With(slog.String("component", "plugin_automation"))
 	}
-	_ = ensureDMChannel
 	return &Automation{logger: componentLogger, bot: &automationDeps{client: client, enabledPluginEventSubscribers: enabled, pluginRoute: route, moduleEnabled: moduleEnabled, incAutomationFailure: incAutomationFailure, incPluginFailure: incPluginFailure}, limiter: newTokenBucketLimiter(defaultPluginAutomationRatePerSec, defaultPluginAutomationBurst), eventSlots: make(chan struct{}, maximumConcurrentPluginEvents)}
 }
 func (p *Automation) FireEvent(eventName string, invocation contract.Invocation) {
@@ -77,12 +76,12 @@ func (p *Automation) FireEvent(eventName string, invocation contract.Invocation)
 		p.failure(context.Background(), "", "plugin event concurrency limit reached", nil)
 	}
 }
-func (p *Automation) fireEvent(ctx context.Context, targets []Target, eventName string, invocation contract.Invocation) {
+func (p *Automation) fireEvent(ctx context.Context, targets []Route, eventName string, invocation contract.Invocation) {
 	for _, target := range targets {
 		p.runEventOne(ctx, target, eventName, invocation)
 	}
 }
-func (p *Automation) runEventOne(ctx context.Context, target Target, eventName string, invocation contract.Invocation) {
+func (p *Automation) runEventOne(ctx context.Context, target Route, eventName string, invocation contract.Invocation) {
 	if target.Host == nil || target.PluginID == "" || !p.allow(target.PluginID, idOfInvocationGuild(invocation), eventName) {
 		return
 	}
@@ -138,7 +137,7 @@ func (p *Automation) RunJob(ctx context.Context, job pluginhost.PluginJob) {
 		if locale == "" {
 			locale = discord.LocaleEnglishUS.Code()
 		}
-		invocation := contract.Invocation{Route: plan.Route, Kind: contract.InvocationTask, Guild: &contract.GuildRef{ID: guildID, Name: guild.Name}, Locale: locale, Task: &contract.TaskInput{ID: job.JobID}}
+		invocation := contract.Invocation{InvocationIdentity: contract.InvocationIdentity{Route: plan.Route, Kind: contract.InvocationTask}, InvocationActorContext: contract.InvocationActorContext{Guild: &contract.GuildRef{ID: guildID, Name: guild.Name}, Locale: locale}, InvocationInput: contract.InvocationInput{Task: &contract.TaskInput{ID: job.JobID}}}
 		callCtx, cancel := context.WithTimeout(ctx, defaultPluginAutomationTimeout)
 		terminal, runErr := route.Host.Run(callCtx, job.PluginID, invocation)
 		cancel()

@@ -7,32 +7,32 @@ import (
 )
 
 func Open(cfg config.Config) (Repository, error) {
-	switch cfg.BundleBackend {
+	switch cfg.Bundles.Backend {
 	case "", config.BundleBackendLocal:
 		return NewLocalRepository(), nil
 	case config.BundleBackendCached:
 		repo, err := NewCachedRepository(CachedRepositoryOptions{
-			StoreDir: cfg.BundleStoreDir,
-			CacheDir: cfg.BundleCacheDir,
+			StoreDir: cfg.Bundles.StoreDir,
+			CacheDir: cfg.Bundles.CacheDir,
 		})
 		if err != nil {
 			return nil, err
 		}
 		return repo, nil
 	case config.BundleBackendObjectStore:
-		store, err := NewDirObjectStore(cfg.BundleStoreDir)
+		store, err := NewDirObjectStore(cfg.Bundles.StoreDir)
 		if err != nil {
 			return nil, err
 		}
 		repo, err := NewObjectStoreRepository(ObjectStoreRepositoryOptions{
 			Store:    store,
-			CacheDir: cfg.BundleCacheDir,
+			CacheDir: cfg.Bundles.CacheDir,
 		})
 		if err != nil {
 			return nil, err
 		}
 		return repo, nil
 	default:
-		return nil, fmt.Errorf("unsupported bundle backend %q", cfg.BundleBackend)
+		return nil, fmt.Errorf("unsupported bundle backend %q", cfg.Bundles.Backend)
 	}
 }

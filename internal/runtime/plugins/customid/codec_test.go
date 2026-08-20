@@ -1,0 +1,26 @@
+package customid
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestCustomIDIsCanonicalAndBounded(t *testing.T) {
+	valid, err := Build("example", "save")
+	if err != nil || valid != "mamacord:pl:example:save" {
+		t.Fatalf("valid=%q err=%v", valid, err)
+	}
+	if plugin, local, ok := Parse(valid); !ok || plugin != "example" || local != "save" {
+		t.Fatalf("parsed=%q %q %v", plugin, local, ok)
+	}
+	for _, ids := range [][2]string{{" example", "save"}, {"Example", "save"}, {"example", "Save"}, {"example", "save:other"}} {
+		if _, err := Build(ids[0], ids[1]); err == nil {
+			t.Errorf("accepted %#v", ids)
+		}
+	}
+	for _, raw := range []string{" " + valid, valid + " ", "mamacord:pl:Example:save", "mamacord:pl:example:Save", "mamacord:pl:example:" + strings.Repeat("a", 80)} {
+		if _, _, ok := Parse(raw); ok {
+			t.Errorf("parsed %q", raw)
+		}
+	}
+}

@@ -12,7 +12,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/catalog"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
 
 type Registrar struct {

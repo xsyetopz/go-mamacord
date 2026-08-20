@@ -29,17 +29,33 @@ type PluginEnabled func(pluginID string) bool
 type GuildCommandEnabled func(ctx context.Context, guildID uint64, pluginID, commandName string) (bool, error)
 
 type Dispatcher struct {
-	Logger                *slog.Logger
-	I18n                  i18n.Registry
-	ProdMode              bool
+	DispatcherCore
+	DispatcherCatalog
+	DispatcherPolicy
+	DispatcherMetrics
+}
+
+type DispatcherCore struct {
+	Logger   *slog.Logger
+	I18n     i18n.Registry
+	ProdMode bool
+	Services ServicesFactory
+}
+
+type DispatcherCatalog struct {
 	Commands              map[string]slashcmd.Command
 	PluginCommands        map[string]discordpluginbridge.Route
 	PluginUserCommands    map[string]discordpluginbridge.Route
 	PluginMessageCommands map[string]discordpluginbridge.Route
-	Services              ServicesFactory
-	CheckRestrictions     RestrictionCheck
-	TakeSlashCooldown     SlashCooldownCheck
-	GuildCommandEnabled   GuildCommandEnabled
+}
+
+type DispatcherPolicy struct {
+	CheckRestrictions   RestrictionCheck
+	TakeSlashCooldown   SlashCooldownCheck
+	GuildCommandEnabled GuildCommandEnabled
+}
+
+type DispatcherMetrics struct {
 	IncInteraction        func()
 	IncInteractionFailure func()
 	IncPluginFailure      func()
@@ -374,7 +390,7 @@ func (d Dispatcher) pluginCommandError(ctx context.Context, e *events.Applicatio
 func pluginInteractionInvocation(user discord.User, member *discord.ResolvedMember, guildID *snowflake.ID, channel discord.InteractionChannel, guild func() (discord.Guild, bool), self func() (discord.OAuth2User, bool), locale string, isOwner bool) contract.Invocation {
 	author := router.UserRef(user)
 	channelRef := router.InteractionChannelRef(channel, router.SnowflakePtrToString(guildID))
-	invocation := contract.Invocation{Author: &author, Channel: &channelRef, Locale: locale, IsOwner: isOwner, ResponseState: contract.ResponseUnacknowledged}
+	invocation := contract.Invocation{InvocationActorContext: contract.InvocationActorContext{Author: &author, Channel: &channelRef, Locale: locale}, InvocationExecutionContext: contract.InvocationExecutionContext{IsOwner: isOwner}, InvocationInteractionContext: contract.InvocationInteractionContext{ResponseState: contract.ResponseUnacknowledged}}
 	if member != nil {
 		value := router.MemberRef(*member, router.SnowflakePtrToString(guildID))
 		invocation.Member = &value

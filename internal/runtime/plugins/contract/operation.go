@@ -147,8 +147,6 @@ func (operation *BestEffortOperation) validateBestEffort(invocation Invocation) 
 	switch value := operation.Operation.(type) {
 	case domainOperation:
 		return value.validateDomain(invocation)
-	case *AppendAuditOperation:
-		return value.validateDomain(invocation)
 	default:
 		return fmt.Errorf("operation %T cannot be best-effort", operation.Operation)
 	}

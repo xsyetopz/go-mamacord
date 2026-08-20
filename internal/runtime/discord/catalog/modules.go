@@ -1,6 +1,7 @@
 package catalog
 
 import (
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/projection"
 	"sort"
 	"strings"
 
@@ -8,8 +9,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 const (
@@ -30,7 +30,7 @@ func BuiltinDefaultEnabled(desc commands.ModuleDescriptor, seed config.ModulesFi
 func ResolveBuiltinModuleEnabled(
 	desc commands.ModuleDescriptor,
 	seed config.ModulesFile,
-	states map[string]store.ModuleState,
+	states map[string]pluginstore.ModuleState,
 ) bool {
 	if !desc.Toggleable {
 		return true
@@ -72,7 +72,7 @@ func SlashCommandNames(commands []slashcmd.Command) []string {
 	return out
 }
 
-func PluginCommandNames(commands []pluginhost.Command) []string {
+func PluginCommandNames(commands []projection.Command) []string {
 	out := make([]string, 0, len(commands))
 	for _, cmd := range commands {
 		if strings.TrimSpace(cmd.Name) != "" {

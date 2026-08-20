@@ -9,9 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
+	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
+	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
+	pgtest "github.com/xsyetopz/go-mamacord/internal/storage/postgres/testkit"
 )
 
 func mustNoErr(t *testing.T, err error, msg string) {
@@ -25,7 +29,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	db := postgrestest.OpenMigratedDB(t)
+	db := pgtest.OpenMigratedDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
 	s, err := postgresstore.New(db)
@@ -35,7 +39,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 
 	now := time.Unix(1_700_000_000, 0).UTC()
 	actorID := uint64(42)
-	if err := s.ModuleStates().PutModuleState(ctx, store.ModuleState{
+	if err := s.ModuleStates().PutModuleState(ctx, pluginstore.ModuleState{
 		ModuleID:  "weather",
 		Enabled:   true,
 		UpdatedAt: now,
@@ -54,7 +58,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected module state: %#v", state)
 	}
 
-	if err := s.TrustedSigners().PutTrustedSigner(ctx, store.TrustedSigner{
+	if err := s.TrustedSigners().PutTrustedSigner(ctx, marketstore.TrustedSigner{
 		KeyID:        "official",
 		PublicKeyB64: "pubkey",
 		AddedAt:      now,
@@ -69,7 +73,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected trusted signers: %#v", signers)
 	}
 
-	source := store.MarketplaceSource{
+	source := marketstore.MarketplaceSource{
 		SourceID:    "demo",
 		Kind:        "git",
 		GitURL:      "https://example.invalid/demo.git",
@@ -92,7 +96,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 	}
 
 	syncedAt := now.Add(2 * time.Second)
-	sync := store.MarketplaceSourceSync{
+	sync := marketstore.MarketplaceSourceSync{
 		SourceID:     "demo",
 		LastSyncedAt: &syncedAt,
 		LastRevision: "abc123",
@@ -110,18 +114,22 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 	}
 
 	installedBy := uint64(7)
-	install := store.PluginInstall{
-		PluginID:          "weather",
-		InstallKind:       "git",
-		SourceID:          "demo",
-		GitURL:            "https://example.invalid/demo.git",
-		GitRef:            "main",
-		GitRevision:       "abc123",
-		SourcePath:        "weather",
-		BundleRelativeDir: "bundles/git-abc123",
-		InstalledAt:       now.Add(3 * time.Second),
-		InstalledBy:       &installedBy,
-		InstalledHashB64:  "hash",
+	install := marketstore.PluginInstall{
+		PluginID: "weather",
+		PluginInstallSource: marketstore.PluginInstallSource{
+			InstallKind: "git",
+			SourceID:    "demo",
+			GitURL:      "https://example.invalid/demo.git",
+			GitRef:      "main",
+			GitRevision: "abc123",
+			SourcePath:  "weather",
+		},
+		PluginInstallArtifact: marketstore.PluginInstallArtifact{
+			BundleRelativeDir: "bundles/git-abc123",
+			InstalledHashB64:  "hash",
+		},
+		InstalledAt: now.Add(3 * time.Second),
+		InstalledBy: &installedBy,
 	}
 	if err := s.PluginInstalls().PutPluginInstall(ctx, install); err != nil {
 		t.Fatalf("PutPluginInstall: %v", err)
@@ -134,7 +142,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected plugin install: got %#v want %#v ok=%t", gotInstall, install, ok)
 	}
 
-	vendor := store.TrustedVendor{
+	vendor := marketstore.TrustedVendor{
 		VendorID:   "acme",
 		Name:       "Acme",
 		WebsiteURL: "https://example.invalid",
@@ -153,7 +161,7 @@ func TestPostgresMetadataPersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected trusted vendor: got %#v want %#v ok=%t", gotVendor, vendor, ok)
 	}
 
-	keys := []store.TrustedVendorKey{
+	keys := []marketstore.TrustedVendorKey{
 		{VendorID: "acme", KeyID: "alpha"},
 		{VendorID: "acme", KeyID: "beta"},
 	}
@@ -173,7 +181,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	db := postgrestest.OpenMigratedDB(t)
+	db := pgtest.OpenMigratedDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 
 	s, err := postgresstore.New(db)
@@ -182,17 +190,17 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 	now := time.Unix(1_700_000_000, 0).UTC()
 	actorID := uint64(42)
 
-	mustNoErr(t, s.Restrictions().PutRestriction(ctx, store.Restriction{
-		TargetType: store.TargetTypeGuild,
+	mustNoErr(t, s.Restrictions().PutRestriction(ctx, moderationstore.Restriction{
+		TargetType: moderationstore.TargetTypeGuild,
 		TargetID:   100,
 		Reason:     "cooldown",
 		CreatedBy:  actorID,
 		CreatedAt:  now,
 	}), "PutRestriction")
-	restriction, ok, err := s.Restrictions().GetRestriction(ctx, store.TargetTypeGuild, 100)
+	restriction, ok, err := s.Restrictions().GetRestriction(ctx, moderationstore.TargetTypeGuild, 100)
 	mustNoErr(t, err, "GetRestriction")
-	if !ok || !reflect.DeepEqual(restriction, store.Restriction{
-		TargetType: store.TargetTypeGuild,
+	if !ok || !reflect.DeepEqual(restriction, moderationstore.Restriction{
+		TargetType: moderationstore.TargetTypeGuild,
 		TargetID:   100,
 		Reason:     "cooldown",
 		CreatedBy:  actorID,
@@ -200,14 +208,14 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 	}) {
 		t.Fatalf("unexpected restriction: got %#v ok=%t", restriction, ok)
 	}
-	mustNoErr(t, s.Restrictions().DeleteRestriction(ctx, store.TargetTypeGuild, 100), "DeleteRestriction")
-	_, ok, err = s.Restrictions().GetRestriction(ctx, store.TargetTypeGuild, 100)
+	mustNoErr(t, s.Restrictions().DeleteRestriction(ctx, moderationstore.TargetTypeGuild, 100), "DeleteRestriction")
+	_, ok, err = s.Restrictions().GetRestriction(ctx, moderationstore.TargetTypeGuild, 100)
 	mustNoErr(t, err, "GetRestriction(after delete)")
 	if ok {
 		t.Fatal("expected restriction to be deleted")
 	}
 
-	mustNoErr(t, s.Warnings().CreateWarning(ctx, store.Warning{
+	mustNoErr(t, s.Warnings().CreateWarning(ctx, moderationstore.Warning{
 		ID:          "warn-old",
 		GuildID:     7,
 		UserID:      9,
@@ -215,7 +223,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		Reason:      "old",
 		CreatedAt:   now,
 	}), "CreateWarning(old)")
-	mustNoErr(t, s.Warnings().CreateWarning(ctx, store.Warning{
+	mustNoErr(t, s.Warnings().CreateWarning(ctx, moderationstore.Warning{
 		ID:          "warn-new",
 		GuildID:     7,
 		UserID:      9,
@@ -240,9 +248,9 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected warning count after delete: %d", count)
 	}
 
-	targetType := store.TargetTypeUser
+	targetType := moderationstore.TargetTypeUser
 	targetID := uint64(123)
-	mustNoErr(t, s.Audit().Append(ctx, store.AuditEntry{
+	mustNoErr(t, s.Audit().Append(ctx, moderationstore.AuditEntry{
 		GuildID:    nil,
 		ActorID:    &actorID,
 		Action:     "warn.create",
@@ -276,7 +284,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatal("expected plugin kv to be deleted")
 	}
 
-	mustNoErr(t, s.AdminSessions().PutAdminSession(ctx, store.AdminSession{
+	mustNoErr(t, s.AdminSessions().PutAdminSession(ctx, accountstore.AdminSession{
 		ID:          "sess-1",
 		UserID:      77,
 		Username:    "mod",
@@ -303,7 +311,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected deleted expired session count after expiry: %d", deletedCount)
 	}
 
-	mustNoErr(t, s.Users().UpsertUserSeen(ctx, store.UserSeen{
+	mustNoErr(t, s.Users().UpsertUserSeen(ctx, accountstore.UserSeen{
 		UserID:      1,
 		CreatedAt:   time.Unix(1_600_000_000, 0).UTC(),
 		IsBot:       false,
@@ -325,7 +333,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected users row: created_at=%d is_bot=%t is_system=%t first_seen_at=%d last_seen_at=%d", userCreatedAt, userIsBot, userIsSystem, userFirstSeenAt, userLastSeenAt)
 	}
 
-	mustNoErr(t, s.Guilds().UpsertGuildSeen(ctx, store.GuildSeen{
+	mustNoErr(t, s.Guilds().UpsertGuildSeen(ctx, accountstore.GuildSeen{
 		GuildID:   10,
 		OwnerID:   2,
 		CreatedAt: time.Unix(1_500_000_000, 0).UTC(),
@@ -380,7 +388,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected user settings after clear: %#v ok=%t", settings, ok)
 	}
 
-	mustNoErr(t, s.CheckIns().CreateCheckIn(ctx, store.CheckIn{
+	mustNoErr(t, s.CheckIns().CreateCheckIn(ctx, automationstore.CheckIn{
 		ID:        "check-1",
 		UserID:    200,
 		Mood:      4,
@@ -388,7 +396,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 	}), "CreateCheckIn")
 	checkins, err := s.CheckIns().ListCheckIns(ctx, 200, 10)
 	mustNoErr(t, err, "ListCheckIns")
-	if len(checkins) != 1 || !reflect.DeepEqual(checkins[0], store.CheckIn{
+	if len(checkins) != 1 || !reflect.DeepEqual(checkins[0], automationstore.CheckIn{
 		ID:        "check-1",
 		UserID:    200,
 		Mood:      4,
@@ -397,7 +405,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatalf("unexpected checkins: %#v", checkins)
 	}
 
-	token := store.DiscordOAuthToken{
+	token := accountstore.DiscordOAuthToken{
 		UserID:          501,
 		AccessTokenEnc:  "access",
 		RefreshTokenEnc: "refresh",
@@ -420,13 +428,13 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 		t.Fatal("expected discord oauth token to be deleted")
 	}
 
-	grantA := store.PluginOAuthGrant{
+	grantA := pluginstore.PluginOAuthGrant{
 		UserID:    501,
 		PluginID:  "weather",
 		Scope:     "forecast:read",
 		CreatedAt: now.Add(40 * time.Minute),
 	}
-	grantB := store.PluginOAuthGrant{
+	grantB := pluginstore.PluginOAuthGrant{
 		UserID:    501,
 		PluginID:  "wellness",
 		Scope:     "checkins:write",
@@ -460,7 +468,7 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 func TestCanonicalPluginConfigMigrationAndVersionedCAS(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
-	db := postgrestest.OpenMigratedDB(t)
+	db := pgtest.OpenMigratedDB(t)
 	t.Cleanup(func() { _ = db.Close() })
 	if _, err := db.ExecContext(ctx, `INSERT INTO plugin_kv(guild_id,plugin_id,key,value_json,updated_at) VALUES(991,'moderation','__guild_config','{"enabled":false}',1)`); err != nil {
 		t.Fatal(err)
@@ -488,7 +496,7 @@ func TestCanonicalPluginConfigMigrationAndVersionedCAS(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	kv := storage.PluginKV().(store.VersionedPluginKVStore)
+	kv := storage.PluginKV().(pluginstore.VersionedPluginKVStore)
 	next, swapped, err := kv.CompareAndSwapPluginKV(ctx, 992, "example", "counter", "1", 0)
 	if err != nil || !swapped || next != 1 {
 		t.Fatalf("initial CAS next=%d swapped=%v err=%v", next, swapped, err)

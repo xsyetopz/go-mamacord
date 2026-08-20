@@ -6,6 +6,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	pluginmanifest "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/manifest"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -17,8 +19,8 @@ import (
 	"time"
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 const (
@@ -27,44 +29,64 @@ const (
 )
 
 type Store interface {
-	TrustedSigners() store.TrustedSignerStore
-	MarketplaceSources() store.MarketplaceSourceStore
-	MarketplaceSourceSyncs() store.MarketplaceSourceSyncStore
-	PluginInstalls() store.PluginInstallStore
-	TrustedVendors() store.TrustedVendorStore
-	TrustedVendorKeys() store.TrustedVendorKeyStore
-	ModuleStates() store.ModuleStateStore
+	TrustedSigners() marketstore.TrustedSignerStore
+	MarketplaceSources() marketstore.MarketplaceSourceStore
+	MarketplaceSourceSyncs() marketstore.MarketplaceSourceSyncStore
+	PluginInstalls() marketstore.PluginInstallStore
+	TrustedVendors() marketstore.TrustedVendorStore
+	TrustedVendorKeys() marketstore.TrustedVendorKeyStore
+	ModuleStates() pluginstore.ModuleStateStore
 }
 
-type Options struct {
-	Logger            *slog.Logger
-	Store             Store
-	Bundles           bundles.Repository
+type OptionDependencies struct {
+	Logger  *slog.Logger
+	Store   Store
+	Bundles bundles.Repository
+}
+type OptionPaths struct {
 	BundledPluginsDir string
 	UserPluginsDir    string
 	TrustedKeysFile   string
 	CacheDir          string
-	ProdMode          bool
-	AllowUnsigned     bool
 	GitBin            string
-	Now               func() time.Time
+}
+type OptionTrust struct {
+	ProdMode      bool
+	AllowUnsigned bool
+}
+type Options struct {
+	OptionDependencies
+	OptionPaths
+	OptionTrust
+	Now func() time.Time
 }
 
-type Manager struct {
-	logger            *slog.Logger
-	store             Store
-	bundles           bundles.Repository
+type managerPaths struct {
 	bundledPluginsDir string
 	userPluginsDir    string
 	trustedKeysFile   string
 	cacheDir          string
-	prodMode          bool
-	allowUnsigned     bool
 	gitBin            string
-	now               func() time.Time
+}
 
+type managerPolicy struct {
+	prodMode      bool
+	allowUnsigned bool
+}
+
+type managerLocks struct {
 	lockMu sync.Mutex
 	locks  map[string]*sync.Mutex
+}
+
+type Manager struct {
+	logger  *slog.Logger
+	store   Store
+	bundles bundles.Repository
+	now     func() time.Time
+	managerPaths
+	managerPolicy
+	managerLocks
 }
 
 func New(opts Options) (*Manager, error) {
@@ -95,18 +117,19 @@ func New(opts Options) (*Manager, error) {
 		now = time.Now
 	}
 	return &Manager{
-		logger:            opts.Logger.With(slog.String("component", "marketplace")),
-		store:             opts.Store,
-		bundles:           bundleRepo,
-		bundledPluginsDir: strings.TrimSpace(opts.BundledPluginsDir),
-		userPluginsDir:    userDir,
-		trustedKeysFile:   strings.TrimSpace(opts.TrustedKeysFile),
-		cacheDir:          cacheDir,
-		prodMode:          opts.ProdMode,
-		allowUnsigned:     opts.AllowUnsigned,
-		gitBin:            gitBin,
-		now:               now,
-		locks:             map[string]*sync.Mutex{},
+		logger:  opts.Logger.With(slog.String("component", "marketplace")),
+		store:   opts.Store,
+		bundles: bundleRepo,
+		now:     now,
+		managerPaths: managerPaths{
+			bundledPluginsDir: strings.TrimSpace(opts.BundledPluginsDir),
+			userPluginsDir:    userDir,
+			trustedKeysFile:   strings.TrimSpace(opts.TrustedKeysFile),
+			cacheDir:          cacheDir,
+			gitBin:            gitBin,
+		},
+		managerPolicy: managerPolicy{prodMode: opts.ProdMode, allowUnsigned: opts.AllowUnsigned},
+		managerLocks:  managerLocks{locks: map[string]*sync.Mutex{}},
 	}, nil
 }
 
@@ -136,7 +159,7 @@ func (m *Manager) ListSources(ctx context.Context) ([]Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	syncByID := make(map[string]store.MarketplaceSourceSync, len(syncs))
+	syncByID := make(map[string]marketstore.MarketplaceSourceSync, len(syncs))
 	for _, item := range syncs {
 		syncByID[item.SourceID] = item
 	}
@@ -165,7 +188,7 @@ func (m *Manager) UpsertSource(ctx context.Context, req SourceUpsert) (Source, e
 	if err := m.store.MarketplaceSources().PutMarketplaceSource(ctx, source); err != nil {
 		return Source{}, err
 	}
-	return sourceFromStore(source, store.MarketplaceSourceSync{}), nil
+	return sourceFromStore(source, marketstore.MarketplaceSourceSync{}), nil
 }
 
 func (m *Manager) DeleteSource(ctx context.Context, sourceID string) error {
@@ -286,17 +309,21 @@ func (m *Manager) Install(ctx context.Context, req InstallRequest) (InstallResul
 		return InstallResult{}, err
 	}
 	now := m.now().UTC()
-	record := store.PluginInstall{
-		PluginID:          candidate.PluginID,
-		InstallKind:       installKindGit,
-		SourceID:          source.SourceID,
-		GitURL:            source.GitURL,
-		GitRef:            source.GitRef,
-		GitRevision:       candidate.GitRevision,
-		SourcePath:        strings.TrimPrefix(strings.TrimPrefix(candidate.SourcePath, m.sourceCheckoutRoot(source.SourceID)), string(filepath.Separator)),
-		BundleRelativeDir: bundleRelativeDir,
-		InstalledAt:       now,
-		InstalledHashB64:  hashB64,
+	record := marketstore.PluginInstall{
+		PluginID: candidate.PluginID,
+		PluginInstallSource: marketstore.PluginInstallSource{
+			InstallKind: installKindGit,
+			SourceID:    source.SourceID,
+			GitURL:      source.GitURL,
+			GitRef:      source.GitRef,
+			GitRevision: candidate.GitRevision,
+			SourcePath:  strings.TrimPrefix(strings.TrimPrefix(candidate.SourcePath, m.sourceCheckoutRoot(source.SourceID)), string(filepath.Separator)),
+		},
+		PluginInstallArtifact: marketstore.PluginInstallArtifact{
+			BundleRelativeDir: bundleRelativeDir,
+			InstalledHashB64:  hashB64,
+		},
+		InstalledAt: now,
 	}
 	if req.ActorID != nil {
 		record.InstalledBy = req.ActorID
@@ -304,7 +331,7 @@ func (m *Manager) Install(ctx context.Context, req InstallRequest) (InstallResul
 	if err := m.store.PluginInstalls().PutPluginInstall(ctx, record); err != nil {
 		return InstallResult{}, err
 	}
-	if err := m.store.ModuleStates().PutModuleState(ctx, store.ModuleState{
+	if err := m.store.ModuleStates().PutModuleState(ctx, pluginstore.ModuleState{
 		ModuleID:  candidate.PluginID,
 		Enabled:   false,
 		UpdatedAt: now,
@@ -377,7 +404,7 @@ func (m *Manager) Update(ctx context.Context, req UpdateRequest) (UpdateResult, 
 	if err := m.store.PluginInstalls().PutPluginInstall(ctx, record); err != nil {
 		return UpdateResult{}, err
 	}
-	if err := m.store.ModuleStates().PutModuleState(ctx, store.ModuleState{
+	if err := m.store.ModuleStates().PutModuleState(ctx, pluginstore.ModuleState{
 		ModuleID:  candidate.PluginID,
 		Enabled:   false,
 		UpdatedAt: m.now().UTC(),
@@ -425,7 +452,7 @@ func (m *Manager) TrustSigner(ctx context.Context, req TrustSignerRequest) error
 	if strings.TrimSpace(req.KeyID) == "" || strings.TrimSpace(req.PublicKeyB64) == "" {
 		return errors.New("key_id and public_key_b64 are required")
 	}
-	return m.store.TrustedSigners().PutTrustedSigner(ctx, store.TrustedSigner{
+	return m.store.TrustedSigners().PutTrustedSigner(ctx, marketstore.TrustedSigner{
 		KeyID:        strings.TrimSpace(req.KeyID),
 		PublicKeyB64: strings.TrimSpace(req.PublicKeyB64),
 		AddedAt:      m.now().UTC(),
@@ -442,7 +469,7 @@ func (m *Manager) TrustVendor(ctx context.Context, req TrustVendorRequest) (Trus
 	if err != nil {
 		return TrustVendorResult{}, err
 	}
-	keys, err := pluginhost.ReadTrustedKeysFile(path)
+	keys, err := signing.ReadTrustedKeysFile(path)
 	if err != nil {
 		return TrustVendorResult{}, err
 	}
@@ -460,7 +487,7 @@ func (m *Manager) TrustVendor(ctx context.Context, req TrustVendorRequest) (Trus
 	}
 	sort.Strings(keyIDs)
 	now := m.now().UTC()
-	if err := m.store.TrustedVendors().PutTrustedVendor(ctx, store.TrustedVendor{
+	if err := m.store.TrustedVendors().PutTrustedVendor(ctx, marketstore.TrustedVendor{
 		VendorID:   vendorID,
 		Name:       name,
 		WebsiteURL: strings.TrimSpace(req.WebsiteURL),
@@ -470,9 +497,9 @@ func (m *Manager) TrustVendor(ctx context.Context, req TrustVendorRequest) (Trus
 	}); err != nil {
 		return TrustVendorResult{}, err
 	}
-	vendorKeys := make([]store.TrustedVendorKey, 0, len(keyIDs))
+	vendorKeys := make([]marketstore.TrustedVendorKey, 0, len(keyIDs))
 	for _, keyID := range keyIDs {
-		vendorKeys = append(vendorKeys, store.TrustedVendorKey{VendorID: vendorID, KeyID: keyID})
+		vendorKeys = append(vendorKeys, marketstore.TrustedVendorKey{VendorID: vendorID, KeyID: keyID})
 	}
 	if err := m.store.TrustedVendorKeys().ReplaceTrustedVendorKeys(ctx, vendorID, vendorKeys); err != nil {
 		return TrustVendorResult{}, err
@@ -508,11 +535,11 @@ func (m *Manager) resolveTrustedKeysImport(ctx context.Context, req TrustVendorR
 	return filepath.Join(m.sourceCheckoutRoot(source.SourceID), clean), nil
 }
 
-func (m *Manager) resolveCandidate(ctx context.Context, source store.MarketplaceSource, pluginID string) (PluginCandidate, error) {
+func (m *Manager) resolveCandidate(ctx context.Context, source marketstore.MarketplaceSource, pluginID string) (PluginCandidate, error) {
 	if _, err := m.syncSourceRecord(ctx, source); err != nil {
 		return PluginCandidate{}, err
 	}
-	candidates, err := m.scanSourceCandidates(ctx, sourceFromStore(source, store.MarketplaceSourceSync{}))
+	candidates, err := m.scanSourceCandidates(ctx, sourceFromStore(source, marketstore.MarketplaceSourceSync{}))
 	if err != nil {
 		return PluginCandidate{}, err
 	}
@@ -550,11 +577,11 @@ func (m *Manager) scanSourceCandidates(ctx context.Context, source Source) ([]Pl
 			return nil
 		}
 		manifestPath := filepath.Join(path, "plugin.json")
-		entrypointPath := filepath.Join(path, pluginhost.StarlarkEntrypoint)
+		entrypointPath := filepath.Join(path, pluginmanifest.StarlarkEntrypoint)
 		if !fileExists(manifestPath) || !fileExists(entrypointPath) {
 			return nil
 		}
-		manifest, err := pluginhost.ReadStarlarkManifest(manifestPath)
+		manifest, err := pluginmanifest.ReadStarlarkManifest(manifestPath)
 		if err != nil {
 			return nil
 		}
@@ -584,7 +611,7 @@ func (m *Manager) scanSourceCandidates(ctx context.Context, source Source) ([]Pl
 	return out, nil
 }
 
-func (m *Manager) syncSourceRecord(ctx context.Context, source store.MarketplaceSource) (SyncResult, error) {
+func (m *Manager) syncSourceRecord(ctx context.Context, source marketstore.MarketplaceSource) (SyncResult, error) {
 	unlock := m.lock(source.SourceID)
 	defer unlock()
 
@@ -613,7 +640,7 @@ func (m *Manager) syncSourceRecord(ctx context.Context, source store.Marketplace
 		revision, syncErr = m.gitRevision(ctx, root)
 	}
 	now := m.now().UTC()
-	syncRow := store.MarketplaceSourceSync{
+	syncRow := marketstore.MarketplaceSourceSync{
 		SourceID:     source.SourceID,
 		LastRevision: revision,
 	}
@@ -636,7 +663,7 @@ func (m *Manager) syncSourceRecord(ctx context.Context, source store.Marketplace
 	}, nil
 }
 
-func (m *Manager) git(ctx context.Context, dir string, source store.MarketplaceSource, args ...string) error {
+func (m *Manager) git(ctx context.Context, dir string, source marketstore.MarketplaceSource, args ...string) error {
 	cmd := exec.CommandContext(ctx, m.gitBin, args...)
 	if dir != "" {
 		cmd.Dir = dir
@@ -722,54 +749,51 @@ func (m *Manager) copyPluginIntoPlace(srcDir, targetRoot, gitRevision string) (s
 	return bundle.BundleDir, bundle.BundleRelativeDir, bundle.HashB64, nil
 }
 
-func (m *Manager) activeInstallDir(targetRoot string, install store.PluginInstall) (string, error) {
-	if strings.TrimSpace(install.BundleRelativeDir) != "" {
-		return m.bundles.ResolveBundleRelativeDir(targetRoot, install.BundleRelativeDir)
-	}
-	return m.bundles.ResolveBundleDir(targetRoot)
-}
-
-func sourceFromStore(source store.MarketplaceSource, sync store.MarketplaceSourceSync) Source {
+func sourceFromStore(source marketstore.MarketplaceSource, sync marketstore.MarketplaceSourceSync) Source {
 	return Source{
-		SourceID:     source.SourceID,
-		Kind:         source.Kind,
-		GitURL:       source.GitURL,
-		GitRef:       source.GitRef,
-		GitSubdir:    source.GitSubdir,
-		TokenEnvVar:  source.TokenEnvVar,
-		Enabled:      source.Enabled,
-		CreatedAt:    source.CreatedAt,
-		UpdatedAt:    source.UpdatedAt,
-		LastSyncedAt: sync.LastSyncedAt,
-		LastRevision: sync.LastRevision,
-		LastError:    sync.LastError,
+		SourceDefinition: SourceDefinition{
+			SourceID:    source.SourceID,
+			Kind:        source.Kind,
+			GitURL:      source.GitURL,
+			GitRef:      source.GitRef,
+			GitSubdir:   source.GitSubdir,
+			TokenEnvVar: source.TokenEnvVar,
+			Enabled:     source.Enabled,
+		},
+		SourceState: SourceState{
+			CreatedAt:    source.CreatedAt,
+			UpdatedAt:    source.UpdatedAt,
+			LastSyncedAt: sync.LastSyncedAt,
+			LastRevision: sync.LastRevision,
+			LastError:    sync.LastError,
+		},
 	}
 }
 
-func normalizeSource(req SourceUpsert) (store.MarketplaceSource, error) {
+func normalizeSource(req SourceUpsert) (marketstore.MarketplaceSource, error) {
 	sourceID := strings.TrimSpace(req.SourceID)
 	if sourceID == "" {
-		return store.MarketplaceSource{}, errors.New("source_id is required")
+		return marketstore.MarketplaceSource{}, errors.New("source_id is required")
 	}
 	if !isSimpleID(sourceID) {
-		return store.MarketplaceSource{}, fmt.Errorf("source_id %q is invalid", sourceID)
+		return marketstore.MarketplaceSource{}, fmt.Errorf("source_id %q is invalid", sourceID)
 	}
 	kind := strings.TrimSpace(req.Kind)
 	if kind == "" {
 		kind = sourceKindGit
 	}
 	if kind != sourceKindGit {
-		return store.MarketplaceSource{}, fmt.Errorf("unsupported source kind %q", kind)
+		return marketstore.MarketplaceSource{}, fmt.Errorf("unsupported source kind %q", kind)
 	}
 	gitURL := strings.TrimSpace(req.GitURL)
 	if gitURL == "" {
-		return store.MarketplaceSource{}, errors.New("git_url is required")
+		return marketstore.MarketplaceSource{}, errors.New("git_url is required")
 	}
 	tokenEnvVar := strings.TrimSpace(req.TokenEnvVar)
 	if tokenEnvVar != "" && strings.Contains(tokenEnvVar, "=") {
-		return store.MarketplaceSource{}, errors.New("token_env_var must be an env var name, not a value")
+		return marketstore.MarketplaceSource{}, errors.New("token_env_var must be an env var name, not a value")
 	}
-	return store.MarketplaceSource{
+	return marketstore.MarketplaceSource{
 		SourceID:    sourceID,
 		Kind:        kind,
 		GitURL:      gitURL,
@@ -796,31 +820,20 @@ func isSimpleID(value string) bool {
 	return true
 }
 
-func manifestCommandNames(cmds []pluginhost.Command) []string {
-	out := make([]string, 0, len(cmds))
-	for _, cmd := range cmds {
-		if name := strings.TrimSpace(cmd.Name); name != "" {
-			out = append(out, name)
-		}
-	}
-	sort.Strings(out)
-	return out
-}
-
-func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, signers store.TrustedSignerStore) (SignatureState, string) {
+func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, signers marketstore.TrustedSignerStore) (SignatureState, string) {
 	sigPath := filepath.Join(dir, "signature.json")
 	if !fileExists(sigPath) {
 		return SignatureStateUnsigned, ""
 	}
-	sig, err := pluginhost.ReadSignature(sigPath)
+	sig, err := signing.ReadSignature(sigPath)
 	if err != nil {
 		return SignatureStateInvalid, ""
 	}
-	keys, err := pluginhost.LoadTrustedKeys(ctx, trustedKeysFile, signers)
+	keys, err := signing.LoadTrustedKeys(ctx, trustedKeysFile, signers)
 	if err != nil {
 		return SignatureStateInvalid, sig.KeyID
 	}
-	if err := pluginhost.VerifyDirSignature(dir, sig, keys); err != nil {
+	if err := signing.VerifyDirSignature(dir, sig, keys); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "unknown signer") {
 			return SignatureStateUntrusted, sig.KeyID
 		}
@@ -843,7 +856,7 @@ func dirExists(path string) bool {
 	return err == nil && info.IsDir()
 }
 
-func redactToken(message string, source store.MarketplaceSource) string {
+func redactToken(message string, source marketstore.MarketplaceSource) string {
 	tokenEnvVar := strings.TrimSpace(source.TokenEnvVar)
 	if tokenEnvVar == "" {
 		return message
@@ -857,14 +870,6 @@ func redactToken(message string, source store.MarketplaceSource) string {
 
 func (m *Manager) sourceCheckoutRoot(sourceID string) string {
 	return filepath.Join(m.cacheDir, "sources", strings.TrimSpace(sourceID))
-}
-
-func installHashForDir(dir string) string {
-	hash, err := bundles.HashDir(dir)
-	if err != nil {
-		return ""
-	}
-	return base64.StdEncoding.EncodeToString(hash[:])
 }
 
 func SourceIDForURL(url string) string {

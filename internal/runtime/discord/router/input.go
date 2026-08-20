@@ -1,13 +1,13 @@
 package router
 
 import (
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/customid"
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/snowflake/v2"
 
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 )
 
@@ -136,7 +136,7 @@ func autocompleteOption(option discord.AutocompleteOption) contract.OptionValue 
 		value.Channel = &contract.ChannelRef{ID: option.Snowflake().String(), Kind: contract.ChannelText}
 	case discord.ApplicationCommandOptionTypeRole:
 		value.Kind = contract.OptionRole
-		value.Role = &contract.RoleRef{ID: option.Snowflake().String()}
+		value.Role = &contract.RoleRef{RoleIdentity: contract.RoleIdentity{ID: option.Snowflake().String()}}
 	case discord.ApplicationCommandOptionTypeMentionable:
 		value.Kind = contract.OptionMentionable
 		value.Mentionable = &contract.MentionableRef{Kind: contract.MentionableUser, User: &contract.UserRef{ID: option.Snowflake().String()}}
@@ -151,14 +151,14 @@ func ComponentInput(e *events.ComponentInteractionCreate, localID string) contra
 	case discord.ComponentTypeStringSelectMenu:
 		input.Kind = contract.ComponentStringSelect
 		for _, item := range e.StringSelectMenuInteractionData().Values {
-			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionString, String: item})
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionString, ScalarOptionValue: contract.ScalarOptionValue{String: item}})
 		}
 	case discord.ComponentTypeUserSelectMenu:
 		input.Kind = contract.ComponentUserSelect
 		data := e.UserSelectMenuInteractionData()
 		for _, id := range data.Values {
 			user := UserRef(data.Resolved.Users[id])
-			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionUser, User: &user})
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionUser, ReferenceOptionValue: contract.ReferenceOptionValue{User: &user}})
 		}
 	case discord.ComponentTypeRoleSelectMenu:
 		input.Kind = contract.ComponentRoleSelect
@@ -166,7 +166,7 @@ func ComponentInput(e *events.ComponentInteractionCreate, localID string) contra
 		guildID := SnowflakePtrToString(e.GuildID())
 		for _, id := range data.Values {
 			role := RoleRef(data.Resolved.Roles[id], guildID)
-			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionRole, Role: &role})
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionRole, ReferenceOptionValue: contract.ReferenceOptionValue{Role: &role}})
 		}
 	case discord.ComponentTypeMentionableSelectMenu:
 		input.Kind = contract.ComponentMentionableSelect
@@ -175,10 +175,10 @@ func ComponentInput(e *events.ComponentInteractionCreate, localID string) contra
 		for _, id := range data.Values {
 			if user, ok := data.Resolved.Users[id]; ok {
 				ref := UserRef(user)
-				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, Mentionable: &contract.MentionableRef{Kind: contract.MentionableUser, User: &ref}})
+				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, ReferenceOptionValue: contract.ReferenceOptionValue{Mentionable: &contract.MentionableRef{Kind: contract.MentionableUser, User: &ref}}})
 			} else if role, ok := data.Resolved.Roles[id]; ok {
 				ref := RoleRef(role, guildID)
-				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, Mentionable: &contract.MentionableRef{Kind: contract.MentionableRole, Role: &ref}})
+				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, ReferenceOptionValue: contract.ReferenceOptionValue{Mentionable: &contract.MentionableRef{Kind: contract.MentionableRole, Role: &ref}}})
 			}
 		}
 	case discord.ComponentTypeChannelSelectMenu:
@@ -187,7 +187,7 @@ func ComponentInput(e *events.ComponentInteractionCreate, localID string) contra
 		guildID := SnowflakePtrToString(e.GuildID())
 		for _, id := range data.Values {
 			ref := ChannelRef(data.Resolved.Channels[id], guildID)
-			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionChannel, Channel: &ref})
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionChannel, ReferenceOptionValue: contract.ReferenceOptionValue{Channel: &ref}})
 		}
 	}
 	return input
@@ -204,7 +204,7 @@ func ModalInput(e *events.ModalSubmitInteractionCreate, pluginID, localID string
 				id, value = field.CustomID, field.Value
 			}
 		}
-		pid, fieldID, ok := pluginhost.ParseCustomID(id)
+		pid, fieldID, ok := customid.Parse(id)
 		if ok && pid == pluginID {
 			input.Fields = append(input.Fields, contract.NamedString{Name: fieldID, Value: value})
 		}
@@ -231,7 +231,7 @@ func InteractionChannelRef(channel discord.InteractionChannel, guildID string) c
 	return contract.ChannelRef{ID: channel.ID().String(), GuildID: guildID, Name: strings.TrimSpace(channel.Name()), Kind: contractChannelKind(channel.Type()), Mention: discord.ChannelMention(channel.ID()), PermissionBits: uint64(channel.Permissions), CreatedAt: channel.ID().Time().UTC().Unix()}
 }
 func RoleRef(role discord.Role, guildID string) contract.RoleRef {
-	return contract.RoleRef{ID: role.ID.String(), GuildID: guildID, Name: role.Name, Position: role.Position, Permissions: ContractPermissions(role.Permissions), Mention: discord.RoleMention(role.ID), Color: role.Color, Hoist: role.Hoist, Mentionable: role.Mentionable, Managed: role.Managed, PermissionBits: uint64(role.Permissions), CreatedAt: role.CreatedAt().UTC().Unix()}
+	return contract.RoleRef{RoleIdentity: contract.RoleIdentity{ID: role.ID.String(), GuildID: guildID, Name: role.Name}, RoleAuthority: contract.RoleAuthority{Position: role.Position, Permissions: ContractPermissions(role.Permissions)}, RolePresentation: contract.RolePresentation{Mention: discord.RoleMention(role.ID), Color: role.Color, Hoist: role.Hoist, Mentionable: role.Mentionable}, RoleManagement: contract.RoleManagement{Managed: role.Managed, PermissionBits: uint64(role.Permissions)}, CreatedAt: role.CreatedAt().UTC().Unix()}
 }
 func AttachmentRef(value discord.Attachment) contract.AttachmentRef {
 	contentType := ""

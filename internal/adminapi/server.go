@@ -3,6 +3,11 @@ package adminapi
 import (
 	"context"
 	"errors"
+	adminauth "github.com/xsyetopz/go-mamacord/internal/adminapi/auth"
+	adminguilds "github.com/xsyetopz/go-mamacord/internal/adminapi/guilds"
+	adminplugins "github.com/xsyetopz/go-mamacord/internal/adminapi/plugins"
+	adminservice "github.com/xsyetopz/go-mamacord/internal/adminapi/service"
+	adminstatus "github.com/xsyetopz/go-mamacord/internal/adminapi/status"
 	"log/slog"
 	"net"
 	"net/http"
@@ -10,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
+	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 const (
@@ -19,67 +24,58 @@ const (
 	sessionTTL        = 12 * time.Hour
 )
 
-type OAuthUser struct {
-	ID         string `json:"id"`
-	Username   string `json:"username"`
-	GlobalName string `json:"global_name"`
-	Avatar     string `json:"avatar"`
-}
-
-type OAuthClient interface {
-	ExchangeCode(ctx context.Context, code string, redirectURL string) (OAuthToken, error)
-	FetchUser(ctx context.Context, accessToken string) (OAuthUser, error)
-	FetchGuilds(ctx context.Context, accessToken string) ([]OAuthGuild, error)
-}
-
 type Options struct {
 	Addr          string
 	Logger        *slog.Logger
-	Service       *Service
+	Service       *adminservice.Service
+	GuildService  *adminguilds.Service
 	SessionSecret string
 	ClientID      string
 	ClientSecret  string
-	OwnerStatus   func() OwnerStatus
-	OAuthClient   OAuthClient
-	SessionStore  store.AdminSessionStore
+	OwnerStatus   func() adminservice.OwnerStatus
+	OAuthClient   adminauth.OAuthClient
+	SessionStore  accountstore.AdminSessionStore
 }
 
-type Server struct {
-	logger *slog.Logger
-	addr   string
-	svc    *Service
+type serverServices struct {
+	logger  *slog.Logger
+	svc     *adminservice.Service
+	guilds  *adminguilds.Handler
+	plugins *adminplugins.Handler
+	status  *adminstatus.Handler
+}
 
+type serverAuth struct {
 	clientID     string
 	clientSecret string
-	ownerStatus  func() OwnerStatus
-	oauth        OAuthClient
+	ownerStatus  func() adminservice.OwnerStatus
+	oauth        adminauth.OAuthClient
 	secret       []byte
+	sessions     accountstore.AdminSessionStore
+}
 
-	sessions store.AdminSessionStore
-
+type oauthStates struct {
 	stateMu    sync.Mutex
 	stateStore map[string]oauthState
+}
 
+type httpRuntime struct {
+	addr     string
 	mu       sync.Mutex
 	listener net.Listener
 	server   *http.Server
 }
 
+type Server struct {
+	serverServices
+	serverAuth
+	oauthStates
+	httpRuntime
+}
+
 type oauthState struct {
 	RedirectURL string
 	ReturnBase  string
-}
-
-type session struct {
-	ID          string
-	UserID      uint64
-	Username    string
-	Name        string
-	AvatarURL   string
-	CSRFToken   string
-	AccessToken string
-	IsOwner     bool
-	ExpiresAt   int64
 }
 
 func New(opts Options) (*Server, error) {
@@ -90,7 +86,7 @@ func New(opts Options) (*Server, error) {
 		return nil, errors.New("logger is required")
 	}
 	if opts.OAuthClient == nil {
-		opts.OAuthClient = NewDiscordOAuthClient(opts.ClientID, opts.ClientSecret)
+		opts.OAuthClient = adminauth.NewDiscordOAuthClient(opts.ClientID, opts.ClientSecret)
 	}
 	sessionStore := opts.SessionStore
 	if sessionStore == nil {
@@ -98,21 +94,35 @@ func New(opts Options) (*Server, error) {
 	}
 	svc := opts.Service
 	if svc == nil {
-		svc = &Service{}
+		svc = &adminservice.Service{}
 	}
-	svc.init()
-	return &Server{
-		logger:       opts.Logger.With(slog.String("component", "admin_api")),
-		addr:         strings.TrimSpace(opts.Addr),
-		svc:          svc,
-		clientID:     strings.TrimSpace(opts.ClientID),
-		clientSecret: strings.TrimSpace(opts.ClientSecret),
-		ownerStatus:  opts.OwnerStatus,
-		oauth:        opts.OAuthClient,
-		secret:       []byte(opts.SessionSecret),
-		sessions:     sessionStore,
-		stateStore:   map[string]oauthState{},
-	}, nil
+	guildService := opts.GuildService
+	if guildService == nil {
+		guildService = &adminguilds.Service{}
+	}
+	if strings.TrimSpace(guildService.ClientID) == "" {
+		guildService.ClientID = strings.TrimSpace(opts.ClientID)
+	}
+	if guildService.OAuth == nil {
+		guildService.OAuth = opts.OAuthClient
+	}
+	guildService.Init()
+	server := &Server{
+		serverServices: serverServices{logger: opts.Logger.With(slog.String("component", "admin_api")), svc: svc},
+		serverAuth: serverAuth{
+			clientID: strings.TrimSpace(opts.ClientID), clientSecret: strings.TrimSpace(opts.ClientSecret),
+			ownerStatus: opts.OwnerStatus, oauth: opts.OAuthClient, secret: []byte(opts.SessionSecret), sessions: sessionStore,
+		},
+		oauthStates: oauthStates{stateStore: map[string]oauthState{}},
+		httpRuntime: httpRuntime{addr: strings.TrimSpace(opts.Addr)},
+	}
+	server.guilds = adminguilds.New(adminguilds.Options{
+		Service: guildService, Logger: server.logger, Responder: httpResponder{},
+		DashboardBaseURL: server.dashboardBaseURL, RequestBaseURL: requestBaseURL,
+	})
+	server.plugins = adminplugins.New(svc, server.logger, httpResponder{})
+	server.status = adminstatus.New(svc, server.logger, httpResponder{})
+	return server, nil
 }
 
 func (s *Server) Start() error {
@@ -167,21 +177,21 @@ func (s *Server) Close(ctx context.Context) error {
 
 type memorySessionStore struct {
 	mu       sync.Mutex
-	sessions map[string]store.AdminSession
+	sessions map[string]accountstore.AdminSession
 }
 
 func newMemorySessionStore() *memorySessionStore {
-	return &memorySessionStore{sessions: map[string]store.AdminSession{}}
+	return &memorySessionStore{sessions: map[string]accountstore.AdminSession{}}
 }
 
-func (s *memorySessionStore) GetAdminSession(_ context.Context, id string) (store.AdminSession, bool, error) {
+func (s *memorySessionStore) GetAdminSession(_ context.Context, id string) (accountstore.AdminSession, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	sess, ok := s.sessions[id]
 	return sess, ok, nil
 }
 
-func (s *memorySessionStore) PutAdminSession(_ context.Context, sess store.AdminSession) error {
+func (s *memorySessionStore) PutAdminSession(_ context.Context, sess accountstore.AdminSession) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.sessions[sess.ID] = sess

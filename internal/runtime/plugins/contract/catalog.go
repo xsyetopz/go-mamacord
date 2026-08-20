@@ -21,21 +21,41 @@ const (
 	RouteCheck        RouteType = "check"
 )
 
-type RouteSignature struct {
-	Type           RouteType
-	Route          RouteID
-	CommandKind    CommandKind
-	Defer          DeferMode
-	Path           []string
-	Options        []OptionDefinition
-	OptionName     string
-	OptionKind     OptionKind
+type CommandRouteSignature struct {
+	CommandKind CommandKind
+	Path        []string
+	Options     []OptionDefinition
+}
+
+type AutocompleteRouteSignature struct {
+	OptionName string
+	OptionKind OptionKind
+}
+
+type ComponentRouteSignature struct {
 	ComponentID    string
 	ComponentKinds []ComponentKind
-	ModalID        string
-	ModalFields    []ModalFieldDefinition
-	Event          string
-	TaskID         string
+}
+
+type ModalRouteSignature struct {
+	ModalID     string
+	ModalFields []ModalFieldDefinition
+}
+
+type AutomationRouteSignature struct {
+	Event  string
+	TaskID string
+}
+
+type RouteSignature struct {
+	Type  RouteType
+	Route RouteID
+	Defer DeferMode
+	CommandRouteSignature
+	AutocompleteRouteSignature
+	ComponentRouteSignature
+	ModalRouteSignature
+	AutomationRouteSignature
 }
 
 func (signature RouteSignature) DeepClone() RouteSignature {
@@ -66,25 +86,25 @@ func (definition Definition) Compile() (*RouteCatalog, error) {
 			}
 		}
 		for _, listener := range cog.Listeners {
-			catalog.add(RouteSignature{Type: RouteListener, Route: listener.Route, Event: listener.Event})
+			catalog.add(RouteSignature{Type: RouteListener, Route: listener.Route, AutomationRouteSignature: AutomationRouteSignature{Event: listener.Event}})
 			for _, check := range listener.Checks {
 				catalog.addCheck(check)
 			}
 		}
 		for _, task := range cog.Tasks {
-			catalog.add(RouteSignature{Type: RouteTask, Route: task.Route, TaskID: task.ID})
+			catalog.add(RouteSignature{Type: RouteTask, Route: task.Route, AutomationRouteSignature: AutomationRouteSignature{TaskID: task.ID}})
 			for _, check := range task.Checks {
 				catalog.addCheck(check)
 			}
 		}
 		for _, component := range cog.Components {
-			catalog.add(RouteSignature{Type: RouteComponent, Route: component.Route, ComponentID: component.ID, ComponentKinds: append([]ComponentKind(nil), component.Kinds...), Defer: component.Defer})
+			catalog.add(RouteSignature{Type: RouteComponent, Route: component.Route, Defer: component.Defer, ComponentRouteSignature: ComponentRouteSignature{ComponentID: component.ID, ComponentKinds: append([]ComponentKind(nil), component.Kinds...)}})
 			for _, check := range component.Checks {
 				catalog.addCheck(check)
 			}
 		}
 		for _, modal := range cog.Modals {
-			catalog.add(RouteSignature{Type: RouteModal, Route: modal.Route, ModalID: modal.ID, ModalFields: append([]ModalFieldDefinition(nil), modal.Fields...), Defer: modal.Defer})
+			catalog.add(RouteSignature{Type: RouteModal, Route: modal.Route, Defer: modal.Defer, ModalRouteSignature: ModalRouteSignature{ModalID: modal.ID, ModalFields: append([]ModalFieldDefinition(nil), modal.Fields...)}})
 			for _, check := range modal.Checks {
 				catalog.addCheck(check)
 			}
@@ -106,10 +126,10 @@ func (catalog *RouteCatalog) addCommand(command CommandDefinition, parent []stri
 		}
 		return nil
 	}
-	catalog.add(RouteSignature{Type: RouteCommand, Route: command.Route, CommandKind: rootKind, Defer: command.Defer, Path: path, Options: cloneOptions(command.Options)})
+	catalog.add(RouteSignature{Type: RouteCommand, Route: command.Route, Defer: command.Defer, CommandRouteSignature: CommandRouteSignature{CommandKind: rootKind, Path: path, Options: cloneOptions(command.Options)}})
 	for _, option := range command.Options {
 		if option.Autocomplete != "" {
-			catalog.add(RouteSignature{Type: RouteAutocomplete, Route: option.Autocomplete, Path: append([]string(nil), path...), Options: cloneOptions(command.Options), OptionName: option.Name, OptionKind: option.Kind})
+			catalog.add(RouteSignature{Type: RouteAutocomplete, Route: option.Autocomplete, CommandRouteSignature: CommandRouteSignature{Path: append([]string(nil), path...), Options: cloneOptions(command.Options)}, AutocompleteRouteSignature: AutocompleteRouteSignature{OptionName: option.Name, OptionKind: option.Kind}})
 		}
 	}
 	return nil

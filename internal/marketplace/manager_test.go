@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	pluginmanifest "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/manifest"
 	"log/slog"
 	"os"
 	"os/exec"
@@ -13,9 +14,8 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
-	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
+	pgtest "github.com/xsyetopz/go-mamacord/internal/storage/postgres/testkit"
 )
 
 func TestManagerInstallAndForceUpdate(t *testing.T) {
@@ -295,7 +295,7 @@ func newTestManager(t *testing.T, prod bool, bundleRepo ...bundles.Repository) (
 
 	tmp := t.TempDir()
 	userDir := filepath.Join(tmp, "user")
-	db := postgrestest.OpenMigratedDB(t)
+	db := pgtest.OpenMigratedDB(t)
 	storage, err := postgresstore.New(db)
 	if err != nil {
 		t.Fatalf("postgresstore.New: %v", err)
@@ -305,15 +305,14 @@ func newTestManager(t *testing.T, prod bool, bundleRepo ...bundles.Repository) (
 		repo = bundleRepo[0]
 	}
 	manager, err := marketplace.New(marketplace.Options{
-		Logger:            slog.New(slog.NewTextHandler(ioDiscard{}, nil)),
-		Store:             storage,
-		Bundles:           repo,
-		BundledPluginsDir: filepath.Join(tmp, "bundled"),
-		UserPluginsDir:    userDir,
-		TrustedKeysFile:   filepath.Join(tmp, "trusted_keys.json"),
-		CacheDir:          filepath.Join(tmp, "cache"),
-		ProdMode:          prod,
-		AllowUnsigned:     false,
+		OptionDependencies: marketplace.OptionDependencies{
+			Logger: slog.New(slog.NewTextHandler(ioDiscard{}, nil)), Store: storage, Bundles: repo,
+		},
+		OptionPaths: marketplace.OptionPaths{
+			BundledPluginsDir: filepath.Join(tmp, "bundled"), UserPluginsDir: userDir,
+			TrustedKeysFile: filepath.Join(tmp, "trusted_keys.json"), CacheDir: filepath.Join(tmp, "cache"),
+		},
+		OptionTrust: marketplace.OptionTrust{ProdMode: prod, AllowUnsigned: false},
 	})
 	if err != nil {
 		t.Fatalf("marketplace.New: %v", err)
@@ -328,7 +327,7 @@ func writePlugin(t *testing.T, repoRoot, pluginID, name, version, sourceMarker s
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
-	manifestBytes, err := json.Marshal(pluginhost.StarlarkManifest{Schema: pluginhost.StarlarkManifestSchema, ID: pluginID, Name: name, Version: version, Entrypoint: pluginhost.StarlarkEntrypoint, Permissions: pluginhost.StarlarkManifestPermissions{Network: pluginhost.StarlarkManifestNetworkPermissions{Hosts: []string{}}}, Locales: pluginhost.StarlarkManifestLocales{Default: "en-US", Supported: []string{"en-US"}}, StateKeys: []string{}, Assets: []string{}})
+	manifestBytes, err := json.Marshal(pluginmanifest.StarlarkManifest{Schema: pluginmanifest.StarlarkManifestSchema, ID: pluginID, Name: name, Version: version, Entrypoint: pluginmanifest.StarlarkEntrypoint, Permissions: pluginmanifest.StarlarkManifestPermissions{Network: pluginmanifest.StarlarkManifestNetworkPermissions{Hosts: []string{}}}, Locales: pluginmanifest.StarlarkManifestLocales{Default: "en-US", Supported: []string{"en-US"}}, StateKeys: []string{}, Assets: []string{}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -369,3 +368,26 @@ func runGit(t *testing.T, dir string, args ...string) {
 type ioDiscard struct{}
 
 func (ioDiscard) Write(p []byte) (int, error) { return len(p), nil }
+
+func TestSourceCompositionPreservesFlatJSON(t *testing.T) {
+	t.Parallel()
+
+	source := marketplace.Source{
+		SourceDefinition: marketplace.SourceDefinition{SourceID: "official", GitURL: "https://example.com/repo.git"},
+		SourceState:      marketplace.SourceState{LastRevision: "abc123"},
+	}
+	data, err := json.Marshal(source)
+	if err != nil {
+		t.Fatalf("Marshal: %v", err)
+	}
+	var object map[string]any
+	if err := json.Unmarshal(data, &object); err != nil {
+		t.Fatalf("Unmarshal: %v", err)
+	}
+	if object["source_id"] != "official" || object["last_revision"] != "abc123" {
+		t.Fatalf("flat source JSON = %#v", object)
+	}
+	if _, nested := object["SourceDefinition"]; nested {
+		t.Fatalf("source JSON unexpectedly nested: %#v", object)
+	}
+}
