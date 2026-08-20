@@ -25,6 +25,9 @@ jobs:
       - name: Check module files
         run: go mod tidy -diff
 
+      - name: Enforce internal architecture
+        run: go run ./cmd/archcheck
+
       - name: Run tests
         run: go test ./...
 
@@ -101,12 +104,11 @@ jobs:
           MAMACORD_TEST_POSTGRES_DSN: postgres://mamacord:secret@127.0.0.1:5432/mamacord?sslmode=disable
         run: |
           go test ./internal/migration \
-            ./internal/storage/postgres \
-            ./internal/storagebootstrap \
+            ./internal/storage/postgres/... \
             ./internal/app \
-            ./internal/adminapi \
+            ./internal/adminapi/... \
             ./internal/marketplace \
-            ./internal/runtime/plugins/starlark \
+            ./internal/runtime/plugins/starlark/... \
             ./internal/runtime/plugins/httpjson \
             ./internal/runtime/plugins/contract \
             -count=1 -v
