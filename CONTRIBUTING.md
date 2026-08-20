@@ -27,11 +27,13 @@ The main code paths are:
 
 - `cmd/mamacord/` for the process entrypoint.
 - `internal/app/` for application wiring.
-- `internal/runtime/discord/` for Discord transport and runtime behavior.
+- `internal/runtime/discord/` for the runtime facade, with gateway, interaction, automation, catalog, control, router, and plugin bridge ownership in its subpackages.
+- `internal/adminapi/` for HTTP composition, with auth, guild, plugin, status, and service ownership in its subpackages.
 - `internal/commands/` for built-in kernel commands and shared command contracts.
 - `internal/runtime/plugins/` for plugin discovery, policy, signing, and dispatch.
-- `internal/runtime/plugins/starlark/` for compilation, author APIs, invocation, and generation lifecycle.
+- `internal/runtime/plugins/starlark/` for compile, author, execution, and generation packages; invocation context belongs in `execution/context/`.
 - `internal/runtime/plugins/contract/` for the language-neutral typed plugin boundary.
+- `internal/storage/` for domain contracts and `internal/storage/postgres/` for inward-depending PostgreSQL adapters.
 - `examples/plugins/` for shipped sample plugins.
 - `plugins/` for runtime-loaded plugins.
 
@@ -50,6 +52,11 @@ Keep those boundaries intact. Avoid mixing Discord transport concerns, feature l
 
 - Run `gofmt` on every edited Go file.
 - Prefer clear package boundaries over catch-all files or generic helpers.
+- Keep each `internal/` directory at no more than 10 grouped file units; `foo.go` and `foo_test.go` count once.
+- Do not keep flat categorical filenames. Two or more grouped Go units sharing a categorical prefix or suffix, including a root such as `service.go` plus `service_config.go`, belong in a cohesive package. Do not rename or concatenate unrelated files to hide the category.
+- Do not repeat the package directory in a Go filename: use `signing/cli.go`, not `signing/signing_cli.go`, and `projection/contract.go`, not `projection/contract_projection.go`.
+- Keep each struct at no more than 10 declared fields through meaningful composition, not metric-only buckets.
+- Do not create `foo/foo.go` solely to satisfy counts. A singleton package needs an independent dependency or consumer boundary.
 - Keep error messages specific and actionable.
 - Avoid hidden behavior in refactors. Structural changes should preserve behavior unless the pull request explicitly changes behavior.
 
@@ -79,6 +86,9 @@ go test ./...
 
 # Run a focused package test
 go test ./internal/runtime/plugins/...
+
+# Enforce internal package layout and struct limits
+go run ./cmd/archcheck
 
 # Format edited Go files
 gofmt -w ./internal/...
