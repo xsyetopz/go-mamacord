@@ -7,7 +7,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type PluginAdmin interface {
@@ -32,7 +32,7 @@ type MarketplaceAdmin interface {
 
 type Services struct {
 	Logger       *slog.Logger
-	Restrictions moderationstore.RestrictionStore
+	Restrictions storage.RestrictionStore
 	ProdMode     bool
 
 	IsOwner func(userID uint64) bool

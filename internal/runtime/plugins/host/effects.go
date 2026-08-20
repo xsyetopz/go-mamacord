@@ -21,9 +21,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
@@ -325,7 +323,7 @@ func (host *Host) loadState(ctx context.Context, plugin *Plugin, guildIDText str
 	if host.store == nil {
 		return nil, errors.New("plugin storage unavailable")
 	}
-	versioned, ok := host.store.PluginKV().(pluginstore.VersionedPluginKVStore)
+	versioned, ok := host.store.PluginKV().(storage.VersionedPluginKVStore)
 	if !ok {
 		return nil, errors.New("plugin KV store does not support versioned state")
 	}
@@ -567,7 +565,7 @@ func (host *Host) putState(ctx context.Context, pluginID string, invocation cont
 	if operation.ExpectedVersion == nil {
 		return host.store.PluginKV().PutPluginKV(ctx, guildID, pluginID, operation.Key, encoded)
 	}
-	versioned, ok := host.store.PluginKV().(pluginstore.VersionedPluginKVStore)
+	versioned, ok := host.store.PluginKV().(storage.VersionedPluginKVStore)
 	if !ok {
 		return errors.New("versioned KV unavailable")
 	}
@@ -594,7 +592,7 @@ func (host *Host) deleteState(ctx context.Context, pluginID string, invocation c
 	if operation.ExpectedVersion == nil {
 		return host.store.PluginKV().DeletePluginKV(ctx, guildID, pluginID, operation.Key)
 	}
-	versioned, ok := host.store.PluginKV().(pluginstore.VersionedPluginKVStore)
+	versioned, ok := host.store.PluginKV().(storage.VersionedPluginKVStore)
 	if !ok {
 		return errors.New("versioned KV unavailable")
 	}
@@ -632,17 +630,17 @@ func (host *Host) executeStorageEffect(ctx context.Context, invocation contract.
 		if authorErr != nil {
 			return authorErr
 		}
-		return host.store.CheckIns().CreateCheckIn(ctx, automationstore.CheckIn{ID: uuid.NewString(), UserID: authorID, Mood: value.Mood, CreatedAt: time.Unix(value.CreatedAt, 0).UTC()})
+		return host.store.CheckIns().CreateCheckIn(ctx, storage.CheckIn{ID: uuid.NewString(), UserID: authorID, Mood: value.Mood, CreatedAt: time.Unix(value.CreatedAt, 0).UTC()})
 	case *contract.CreateReminderOperation:
 		if authorErr != nil {
 			return authorErr
 		}
-		reminder := automationstore.Reminder{
-			ReminderIdentity:       automationstore.ReminderIdentity{ID: value.ReminderID, UserID: authorID},
-			ReminderSchedule:       automationstore.ReminderSchedule{Schedule: value.Schedule, Kind: value.Kind, Note: value.Note},
-			ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{Delivery: automationstore.ReminderDelivery(value.Delivery)},
-			ReminderState:          automationstore.ReminderState{Enabled: true, NextRunAt: time.Unix(value.NextRunAt, 0).UTC()},
-			ReminderTimestamps: automationstore.ReminderTimestamps{
+		reminder := storage.Reminder{
+			ReminderIdentity:       storage.ReminderIdentity{ID: value.ReminderID, UserID: authorID},
+			ReminderSchedule:       storage.ReminderSchedule{Schedule: value.Schedule, Kind: value.Kind, Note: value.Note},
+			ReminderDeliveryTarget: storage.ReminderDeliveryTarget{Delivery: storage.ReminderDelivery(value.Delivery)},
+			ReminderState:          storage.ReminderState{Enabled: true, NextRunAt: time.Unix(value.NextRunAt, 0).UTC()},
+			ReminderTimestamps: storage.ReminderTimestamps{
 				CreatedAt: time.Unix(invocation.NowUnix, 0).UTC(),
 				UpdatedAt: time.Unix(invocation.NowUnix, 0).UTC(),
 			},
@@ -682,7 +680,7 @@ func (host *Host) executeStorageEffect(ctx context.Context, invocation contract.
 		if err != nil {
 			return err
 		}
-		return host.store.Warnings().CreateWarning(ctx, moderationstore.Warning{ID: uuid.NewString(), GuildID: guildID, UserID: target, ModeratorID: authorID, Reason: value.Reason, CreatedAt: time.Unix(value.CreatedAt, 0).UTC()})
+		return host.store.Warnings().CreateWarning(ctx, storage.Warning{ID: uuid.NewString(), GuildID: guildID, UserID: target, ModeratorID: authorID, Reason: value.Reason, CreatedAt: time.Unix(value.CreatedAt, 0).UTC()})
 	case *contract.DeleteWarningOperation:
 		if authorErr != nil {
 			return authorErr
@@ -716,7 +714,7 @@ func (host *Host) executeStorageEffect(ctx context.Context, invocation contract.
 	}
 }
 func (host *Host) appendAudit(ctx context.Context, invocation contract.Invocation, value *contract.AppendAuditOperation) error {
-	entry := moderationstore.AuditEntry{Action: value.Action, CreatedAt: time.Unix(value.CreatedAt, 0).UTC(), MetaJSON: "{}"}
+	entry := storage.AuditEntry{Action: value.Action, CreatedAt: time.Unix(value.CreatedAt, 0).UTC(), MetaJSON: "{}"}
 	if invocation.Guild != nil {
 		guild, err := parseID(invocation.Guild.ID)
 		if err != nil {
@@ -736,7 +734,7 @@ func (host *Host) appendAudit(ctx context.Context, invocation contract.Invocatio
 		if err != nil {
 			return err
 		}
-		kind := moderationstore.TargetType(value.TargetType)
+		kind := storage.TargetType(value.TargetType)
 		entry.TargetType = &kind
 		entry.TargetID = &target
 	}

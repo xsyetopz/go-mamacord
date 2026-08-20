@@ -7,20 +7,19 @@ import (
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/snowflake/v2"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Service struct {
 	logger        *slog.Logger
 	i18n          i18n.Registry
-	reminderStore automationstore.ReminderStore
-	userSettings  accountstore.UserSettingsStore
+	reminderStore storage.ReminderStore
+	userSettings  storage.UserSettingsStore
 	client        *bot.Client
 	incFailure    func()
 }
 
-func NewService(logger *slog.Logger, registry i18n.Registry, reminders automationstore.ReminderStore, settings accountstore.UserSettingsStore, client *bot.Client, incFailure func()) *Service {
+func NewService(logger *slog.Logger, registry i18n.Registry, reminders storage.ReminderStore, settings storage.UserSettingsStore, client *bot.Client, incFailure func()) *Service {
 	return &Service{logger: logger, i18n: registry, reminderStore: reminders, userSettings: settings, client: client, incFailure: incFailure}
 }
 

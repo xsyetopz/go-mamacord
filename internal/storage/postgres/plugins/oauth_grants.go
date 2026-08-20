@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"strings"
 	"time"
-
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 type pluginOAuthGrantStore struct {
@@ -16,16 +15,16 @@ type pluginOAuthGrantStore struct {
 	now func() time.Time
 }
 
-func (s pluginOAuthGrantStore) GetPluginOAuthGrant(ctx context.Context, userID uint64, pluginID string) (pluginstore.PluginOAuthGrant, bool, error) {
+func (s pluginOAuthGrantStore) GetPluginOAuthGrant(ctx context.Context, userID uint64, pluginID string) (storage.PluginOAuthGrant, bool, error) {
 	if s.db == nil {
-		return pluginstore.PluginOAuthGrant{}, false, errors.New("db unavailable")
+		return storage.PluginOAuthGrant{}, false, errors.New("db unavailable")
 	}
 	if userID == 0 {
-		return pluginstore.PluginOAuthGrant{}, false, errors.New("invalid user id")
+		return storage.PluginOAuthGrant{}, false, errors.New("invalid user id")
 	}
 	pluginID = strings.TrimSpace(pluginID)
 	if pluginID == "" {
-		return pluginstore.PluginOAuthGrant{}, false, errors.New("plugin id is required")
+		return storage.PluginOAuthGrant{}, false, errors.New("plugin id is required")
 	}
 
 	row := s.db.QueryRowContext(
@@ -36,21 +35,21 @@ func (s pluginOAuthGrantStore) GetPluginOAuthGrant(ctx context.Context, userID u
 		userID,
 		pluginID,
 	)
-	var grant pluginstore.PluginOAuthGrant
+	var grant storage.PluginOAuthGrant
 	var createdAt int64
 	var updatedAt int64
 	if err := row.Scan(&grant.UserID, &grant.PluginID, &grant.Scope, &createdAt, &updatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return pluginstore.PluginOAuthGrant{}, false, nil
+			return storage.PluginOAuthGrant{}, false, nil
 		}
-		return pluginstore.PluginOAuthGrant{}, false, err
+		return storage.PluginOAuthGrant{}, false, err
 	}
 	grant.CreatedAt = time.Unix(createdAt, 0).UTC()
 	grant.UpdatedAt = time.Unix(updatedAt, 0).UTC()
 	return grant, true, nil
 }
 
-func (s pluginOAuthGrantStore) ListPluginOAuthGrants(ctx context.Context, userID uint64) ([]pluginstore.PluginOAuthGrant, error) {
+func (s pluginOAuthGrantStore) ListPluginOAuthGrants(ctx context.Context, userID uint64) ([]storage.PluginOAuthGrant, error) {
 	if s.db == nil {
 		return nil, errors.New("db unavailable")
 	}
@@ -71,9 +70,9 @@ func (s pluginOAuthGrantStore) ListPluginOAuthGrants(ctx context.Context, userID
 	}
 	defer rows.Close()
 
-	out := []pluginstore.PluginOAuthGrant{}
+	out := []storage.PluginOAuthGrant{}
 	for rows.Next() {
-		var grant pluginstore.PluginOAuthGrant
+		var grant storage.PluginOAuthGrant
 		var createdAt int64
 		var updatedAt int64
 		if err := rows.Scan(&grant.UserID, &grant.PluginID, &grant.Scope, &createdAt, &updatedAt); err != nil {
@@ -89,7 +88,7 @@ func (s pluginOAuthGrantStore) ListPluginOAuthGrants(ctx context.Context, userID
 	return out, nil
 }
 
-func (s pluginOAuthGrantStore) PutPluginOAuthGrant(ctx context.Context, grant pluginstore.PluginOAuthGrant) error {
+func (s pluginOAuthGrantStore) PutPluginOAuthGrant(ctx context.Context, grant storage.PluginOAuthGrant) error {
 	if s.db == nil {
 		return errors.New("db unavailable")
 	}

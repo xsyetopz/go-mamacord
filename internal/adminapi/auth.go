@@ -9,13 +9,12 @@ import (
 	"errors"
 	adminauth "github.com/xsyetopz/go-mamacord/internal/adminapi/auth"
 	adminservice "github.com/xsyetopz/go-mamacord/internal/adminapi/service"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 func (s *Server) withAuth(next func(http.ResponseWriter, *http.Request, adminauth.Session)) http.HandlerFunc {
@@ -201,7 +200,7 @@ func (s *Server) putSession(ctx context.Context, sess adminauth.Session) error {
 	if s.sessions == nil {
 		return errors.New("session store is not configured")
 	}
-	return s.sessions.PutAdminSession(ctx, accountstore.AdminSession{
+	return s.sessions.PutAdminSession(ctx, storage.AdminSession{
 		ID:          sess.ID,
 		UserID:      sess.UserID,
 		Username:    sess.Username,

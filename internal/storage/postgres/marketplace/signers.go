@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"strings"
 	"time"
-
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
 )
 
 type signerStore struct {
@@ -15,7 +14,7 @@ type signerStore struct {
 	now func() time.Time
 }
 
-func (s signerStore) ListTrustedSigners(ctx context.Context) ([]marketstore.TrustedSigner, error) {
+func (s signerStore) ListTrustedSigners(ctx context.Context) ([]storage.TrustedSigner, error) {
 	const query = `SELECT key_id, public_key_b64, added_at FROM trusted_signers ORDER BY key_id`
 
 	rows, err := s.db.QueryContext(ctx, query)
@@ -24,7 +23,7 @@ func (s signerStore) ListTrustedSigners(ctx context.Context) ([]marketstore.Trus
 	}
 	defer rows.Close()
 
-	var out []marketstore.TrustedSigner
+	var out []storage.TrustedSigner
 	for rows.Next() {
 		var (
 			keyID        string
@@ -34,7 +33,7 @@ func (s signerStore) ListTrustedSigners(ctx context.Context) ([]marketstore.Trus
 		if err := rows.Scan(&keyID, &publicKeyB64, &addedAt); err != nil {
 			return nil, fmt.Errorf("scan trusted signer: %w", err)
 		}
-		out = append(out, marketstore.TrustedSigner{
+		out = append(out, storage.TrustedSigner{
 			KeyID:        strings.TrimSpace(keyID),
 			PublicKeyB64: strings.TrimSpace(publicKeyB64),
 			AddedAt:      time.Unix(addedAt, 0).UTC(),
@@ -46,7 +45,7 @@ func (s signerStore) ListTrustedSigners(ctx context.Context) ([]marketstore.Trus
 	return out, nil
 }
 
-func (s signerStore) PutTrustedSigner(ctx context.Context, signer marketstore.TrustedSigner) error {
+func (s signerStore) PutTrustedSigner(ctx context.Context, signer storage.TrustedSigner) error {
 	keyID := strings.TrimSpace(signer.KeyID)
 	if keyID == "" {
 		return fmt.Errorf("key_id is required")

@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type userSettingsStore struct {
@@ -17,14 +16,14 @@ type userSettingsStore struct {
 	now func() time.Time
 }
 
-func (s userSettingsStore) GetUserSettings(ctx context.Context, userID uint64) (accountstore.UserSettings, bool, error) {
+func (s userSettingsStore) GetUserSettings(ctx context.Context, userID uint64) (storage.UserSettings, bool, error) {
 	if s.db == nil {
-		return accountstore.UserSettings{}, false, errors.New("db not configured")
+		return storage.UserSettings{}, false, errors.New("db not configured")
 	}
 
 	userID64, err := sqlvalue.Uint64ToInt64(userID, "user_id")
 	if err != nil {
-		return accountstore.UserSettings{}, false, err
+		return storage.UserSettings{}, false, err
 	}
 
 	const query = `
@@ -40,21 +39,21 @@ WHERE user_id = $1`
 	)
 	if err := s.db.QueryRowContext(ctx, query, userID64).Scan(&timezone, &dmChannel, &createdAt, &updatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return accountstore.UserSettings{}, false, nil
+			return storage.UserSettings{}, false, nil
 		}
-		return accountstore.UserSettings{}, false, fmt.Errorf("get user_settings: %w", err)
+		return storage.UserSettings{}, false, fmt.Errorf("get user_settings: %w", err)
 	}
 
 	var dmPtr *uint64
 	if dmChannel.Valid {
 		v, err := sqlvalue.Int64ToUint64(dmChannel.Int64, "dm_channel_id")
 		if err != nil {
-			return accountstore.UserSettings{}, false, err
+			return storage.UserSettings{}, false, err
 		}
 		dmPtr = &v
 	}
 
-	return accountstore.UserSettings{
+	return storage.UserSettings{
 		UserID:      userID,
 		Timezone:    strings.TrimSpace(timezone),
 		DMChannelID: dmPtr,

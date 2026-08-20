@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 type restrictionStore struct {
@@ -18,9 +17,9 @@ type restrictionStore struct {
 
 func (s restrictionStore) GetRestriction(
 	ctx context.Context,
-	targetType moderationstore.TargetType,
+	targetType storage.TargetType,
 	targetID uint64,
-) (moderationstore.Restriction, bool, error) {
+) (storage.Restriction, bool, error) {
 	const query = `
 SELECT reason, created_by, created_at
 FROM restrictions
@@ -28,7 +27,7 @@ WHERE target_type = $1 AND target_id = $2`
 
 	targetIDDB, err := sqlvalue.Uint64ToInt64(targetID, "target_id")
 	if err != nil {
-		return moderationstore.Restriction{}, false, err
+		return storage.Restriction{}, false, err
 	}
 
 	var (
@@ -38,17 +37,17 @@ WHERE target_type = $1 AND target_id = $2`
 	)
 	if err := s.db.QueryRowContext(ctx, query, string(targetType), targetIDDB).Scan(&reason, &createdBy, &createdAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return moderationstore.Restriction{}, false, nil
+			return storage.Restriction{}, false, nil
 		}
-		return moderationstore.Restriction{}, false, fmt.Errorf("get restriction: %w", err)
+		return storage.Restriction{}, false, fmt.Errorf("get restriction: %w", err)
 	}
 
 	createdByU64, err := sqlvalue.Int64ToUint64(createdBy, "created_by")
 	if err != nil {
-		return moderationstore.Restriction{}, false, err
+		return storage.Restriction{}, false, err
 	}
 
-	return moderationstore.Restriction{
+	return storage.Restriction{
 		TargetType: targetType,
 		TargetID:   targetID,
 		Reason:     reason,
@@ -57,7 +56,7 @@ WHERE target_type = $1 AND target_id = $2`
 	}, true, nil
 }
 
-func (s restrictionStore) PutRestriction(ctx context.Context, r moderationstore.Restriction) error {
+func (s restrictionStore) PutRestriction(ctx context.Context, r storage.Restriction) error {
 	const query = `
 INSERT INTO restrictions(target_type, target_id, reason, created_by, created_at)
 VALUES ($1, $2, $3, $4, $5)
@@ -94,7 +93,7 @@ ON CONFLICT(target_type, target_id) DO UPDATE SET
 	return nil
 }
 
-func (s restrictionStore) DeleteRestriction(ctx context.Context, targetType moderationstore.TargetType, targetID uint64) error {
+func (s restrictionStore) DeleteRestriction(ctx context.Context, targetType storage.TargetType, targetID uint64) error {
 	targetIDDB, err := sqlvalue.Uint64ToInt64(targetID, "target_id")
 	if err != nil {
 		return err

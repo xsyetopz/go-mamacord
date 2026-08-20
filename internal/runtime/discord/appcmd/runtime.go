@@ -16,7 +16,7 @@ import (
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Runtime struct {
@@ -29,7 +29,7 @@ type Runtime struct {
 type RuntimeCore struct {
 	Logger       *slog.Logger
 	Registry     i18n.Registry
-	Restrictions moderationstore.RestrictionStore
+	Restrictions storage.RestrictionStore
 	ProdMode     bool
 }
 
@@ -84,7 +84,7 @@ func (r Runtime) CheckRestrictions(
 	msgText := t.S(msgID, msgData)
 
 	userID := uint64(e.User().ID)
-	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeUser, userID); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, storage.TargetTypeUser, userID); err != nil {
 		return false, err
 	} else if ok {
 		return true, e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", msgText, true))
@@ -95,7 +95,7 @@ func (r Runtime) CheckRestrictions(
 		return false, nil
 	}
 
-	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeGuild, uint64(*guildID)); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, storage.TargetTypeGuild, uint64(*guildID)); err != nil {
 		return false, err
 	} else if ok {
 		return true, e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", msgText, true))

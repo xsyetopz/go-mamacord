@@ -2,9 +2,8 @@ package pluginspg
 
 import (
 	"database/sql"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"time"
-
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 type Store struct {
@@ -19,14 +18,14 @@ func New(db *sql.DB, now func() time.Time) Store {
 	return Store{db: db, now: now}
 }
 
-func (s Store) PluginKV() pluginstore.PluginKVStore {
+func (s Store) PluginKV() storage.PluginKVStore {
 	return pluginKVStore{db: s.db, now: s.now}
 }
 
-func (s Store) ModuleStates() pluginstore.ModuleStateStore {
+func (s Store) ModuleStates() storage.ModuleStateStore {
 	return moduleStateStore{db: s.db, now: s.now}
 }
 
-func (s Store) PluginOAuthGrants() pluginstore.PluginOAuthGrantStore {
+func (s Store) PluginOAuthGrants() storage.PluginOAuthGrantStore {
 	return pluginOAuthGrantStore{db: s.db, now: s.now}
 }

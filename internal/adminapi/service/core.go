@@ -18,7 +18,7 @@ import (
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var pluginIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]{1,31}$`)
@@ -39,8 +39,8 @@ type ServiceAdmins struct {
 }
 
 type ServiceStores struct {
-	TrustedSigners marketstore.TrustedSignerStore
-	PluginInstalls marketstore.PluginInstallStore
+	TrustedSigners storage.TrustedSignerStore
+	PluginInstalls storage.PluginInstallStore
 }
 
 type Service struct {

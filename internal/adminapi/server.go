@@ -8,14 +8,13 @@ import (
 	adminplugins "github.com/xsyetopz/go-mamacord/internal/adminapi/plugins"
 	adminservice "github.com/xsyetopz/go-mamacord/internal/adminapi/service"
 	adminstatus "github.com/xsyetopz/go-mamacord/internal/adminapi/status"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"log/slog"
 	"net"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 const (
@@ -34,7 +33,7 @@ type Options struct {
 	ClientSecret  string
 	OwnerStatus   func() adminservice.OwnerStatus
 	OAuthClient   adminauth.OAuthClient
-	SessionStore  accountstore.AdminSessionStore
+	SessionStore  storage.AdminSessionStore
 }
 
 type serverServices struct {
@@ -51,7 +50,7 @@ type serverAuth struct {
 	ownerStatus  func() adminservice.OwnerStatus
 	oauth        adminauth.OAuthClient
 	secret       []byte
-	sessions     accountstore.AdminSessionStore
+	sessions     storage.AdminSessionStore
 }
 
 type oauthStates struct {
@@ -177,21 +176,21 @@ func (s *Server) Close(ctx context.Context) error {
 
 type memorySessionStore struct {
 	mu       sync.Mutex
-	sessions map[string]accountstore.AdminSession
+	sessions map[string]storage.AdminSession
 }
 
 func newMemorySessionStore() *memorySessionStore {
-	return &memorySessionStore{sessions: map[string]accountstore.AdminSession{}}
+	return &memorySessionStore{sessions: map[string]storage.AdminSession{}}
 }
 
-func (s *memorySessionStore) GetAdminSession(_ context.Context, id string) (accountstore.AdminSession, bool, error) {
+func (s *memorySessionStore) GetAdminSession(_ context.Context, id string) (storage.AdminSession, bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	sess, ok := s.sessions[id]
 	return sess, ok, nil
 }
 
-func (s *memorySessionStore) PutAdminSession(_ context.Context, sess accountstore.AdminSession) error {
+func (s *memorySessionStore) PutAdminSession(_ context.Context, sess storage.AdminSession) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.sessions[sess.ID] = sess

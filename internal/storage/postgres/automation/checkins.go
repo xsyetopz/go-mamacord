@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
 )
 
 type checkInStore struct {
@@ -17,7 +16,7 @@ type checkInStore struct {
 	now func() time.Time
 }
 
-func (s checkInStore) CreateCheckIn(ctx context.Context, c automationstore.CheckIn) error {
+func (s checkInStore) CreateCheckIn(ctx context.Context, c storage.CheckIn) error {
 	if s.db == nil {
 		return errors.New("db not configured")
 	}
@@ -58,7 +57,7 @@ VALUES ($1, $2, $3, $4)`
 	return nil
 }
 
-func (s checkInStore) ListCheckIns(ctx context.Context, userID uint64, limit int) ([]automationstore.CheckIn, error) {
+func (s checkInStore) ListCheckIns(ctx context.Context, userID uint64, limit int) ([]storage.CheckIn, error) {
 	if s.db == nil {
 		return nil, errors.New("db not configured")
 	}
@@ -84,7 +83,7 @@ LIMIT $2`
 	}
 	defer rows.Close()
 
-	out := []automationstore.CheckIn{}
+	out := []storage.CheckIn{}
 	for rows.Next() {
 		var (
 			id        string
@@ -94,7 +93,7 @@ LIMIT $2`
 		if err := rows.Scan(&id, &mood, &createdAt); err != nil {
 			return nil, fmt.Errorf("scan checkin: %w", err)
 		}
-		out = append(out, automationstore.CheckIn{
+		out = append(out, storage.CheckIn{
 			ID:        strings.TrimSpace(id),
 			UserID:    userID,
 			Mood:      mood,

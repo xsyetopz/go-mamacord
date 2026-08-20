@@ -1,4 +1,4 @@
-package bootstrap
+package postgresstore
 
 import (
 	"context"
@@ -6,10 +6,9 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
-func OpenRuntimeStore(ctx context.Context, cfg config.Config) (*postgresstore.Store, int, error) {
+func OpenRuntimeStore(ctx context.Context, cfg config.Config) (*Store, int, error) {
 	switch cfg.Storage.Backend {
 	case "", config.StorageBackendPostgres:
 		return openPostgresRuntimeStore(ctx, cfg)
@@ -28,7 +27,7 @@ func MigrationStatus(ctx context.Context, cfg config.Config) (migrate.Status, er
 
 	switch cfg.Storage.Backend {
 	case "", config.StorageBackendPostgres:
-		db, err := postgresstore.Open(ctx, postgresstore.Options{DSN: cfg.Storage.PostgresDSN})
+		db, err := Open(ctx, Options{DSN: cfg.Storage.PostgresDSN})
 		if err != nil {
 			return migrate.Status{}, err
 		}
@@ -49,7 +48,7 @@ func MigrateUp(ctx context.Context, cfg config.Config) (migrate.Status, error) {
 
 	switch cfg.Storage.Backend {
 	case "", config.StorageBackendPostgres:
-		db, err := postgresstore.Open(ctx, postgresstore.Options{DSN: cfg.Storage.PostgresDSN})
+		db, err := Open(ctx, Options{DSN: cfg.Storage.PostgresDSN})
 		if err != nil {
 			return migrate.Status{}, err
 		}
@@ -60,8 +59,8 @@ func MigrateUp(ctx context.Context, cfg config.Config) (migrate.Status, error) {
 	}
 }
 
-func openPostgresRuntimeStore(ctx context.Context, cfg config.Config) (*postgresstore.Store, int, error) {
-	db, err := postgresstore.Open(ctx, postgresstore.Options{DSN: cfg.Storage.PostgresDSN})
+func openPostgresRuntimeStore(ctx context.Context, cfg config.Config) (*Store, int, error) {
+	db, err := Open(ctx, Options{DSN: cfg.Storage.PostgresDSN})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -79,7 +78,7 @@ func openPostgresRuntimeStore(ctx context.Context, cfg config.Config) (*postgres
 		return nil, 0, err
 	}
 
-	store, err := postgresstore.New(db)
+	store, err := New(db)
 	if err != nil {
 		_ = db.Close()
 		return nil, 0, err

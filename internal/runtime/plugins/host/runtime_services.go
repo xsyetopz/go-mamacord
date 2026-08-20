@@ -13,7 +13,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/persona"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 	"github.com/xsyetopz/go-mamacord/internal/scheduling"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/timezone"
 )
 
@@ -223,7 +223,7 @@ func parseID(value string) (uint64, error) {
 	}
 	return id, nil
 }
-func reminderContract(item automationstore.Reminder) contract.ReminderRef {
+func reminderContract(item storage.Reminder) contract.ReminderRef {
 	out := contract.ReminderRef{ReminderDefinition: contract.ReminderDefinition{ID: item.ID, Schedule: item.Schedule, Kind: item.Kind, Note: item.Note}, ReminderDestination: contract.ReminderDestination{Delivery: string(item.Delivery)}, ReminderScheduleState: contract.ReminderScheduleState{Enabled: item.Enabled, NextRunAt: item.NextRunAt.UTC().Unix(), FailureCount: item.FailureCount}, ReminderTimestamps: contract.ReminderTimestamps{CreatedAt: item.CreatedAt.UTC().Unix(), UpdatedAt: item.UpdatedAt.UTC().Unix()}}
 	if item.GuildID != nil {
 		out.GuildID = strconv.FormatUint(*item.GuildID, 10)

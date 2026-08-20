@@ -2,9 +2,8 @@ package moderationpg
 
 import (
 	"database/sql"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"time"
-
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 type Store struct {
@@ -19,14 +18,14 @@ func New(db *sql.DB, now func() time.Time) Store {
 	return Store{db: db, now: now}
 }
 
-func (s Store) Restrictions() moderationstore.RestrictionStore {
+func (s Store) Restrictions() storage.RestrictionStore {
 	return restrictionStore{db: s.db, now: s.now}
 }
 
-func (s Store) Warnings() moderationstore.WarningStore {
+func (s Store) Warnings() storage.WarningStore {
 	return warningStore{db: s.db, now: s.now}
 }
 
-func (s Store) Audit() moderationstore.AuditStore {
+func (s Store) Audit() storage.AuditStore {
 	return auditStore{db: s.db, now: s.now}
 }

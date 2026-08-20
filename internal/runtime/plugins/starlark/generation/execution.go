@@ -1,4 +1,4 @@
-package execution
+package generation
 
 import (
 	"context"
@@ -12,13 +12,13 @@ import (
 	starlarkgo "go.starlark.net/starlark"
 )
 
-type Program struct {
+type executionProgram struct {
 	Limits  evaluation.Limits
 	Catalog *contract.RouteCatalog
 	Routes  map[contract.RouteID]starlarkgo.Callable
 }
 
-func Invoke(ctx context.Context, program Program, invocation contract.Invocation, services contextapi.InvocationServices, print func(string)) (contract.Outcome, error) {
+func invokeProgram(ctx context.Context, program executionProgram, invocation contract.Invocation, services contextapi.InvocationServices, print func(string)) (contract.Outcome, error) {
 	if invocation.Kind == contract.InvocationCheck {
 		return contract.Outcome{}, evaluation.NewRuntimeError(evaluation.ErrorValidation, "invoke", string(invocation.Route), errors.New("check route requires Check"))
 	}
@@ -64,7 +64,7 @@ func Invoke(ctx context.Context, program Program, invocation contract.Invocation
 	return outcome, nil
 }
 
-func Check(ctx context.Context, program Program, invocation contract.Invocation, services contextapi.InvocationServices, print func(string)) (contract.CheckDecision, error) {
+func checkProgram(ctx context.Context, program executionProgram, invocation contract.Invocation, services contextapi.InvocationServices, print func(string)) (contract.CheckDecision, error) {
 	if invocation.Kind != contract.InvocationCheck {
 		return contract.CheckDecision{}, evaluation.NewRuntimeError(evaluation.ErrorValidation, "check", string(invocation.Route), errors.New("invocation is not a check"))
 	}

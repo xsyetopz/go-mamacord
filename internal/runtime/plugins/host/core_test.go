@@ -17,11 +17,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func TestCommandPermissions_ExpressionsAliases(t *testing.T) {
@@ -258,16 +254,16 @@ func TestLoadAllPrefersStoredBundleRelativeDirForManagedUserPlugin(t *testing.T)
 		RuntimeOptions: RuntimeOptions{
 			Logger: slog.New(slog.NewTextHandler(ioDiscard{}, nil)),
 			Store: hostStoreStub{
-				installs: map[string]marketstore.PluginInstall{
+				installs: map[string]storage.PluginInstall{
 					"managed": {
 						PluginID: "managed",
-						PluginInstallSource: marketstore.PluginInstallSource{
+						PluginInstallSource: storage.PluginInstallSource{
 							InstallKind: "git",
 							GitURL:      "https://example.invalid/demo.git",
 							GitRevision: "new",
 							SourcePath:  "managed",
 						},
-						PluginInstallArtifact: marketstore.PluginInstallArtifact{
+						PluginInstallArtifact: storage.PluginInstallArtifact{
 							BundleRelativeDir: filepath.Join("bundles", "git-new"),
 							InstalledHashB64:  "hash",
 						},
@@ -318,16 +314,16 @@ func TestLoadAllFallsBackWhenStoredBundleRelativeDirIsInvalid(t *testing.T) {
 		RuntimeOptions: RuntimeOptions{
 			Logger: slog.New(slog.NewTextHandler(ioDiscard{}, nil)),
 			Store: hostStoreStub{
-				installs: map[string]marketstore.PluginInstall{
+				installs: map[string]storage.PluginInstall{
 					"managed": {
 						PluginID: "managed",
-						PluginInstallSource: marketstore.PluginInstallSource{
+						PluginInstallSource: storage.PluginInstallSource{
 							InstallKind: "git",
 							GitURL:      "https://example.invalid/demo.git",
 							GitRevision: "bad",
 							SourcePath:  "managed",
 						},
-						PluginInstallArtifact: marketstore.PluginInstallArtifact{
+						PluginInstallArtifact: storage.PluginInstallArtifact{
 							BundleRelativeDir: filepath.Join("..", "escape"),
 							InstalledHashB64:  "hash",
 						},
@@ -576,16 +572,16 @@ func TestLoadAllPrefersStoredBundleRelativeDirForManagedObjectStorePluginAndUses
 		RuntimeOptions: RuntimeOptions{
 			Logger: slog.New(slog.NewTextHandler(ioDiscard{}, nil)),
 			Store: hostStoreStub{
-				installs: map[string]marketstore.PluginInstall{
+				installs: map[string]storage.PluginInstall{
 					"managed": {
 						PluginID: "managed",
-						PluginInstallSource: marketstore.PluginInstallSource{
+						PluginInstallSource: storage.PluginInstallSource{
 							InstallKind: "git",
 							GitURL:      "https://example.invalid/demo.git",
 							GitRevision: "new",
 							SourcePath:  "managed",
 						},
-						PluginInstallArtifact: marketstore.PluginInstallArtifact{
+						PluginInstallArtifact: storage.PluginInstallArtifact{
 							BundleRelativeDir: newBundle.BundleRelativeDir,
 							InstalledHashB64:  newBundle.HashB64,
 						},
@@ -674,45 +670,45 @@ type ioDiscard struct{}
 func (ioDiscard) Write(p []byte) (int, error) { return len(p), nil }
 
 type hostStoreStub struct {
-	installs map[string]marketstore.PluginInstall
-	kv       pluginstore.PluginKVStore
+	installs map[string]storage.PluginInstall
+	kv       storage.PluginKVStore
 }
 
-func (s hostStoreStub) TrustedSigners() marketstore.TrustedSignerStore {
+func (s hostStoreStub) TrustedSigners() storage.TrustedSignerStore {
 	return trustedSignerListStub{}
 }
-func (s hostStoreStub) PluginInstalls() marketstore.PluginInstallStore {
+func (s hostStoreStub) PluginInstalls() storage.PluginInstallStore {
 	return pluginInstallLookupStub{installs: s.installs}
 }
-func (s hostStoreStub) PluginKV() pluginstore.PluginKVStore          { return s.kv }
-func (s hostStoreStub) UserSettings() accountstore.UserSettingsStore { return nil }
-func (s hostStoreStub) Reminders() automationstore.ReminderStore     { return nil }
-func (s hostStoreStub) CheckIns() automationstore.CheckInStore       { return nil }
-func (s hostStoreStub) Warnings() moderationstore.WarningStore       { return nil }
-func (s hostStoreStub) Audit() moderationstore.AuditStore            { return nil }
+func (s hostStoreStub) PluginKV() storage.PluginKVStore         { return s.kv }
+func (s hostStoreStub) UserSettings() storage.UserSettingsStore { return nil }
+func (s hostStoreStub) Reminders() storage.ReminderStore        { return nil }
+func (s hostStoreStub) CheckIns() storage.CheckInStore          { return nil }
+func (s hostStoreStub) Warnings() storage.WarningStore          { return nil }
+func (s hostStoreStub) Audit() storage.AuditStore               { return nil }
 
 type trustedSignerListStub struct{}
 
-func (trustedSignerListStub) ListTrustedSigners(context.Context) ([]marketstore.TrustedSigner, error) {
+func (trustedSignerListStub) ListTrustedSigners(context.Context) ([]storage.TrustedSigner, error) {
 	return nil, nil
 }
-func (trustedSignerListStub) PutTrustedSigner(context.Context, marketstore.TrustedSigner) error {
+func (trustedSignerListStub) PutTrustedSigner(context.Context, storage.TrustedSigner) error {
 	return nil
 }
 func (trustedSignerListStub) DeleteTrustedSigner(context.Context, string) error { return nil }
 
 type pluginInstallLookupStub struct {
-	installs map[string]marketstore.PluginInstall
+	installs map[string]storage.PluginInstall
 }
 
-func (s pluginInstallLookupStub) GetPluginInstall(_ context.Context, pluginID string) (marketstore.PluginInstall, bool, error) {
+func (s pluginInstallLookupStub) GetPluginInstall(_ context.Context, pluginID string) (storage.PluginInstall, bool, error) {
 	item, ok := s.installs[pluginID]
 	return item, ok, nil
 }
-func (s pluginInstallLookupStub) ListPluginInstalls(context.Context) ([]marketstore.PluginInstall, error) {
+func (s pluginInstallLookupStub) ListPluginInstalls(context.Context) ([]storage.PluginInstall, error) {
 	return nil, nil
 }
-func (s pluginInstallLookupStub) PutPluginInstall(context.Context, marketstore.PluginInstall) error {
+func (s pluginInstallLookupStub) PutPluginInstall(context.Context, storage.PluginInstall) error {
 	return nil
 }
 func (s pluginInstallLookupStub) DeletePluginInstall(context.Context, string) error { return nil }

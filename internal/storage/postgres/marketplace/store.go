@@ -2,9 +2,8 @@ package marketplacepg
 
 import (
 	"database/sql"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"time"
-
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
 )
 
 type Store struct {
@@ -19,26 +18,26 @@ func New(db *sql.DB, now func() time.Time) Store {
 	return Store{db: db, now: now}
 }
 
-func (s Store) TrustedSigners() marketstore.TrustedSignerStore {
+func (s Store) TrustedSigners() storage.TrustedSignerStore {
 	return signerStore{db: s.db, now: s.now}
 }
 
-func (s Store) Sources() marketstore.MarketplaceSourceStore {
+func (s Store) Sources() storage.MarketplaceSourceStore {
 	return marketplaceSourceStore{db: s.db, now: s.now}
 }
 
-func (s Store) SourceSyncs() marketstore.MarketplaceSourceSyncStore {
+func (s Store) SourceSyncs() storage.MarketplaceSourceSyncStore {
 	return marketplaceSourceSyncStore{db: s.db, now: s.now}
 }
 
-func (s Store) PluginInstalls() marketstore.PluginInstallStore {
+func (s Store) PluginInstalls() storage.PluginInstallStore {
 	return pluginInstallStore{db: s.db, now: s.now}
 }
 
-func (s Store) TrustedVendors() marketstore.TrustedVendorStore {
+func (s Store) TrustedVendors() storage.TrustedVendorStore {
 	return trustedVendorStore{db: s.db, now: s.now}
 }
 
-func (s Store) TrustedVendorKeys() marketstore.TrustedVendorKeyStore {
+func (s Store) TrustedVendorKeys() storage.TrustedVendorKeyStore {
 	return trustedVendorKeyStore{db: s.db}
 }

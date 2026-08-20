@@ -1,4 +1,4 @@
-package moderation
+package storage
 
 import (
 	"context"

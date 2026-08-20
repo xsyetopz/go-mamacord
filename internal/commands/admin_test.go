@@ -1,4 +1,4 @@
-package admin
+package commands
 
 import (
 	"slices"
@@ -8,7 +8,7 @@ import (
 func TestDefinitionsContainAdminCommandFamilies(t *testing.T) {
 	t.Parallel()
 
-	defs := Definitions()
+	defs := adminDefinitions()
 	names := make([]string, 0, len(defs))
 	for _, def := range defs {
 		names = append(names, def.Name)

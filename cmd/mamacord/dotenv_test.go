@@ -1,4 +1,4 @@
-package dotenv
+package main
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestLoadFile_DoesNotOverride(t *testing.T) {
+func TestLoadEnvFile_DoesNotOverride(t *testing.T) {
 	keyA := "DOTENV_TEST_A_NO_OVERRIDE"
 	keyB := "DOTENV_TEST_B_SET"
 	t.Setenv(keyA, "already")
@@ -17,7 +17,7 @@ func TestLoadFile_DoesNotOverride(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := LoadFile(path); err != nil {
+	if err := loadEnvFile(path); err != nil {
 		t.Fatal(err)
 	}
 	if got := os.Getenv(keyA); got != "already" {
@@ -28,7 +28,7 @@ func TestLoadFile_DoesNotOverride(t *testing.T) {
 	}
 }
 
-func TestLoadFile_ParsesQuotesExportAndComments(t *testing.T) {
+func TestLoadEnvFile_ParsesQuotesExportAndComments(t *testing.T) {
 	keyA := "DOTENV_TEST_A_EXPORT"
 	keyB := "DOTENV_TEST_B_DOUBLE"
 	keyC := "DOTENV_TEST_C_SINGLE"
@@ -47,7 +47,7 @@ func TestLoadFile_ParsesQuotesExportAndComments(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := LoadFile(path); err != nil {
+	if err := loadEnvFile(path); err != nil {
 		t.Fatal(err)
 	}
 	if got := os.Getenv(keyA); got != "1" {
@@ -64,7 +64,7 @@ func TestLoadFile_ParsesQuotesExportAndComments(t *testing.T) {
 	}
 }
 
-func TestLoadAutoWithSearch_FallsBackToExecutableDir(t *testing.T) {
+func TestLoadEnvAutoWithSearch_FallsBackToExecutableDir(t *testing.T) {
 	workDir := t.TempDir()
 	execDir := t.TempDir()
 
@@ -72,9 +72,9 @@ func TestLoadAutoWithSearch_FallsBackToExecutableDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res, err := LoadAutoWithSearch(
+	res, err := loadEnvAutoWithSearch(
 		[]string{".env.prod", ".env.dev"},
-		[]SearchResult{
+		[]envSearchResult{
 			{Path: workDir, Source: "working_dir"},
 			{Path: execDir, Source: "executable_dir"},
 		},

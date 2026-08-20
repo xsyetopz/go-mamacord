@@ -15,7 +15,7 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func TestReadTrustedKeysFileAndLoadTrustedKeys(t *testing.T) {
@@ -62,7 +62,7 @@ func TestReadTrustedKeysFileAndLoadTrustedKeys(t *testing.T) {
 		context.Background(),
 		filePath,
 		trustedSignerStoreStub{
-			signers: []marketstore.TrustedSigner{
+			signers: []storage.TrustedSigner{
 				{
 					KeyID:        "store-key",
 					PublicKeyB64: base64.StdEncoding.EncodeToString(storePublicKey),
@@ -182,15 +182,15 @@ func mustWriteFile(t *testing.T, path string, bytes []byte) {
 }
 
 type trustedSignerStoreStub struct {
-	signers []marketstore.TrustedSigner
+	signers []storage.TrustedSigner
 	err     error
 }
 
-func (s trustedSignerStoreStub) ListTrustedSigners(context.Context) ([]marketstore.TrustedSigner, error) {
+func (s trustedSignerStoreStub) ListTrustedSigners(context.Context) ([]storage.TrustedSigner, error) {
 	return s.signers, s.err
 }
 
-func (trustedSignerStoreStub) PutTrustedSigner(context.Context, marketstore.TrustedSigner) error {
+func (trustedSignerStoreStub) PutTrustedSigner(context.Context, storage.TrustedSigner) error {
 	return nil
 }
 

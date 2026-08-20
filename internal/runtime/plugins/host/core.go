@@ -16,13 +16,8 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/httpjson"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/generation"
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Host struct {
@@ -63,14 +58,14 @@ type hostRegistry struct {
 }
 
 type Store interface {
-	TrustedSigners() marketstore.TrustedSignerStore
-	PluginInstalls() marketstore.PluginInstallStore
-	PluginKV() pluginstore.PluginKVStore
-	UserSettings() accountstore.UserSettingsStore
-	Reminders() automationstore.ReminderStore
-	CheckIns() automationstore.CheckInStore
-	Warnings() moderationstore.WarningStore
-	Audit() moderationstore.AuditStore
+	TrustedSigners() storage.TrustedSignerStore
+	PluginInstalls() storage.PluginInstallStore
+	PluginKV() storage.PluginKVStore
+	UserSettings() storage.UserSettingsStore
+	Reminders() storage.ReminderStore
+	CheckIns() storage.CheckInStore
+	Warnings() storage.WarningStore
+	Audit() storage.AuditStore
 }
 type Options struct {
 	BundleOptions
@@ -166,7 +161,7 @@ func NewHost(opts Options) (*Host, error) {
 	}
 	httpClient := opts.HTTP
 	if httpClient == nil {
-		client, clientErr := httpjson.New(httpjson.Options{Timeout: 2 * time.Second})
+		client, clientErr := newHTTPJSONClient(httpJSONOptions{Timeout: 2 * time.Second})
 		if clientErr != nil {
 			return nil, clientErr
 		}

@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 type auditStore struct {
@@ -15,7 +14,7 @@ type auditStore struct {
 	now func() time.Time
 }
 
-func (s auditStore) Append(ctx context.Context, entry moderationstore.AuditEntry) error {
+func (s auditStore) Append(ctx context.Context, entry storage.AuditEntry) error {
 	const query = `
 INSERT INTO audit_log(guild_id, actor_id, action, target_type, target_id, created_at, meta_json)
 VALUES ($1, $2, $3, $4, $5, $6, $7)`
@@ -54,7 +53,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	return nil
 }
 
-func targetTypePtr(v *moderationstore.TargetType) any {
+func targetTypePtr(v *storage.TargetType) any {
 	if v == nil {
 		return nil
 	}

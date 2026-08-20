@@ -1,4 +1,4 @@
-package cdn
+package pluginbridge
 
 import (
 	"context"
@@ -11,17 +11,17 @@ import (
 	"time"
 )
 
-type DiscordCDNFetcher struct {
+type discordCDNFetcher struct {
 	c *http.Client
 }
 
 const defaultDiscordCDNTimeout = 5 * time.Second
 
-func NewDiscordCDNFetcher() *DiscordCDNFetcher {
-	return NewDiscordCDNFetcherWithClient(nil)
+func newDiscordCDNFetcher() *discordCDNFetcher {
+	return newDiscordCDNFetcherWithClient(nil)
 }
 
-func NewDiscordCDNFetcherWithClient(client *http.Client) *DiscordCDNFetcher {
+func newDiscordCDNFetcherWithClient(client *http.Client) *discordCDNFetcher {
 	if client == nil {
 		client = &http.Client{
 			Timeout: defaultDiscordCDNTimeout,
@@ -36,12 +36,12 @@ func NewDiscordCDNFetcherWithClient(client *http.Client) *DiscordCDNFetcher {
 			},
 		}
 	}
-	return &DiscordCDNFetcher{c: client}
+	return &discordCDNFetcher{c: client}
 }
 
 const maxRedirects = 2
 
-func (f *DiscordCDNFetcher) Fetch(ctx context.Context, rawURL string, maxBytes int64) ([]byte, error) {
+func (f *discordCDNFetcher) Fetch(ctx context.Context, rawURL string, maxBytes int64) ([]byte, error) {
 	rawURL = strings.TrimSpace(rawURL)
 	if rawURL == "" {
 		return nil, errors.New("url is required")

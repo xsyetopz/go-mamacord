@@ -1,9 +1,7 @@
-package parse_test
+package executor
 
 import (
 	"testing"
-
-	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/parse"
 )
 
 func TestParseEmojiID(t *testing.T) {
@@ -19,7 +17,7 @@ func TestParseEmojiID(t *testing.T) {
 		{"<:x:>", 0, false},
 	}
 	for _, tc := range cases {
-		got, ok := parse.ParseEmojiID(tc.in)
+		got, ok := parseEmojiID(tc.in)
 		if uint64(got) != tc.want || ok != tc.ok {
 			t.Fatalf("ParseEmojiID(%q) = (%d,%v), want (%d,%v)", tc.in, uint64(got), ok, tc.want, tc.ok)
 		}
@@ -40,7 +38,7 @@ func TestParseStickerID(t *testing.T) {
 		{"", 0, false},
 	}
 	for _, tc := range cases {
-		got, ok := parse.ParseStickerID(tc.in)
+		got, ok := parseStickerID(tc.in)
 		if uint64(got) != tc.want || ok != tc.ok {
 			t.Fatalf("ParseStickerID(%q) = (%d,%v), want (%d,%v)", tc.in, uint64(got), ok, tc.want, tc.ok)
 		}
@@ -59,7 +57,7 @@ func TestParseHexColor(t *testing.T) {
 		{"", 0, false},
 	}
 	for _, tc := range cases {
-		got, ok := parse.ParseHexColor(tc.in)
+		got, ok := parseHexColor(tc.in)
 		if got != tc.want || ok != tc.ok {
 			t.Fatalf("ParseHexColor(%q) = (%d,%v), want (%d,%v)", tc.in, got, ok, tc.want, tc.ok)
 		}
@@ -79,7 +77,7 @@ func TestParseMessageID(t *testing.T) {
 		{"", 0, false},
 	}
 	for _, tc := range cases {
-		got, ok := parse.ParseMessageID(tc.in)
+		got, ok := parseMessageID(tc.in)
 		if uint64(got) != tc.want || ok != tc.ok {
 			t.Fatalf("ParseMessageID(%q) = (%d,%v), want (%d,%v)", tc.in, uint64(got), ok, tc.want, tc.ok)
 		}

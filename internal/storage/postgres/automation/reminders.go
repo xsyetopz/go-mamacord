@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
 )
 
 type reminderStore struct {
@@ -23,7 +22,7 @@ const (
 	defaultReminderLeaseDuration = 30 * time.Second
 )
 
-func (s reminderStore) CreateReminder(ctx context.Context, r automationstore.Reminder) error {
+func (s reminderStore) CreateReminder(ctx context.Context, r storage.Reminder) error {
 	if s.db == nil {
 		return errors.New("db not configured")
 	}
@@ -93,7 +92,7 @@ INSERT INTO reminders(
 	return nil
 }
 
-func (s reminderStore) ListReminders(ctx context.Context, userID uint64, limit int) ([]automationstore.Reminder, error) {
+func (s reminderStore) ListReminders(ctx context.Context, userID uint64, limit int) ([]storage.Reminder, error) {
 	if s.db == nil {
 		return nil, errors.New("db not configured")
 	}
@@ -121,7 +120,7 @@ LIMIT $2`
 	}
 	defer rows.Close()
 
-	out := []automationstore.Reminder{}
+	out := []storage.Reminder{}
 	for rows.Next() {
 		item, err := scanReminder(rows, userID)
 		if err != nil {
@@ -164,7 +163,7 @@ func (s reminderStore) ClaimDueReminders(
 	leaseID string,
 	leaseDuration time.Duration,
 	limit int,
-) ([]automationstore.Reminder, error) {
+) ([]storage.Reminder, error) {
 	if s.db == nil {
 		return nil, errors.New("db not configured")
 	}
@@ -204,7 +203,7 @@ func (s reminderStore) ClaimDueReminders(
 	return claimed, nil
 }
 
-func selectDueReminderCandidates(ctx context.Context, tx *sql.Tx, nowUnix int64, limit int) ([]automationstore.Reminder, error) {
+func selectDueReminderCandidates(ctx context.Context, tx *sql.Tx, nowUnix int64, limit int) ([]storage.Reminder, error) {
 	const query = `
 SELECT id, user_id, schedule, kind, note, delivery, guild_id, channel_id,
 	enabled, next_run_at, last_run_at, failure_count,
@@ -222,7 +221,7 @@ LIMIT $4`
 	}
 	defer rows.Close()
 
-	candidates := []automationstore.Reminder{}
+	candidates := []storage.Reminder{}
 	for rows.Next() {
 		var (
 			id           string
@@ -272,28 +271,28 @@ LIMIT $4`
 			channelPtr = &v
 		}
 
-		candidates = append(candidates, automationstore.Reminder{
-			ReminderIdentity: automationstore.ReminderIdentity{
+		candidates = append(candidates, storage.Reminder{
+			ReminderIdentity: storage.ReminderIdentity{
 				ID:     strings.TrimSpace(id),
 				UserID: userIDU64,
 			},
-			ReminderSchedule: automationstore.ReminderSchedule{
+			ReminderSchedule: storage.ReminderSchedule{
 				Schedule: strings.TrimSpace(schedule),
 				Kind:     strings.TrimSpace(kind),
 				Note:     strings.TrimSpace(note),
 			},
-			ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{
-				Delivery:  automationstore.ReminderDelivery(strings.TrimSpace(delivery)),
+			ReminderDeliveryTarget: storage.ReminderDeliveryTarget{
+				Delivery:  storage.ReminderDelivery(strings.TrimSpace(delivery)),
 				GuildID:   guildPtr,
 				ChannelID: channelPtr,
 			},
-			ReminderState: automationstore.ReminderState{
+			ReminderState: storage.ReminderState{
 				Enabled:      enabled,
 				NextRunAt:    time.Unix(nextRunAt, 0).UTC(),
 				LastRunAt:    nullInt64ToTimePtr(lastRunAt),
 				FailureCount: failureCount,
 			},
-			ReminderTimestamps: automationstore.ReminderTimestamps{
+			ReminderTimestamps: storage.ReminderTimestamps{
 				CreatedAt: time.Unix(createdAt, 0).UTC(),
 				UpdatedAt: time.Unix(updatedAt, 0).UTC(),
 			},
@@ -309,12 +308,12 @@ LIMIT $4`
 func claimReminderCandidates(
 	ctx context.Context,
 	tx *sql.Tx,
-	candidates []automationstore.Reminder,
+	candidates []storage.Reminder,
 	leaseUntilUnix int64,
 	leaseID string,
 	updatedAtUnix int64,
 	nowUnix int64,
-) ([]automationstore.Reminder, error) {
+) ([]storage.Reminder, error) {
 	const query = `
 UPDATE reminders
 SET lease_until = $1, lease_id = $2, updated_at = $3
@@ -323,7 +322,7 @@ WHERE id = $4
 	AND next_run_at <= $6
 	AND (lease_until IS NULL OR lease_until < $7)`
 
-	claimed := make([]automationstore.Reminder, 0, len(candidates))
+	claimed := make([]storage.Reminder, 0, len(candidates))
 	for _, reminder := range candidates {
 		res, err := tx.ExecContext(
 			ctx,
@@ -409,7 +408,7 @@ type rowScanner interface {
 	Scan(dest ...any) error
 }
 
-func scanReminder(r rowScanner, userID uint64) (automationstore.Reminder, error) {
+func scanReminder(r rowScanner, userID uint64) (storage.Reminder, error) {
 	var (
 		id           string
 		schedule     string
@@ -429,14 +428,14 @@ func scanReminder(r rowScanner, userID uint64) (automationstore.Reminder, error)
 		&id, &schedule, &kind, &note, &delivery, &guildID, &channelID,
 		&enabled, &nextRunAt, &lastRunAt, &failureCount, &createdAt, &updatedAt,
 	); err != nil {
-		return automationstore.Reminder{}, fmt.Errorf("scan reminder: %w", err)
+		return storage.Reminder{}, fmt.Errorf("scan reminder: %w", err)
 	}
 
 	var guildPtr *uint64
 	if guildID.Valid {
 		v, err := sqlvalue.Int64ToUint64(guildID.Int64, "guild_id")
 		if err != nil {
-			return automationstore.Reminder{}, err
+			return storage.Reminder{}, err
 		}
 		guildPtr = &v
 	}
@@ -445,7 +444,7 @@ func scanReminder(r rowScanner, userID uint64) (automationstore.Reminder, error)
 	if channelID.Valid {
 		v, err := sqlvalue.Int64ToUint64(channelID.Int64, "channel_id")
 		if err != nil {
-			return automationstore.Reminder{}, err
+			return storage.Reminder{}, err
 		}
 		channelPtr = &v
 	}
@@ -456,28 +455,28 @@ func scanReminder(r rowScanner, userID uint64) (automationstore.Reminder, error)
 		lastPtr = &t
 	}
 
-	return automationstore.Reminder{
-		ReminderIdentity: automationstore.ReminderIdentity{
+	return storage.Reminder{
+		ReminderIdentity: storage.ReminderIdentity{
 			ID:     strings.TrimSpace(id),
 			UserID: userID,
 		},
-		ReminderSchedule: automationstore.ReminderSchedule{
+		ReminderSchedule: storage.ReminderSchedule{
 			Schedule: strings.TrimSpace(schedule),
 			Kind:     strings.TrimSpace(kind),
 			Note:     strings.TrimSpace(note),
 		},
-		ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{
-			Delivery:  automationstore.ReminderDelivery(strings.TrimSpace(delivery)),
+		ReminderDeliveryTarget: storage.ReminderDeliveryTarget{
+			Delivery:  storage.ReminderDelivery(strings.TrimSpace(delivery)),
 			GuildID:   guildPtr,
 			ChannelID: channelPtr,
 		},
-		ReminderState: automationstore.ReminderState{
+		ReminderState: storage.ReminderState{
 			Enabled:      enabled,
 			NextRunAt:    time.Unix(nextRunAt, 0).UTC(),
 			LastRunAt:    lastPtr,
 			FailureCount: failureCount,
 		},
-		ReminderTimestamps: automationstore.ReminderTimestamps{
+		ReminderTimestamps: storage.ReminderTimestamps{
 			CreatedAt: time.Unix(createdAt, 0).UTC(),
 			UpdatedAt: time.Unix(updatedAt, 0).UTC(),
 		},

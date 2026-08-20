@@ -9,7 +9,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const (
@@ -30,7 +30,7 @@ func BuiltinDefaultEnabled(desc commands.ModuleDescriptor, seed config.ModulesFi
 func ResolveBuiltinModuleEnabled(
 	desc commands.ModuleDescriptor,
 	seed config.ModulesFile,
-	states map[string]pluginstore.ModuleState,
+	states map[string]storage.ModuleState,
 ) bool {
 	if !desc.Toggleable {
 		return true

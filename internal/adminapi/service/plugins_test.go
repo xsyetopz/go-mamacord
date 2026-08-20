@@ -11,7 +11,7 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/config"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storecontract "github.com/xsyetopz/go-mamacord/internal/storage"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 	pgtest "github.com/xsyetopz/go-mamacord/internal/storage/postgres/testkit"
 )
@@ -71,16 +71,16 @@ func TestPluginsUsesStoredBundleRelativeDirForMarketplacePlugin(t *testing.T) {
 	writeServicePluginBundle(t, bundleDir, "bundleme")
 
 	storage := newPluginTestStore(t, tmp)
-	if err := storage.PluginInstalls().PutPluginInstall(ctx, marketstore.PluginInstall{
+	if err := storage.PluginInstalls().PutPluginInstall(ctx, storecontract.PluginInstall{
 		PluginID: "bundleme",
-		PluginInstallSource: marketstore.PluginInstallSource{
+		PluginInstallSource: storecontract.PluginInstallSource{
 			InstallKind: "git",
 			SourceID:    "demo",
 			GitURL:      "https://example.invalid/demo.git",
 			GitRevision: "abc123",
 			SourcePath:  "bundleme",
 		},
-		PluginInstallArtifact: marketstore.PluginInstallArtifact{
+		PluginInstallArtifact: storecontract.PluginInstallArtifact{
 			BundleRelativeDir: bundleRel,
 			InstalledHashB64:  "hash",
 		},
@@ -139,16 +139,16 @@ func TestPluginsFallsBackToActiveBundleWhenStoredBundleRelativeDirIsInvalid(t *t
 	}
 
 	storage := newPluginTestStore(t, tmp)
-	if err := storage.PluginInstalls().PutPluginInstall(ctx, marketstore.PluginInstall{
+	if err := storage.PluginInstalls().PutPluginInstall(ctx, storecontract.PluginInstall{
 		PluginID: "bundleme",
-		PluginInstallSource: marketstore.PluginInstallSource{
+		PluginInstallSource: storecontract.PluginInstallSource{
 			InstallKind: "git",
 			SourceID:    "demo",
 			GitURL:      "https://example.invalid/demo.git",
 			GitRevision: "broken",
 			SourcePath:  "bundleme",
 		},
-		PluginInstallArtifact: marketstore.PluginInstallArtifact{
+		PluginInstallArtifact: storecontract.PluginInstallArtifact{
 			BundleRelativeDir: filepath.Join("..", "escape"),
 			InstalledHashB64:  "hash",
 		},
@@ -213,16 +213,16 @@ func TestPluginsUsesRepositoryBundleModifiedForObjectStorePlugin(t *testing.T) {
 	}
 
 	storage := newPluginTestStore(t, tmp)
-	if err := storage.PluginInstalls().PutPluginInstall(ctx, marketstore.PluginInstall{
+	if err := storage.PluginInstalls().PutPluginInstall(ctx, storecontract.PluginInstall{
 		PluginID: "bundleme",
-		PluginInstallSource: marketstore.PluginInstallSource{
+		PluginInstallSource: storecontract.PluginInstallSource{
 			InstallKind: "git",
 			SourceID:    "demo",
 			GitURL:      "https://example.invalid/demo.git",
 			GitRevision: "abc123",
 			SourcePath:  "bundleme",
 		},
-		PluginInstallArtifact: marketstore.PluginInstallArtifact{
+		PluginInstallArtifact: storecontract.PluginInstallArtifact{
 			BundleRelativeDir: bundle.BundleRelativeDir,
 			InstalledHashB64:  bundle.HashB64,
 		},

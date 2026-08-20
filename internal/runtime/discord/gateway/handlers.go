@@ -13,8 +13,7 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 const (
@@ -43,10 +42,10 @@ type HandlerCore struct {
 }
 
 type HandlerStores struct {
-	Restrictions moderationstore.RestrictionStore
-	Guilds       accountstore.GuildStore
-	Users        accountstore.UserStore
-	GuildMembers accountstore.GuildMemberStore
+	Restrictions storage.RestrictionStore
+	Guilds       storage.GuildStore
+	Users        storage.UserStore
+	GuildMembers storage.GuildMemberStore
 }
 
 type HandlerRegistration struct {
@@ -68,7 +67,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 	guildID := uint64(e.GuildID)
 
 	restrictions := h.Restrictions
-	if _, ok, err := restrictions.GetRestriction(ctx, moderationstore.TargetTypeGuild, guildID); err != nil {
+	if _, ok, err := restrictions.GetRestriction(ctx, storage.TargetTypeGuild, guildID); err != nil {
 		h.logger().Error(
 			"guild restriction check failed",
 			slog.String("err", err.Error()),
@@ -84,7 +83,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 	guildName := strings.TrimSpace(e.Guild.Name)
 	ownerID := uint64(e.Guild.OwnerID)
 
-	_ = h.Guilds.UpsertGuildSeen(ctx, accountstore.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, storage.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   ownerID,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -103,7 +102,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 			isSystem = owner.System
 		}
 
-		_ = h.Users.UpsertUserSeen(ctx, accountstore.UserSeen{
+		_ = h.Users.UpsertUserSeen(ctx, storage.UserSeen{
 			UserID:      ownerID,
 			CreatedAt:   snowflake.ID(ownerID).Time().UTC(),
 			IsBot:       isBot,
@@ -158,7 +157,7 @@ func (h Handlers) OnGuildUpdate(e *events.GuildUpdate) {
 	now := time.Now().UTC()
 
 	guildName := strings.TrimSpace(e.Guild.Name)
-	_ = h.Guilds.UpsertGuildSeen(ctx, accountstore.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, storage.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   newOwner,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -191,7 +190,7 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 	guildID := uint64(e.GuildID)
 	userID := uint64(user.ID)
 
-	_ = h.Users.UpsertUserSeen(ctx, accountstore.UserSeen{
+	_ = h.Users.UpsertUserSeen(ctx, storage.UserSeen{
 		UserID:      userID,
 		CreatedAt:   user.ID.Time().UTC(),
 		IsBot:       user.Bot,

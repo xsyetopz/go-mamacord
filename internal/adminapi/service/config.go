@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
+	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 	"os"
 	"strings"
 
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	bootstrap "github.com/xsyetopz/go-mamacord/internal/storage/postgres/bootstrap"
 )
 
 func (s *Service) LoadModulesConfig() (config.ModulesFile, error) {
@@ -66,7 +66,7 @@ func (s *Service) TrustedKeys(ctx context.Context) (TrustedKeysResponse, error) 
 }
 
 func (s *Service) MigrationStatus(ctx context.Context) (MigrationStatusResponse, error) {
-	status, err := bootstrap.MigrationStatus(ctx, s.Config)
+	status, err := postgresstore.MigrationStatus(ctx, s.Config)
 	if err != nil {
 		return MigrationStatusResponse{}, err
 	}
@@ -74,7 +74,7 @@ func (s *Service) MigrationStatus(ctx context.Context) (MigrationStatusResponse,
 }
 
 func (s *Service) MigrateUp(ctx context.Context) (MigrationStatusResponse, error) {
-	status, err := bootstrap.MigrateUp(ctx, s.Config)
+	status, err := postgresstore.MigrateUp(ctx, s.Config)
 	if err != nil {
 		return MigrationStatusResponse{}, err
 	}

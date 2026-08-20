@@ -1,4 +1,4 @@
-package httpjson
+package pluginhost
 
 import (
 	"context"
@@ -20,20 +20,20 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 )
 
-const MaximumResponseBytes int64 = 64 * 1024
+const maxHTTPJSONResponseBytes int64 = 64 * 1024
 
-type Client struct{ client *http.Client }
+type httpJSONClient struct{ client *http.Client }
 
-type Resolver interface {
+type httpJSONResolver interface {
 	LookupNetIP(context.Context, string, string) ([]netip.Addr, error)
 }
 
-type Options struct {
+type httpJSONOptions struct {
 	Timeout  time.Duration
-	Resolver Resolver
+	Resolver httpJSONResolver
 }
 
-func New(options Options) (*Client, error) {
+func newHTTPJSONClient(options httpJSONOptions) (*httpJSONClient, error) {
 	if options.Timeout <= 0 {
 		return nil, errors.New("HTTP JSON timeout must be positive")
 	}
@@ -43,20 +43,20 @@ func New(options Options) (*Client, error) {
 	}
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.Proxy = nil
-	transport.DialContext = secureDialContext(resolver)
+	transport.DialContext = secureHTTPJSONDialContext(resolver)
 	transport.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS12}
 	transport.ResponseHeaderTimeout = options.Timeout
 	transport.MaxResponseHeaderBytes = 64 * 1024
 	client := &http.Client{Transport: transport, Timeout: options.Timeout, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
-	return &Client{client: client}, nil
+	return &httpJSONClient{client: client}, nil
 }
 
-func (client *Client) GetJSON(ctx context.Context, rawURL string, maxBytes int64) (contract.Value, bool, error) {
+func (client *httpJSONClient) GetJSON(ctx context.Context, rawURL string, maxBytes int64) (contract.Value, bool, error) {
 	if client == nil || client.client == nil {
 		return contract.Value{}, false, errors.New("HTTP JSON client is not initialized")
 	}
-	if maxBytes < 1 || maxBytes > MaximumResponseBytes {
-		return contract.Value{}, false, fmt.Errorf("response limit must be between 1 and %d", MaximumResponseBytes)
+	if maxBytes < 1 || maxBytes > maxHTTPJSONResponseBytes {
+		return contract.Value{}, false, fmt.Errorf("response limit must be between 1 and %d", maxHTTPJSONResponseBytes)
 	}
 	parsed, err := url.Parse(rawURL)
 	if err != nil || parsed.Scheme != "https" || parsed.Hostname() == "" || parsed.User != nil || parsed.Fragment != "" {
@@ -96,7 +96,7 @@ func (client *Client) GetJSON(ctx context.Context, rawURL string, maxBytes int64
 	if int64(len(payload)) > maxBytes {
 		return contract.Value{}, false, nil
 	}
-	if err := validateUniqueJSONKeys(payload); err != nil {
+	if err := validateUniqueHTTPJSONKeys(payload); err != nil {
 		return contract.Value{}, false, nil
 	}
 	decoder := json.NewDecoder(strings.NewReader(string(payload)))
@@ -109,7 +109,7 @@ func (client *Client) GetJSON(ctx context.Context, rawURL string, maxBytes int64
 	if err := decoder.Decode(&extra); err != io.EOF {
 		return contract.Value{}, false, nil
 	}
-	value, err := convertJSON(raw, 0, new(int))
+	value, err := convertHTTPJSON(raw, 0, new(int))
 	if err != nil {
 		return contract.Value{}, false, nil
 	}
@@ -119,7 +119,7 @@ func (client *Client) GetJSON(ctx context.Context, rawURL string, maxBytes int64
 	return value, true, nil
 }
 
-func secureDialContext(resolver Resolver) func(context.Context, string, string) (net.Conn, error) {
+func secureHTTPJSONDialContext(resolver httpJSONResolver) func(context.Context, string, string) (net.Conn, error) {
 	return func(ctx context.Context, network, address string) (net.Conn, error) {
 		host, port, err := net.SplitHostPort(address)
 		if err != nil {
@@ -129,7 +129,7 @@ func secureDialContext(resolver Resolver) func(context.Context, string, string) 
 		if err != nil {
 			return nil, fmt.Errorf("resolve HTTP host: %w", err)
 		}
-		if err := validateResolvedIPs(addresses); err != nil {
+		if err := validateHTTPJSONResolvedIPs(addresses); err != nil {
 			return nil, err
 		}
 		dialer := net.Dialer{}
@@ -147,7 +147,7 @@ func secureDialContext(resolver Resolver) func(context.Context, string, string) 
 		return nil, fmt.Errorf("connect HTTP host: %w", errors.Join(failures...))
 	}
 }
-func validateResolvedIPs(addresses []netip.Addr) error {
+func validateHTTPJSONResolvedIPs(addresses []netip.Addr) error {
 	if len(addresses) == 0 {
 		return errors.New("HTTP host resolved to no addresses")
 	}
@@ -159,7 +159,7 @@ func validateResolvedIPs(addresses []netip.Addr) error {
 	}
 	return nil
 }
-func convertJSON(raw any, depth int, items *int) (contract.Value, error) {
+func convertHTTPJSON(raw any, depth int, items *int) (contract.Value, error) {
 	if depth > contract.MaxValueDepth {
 		return contract.Value{}, errors.New("JSON exceeds maximum depth")
 	}
@@ -187,7 +187,7 @@ func convertJSON(raw any, depth int, items *int) (contract.Value, error) {
 		converted := make([]contract.Value, len(value))
 		for index, item := range value {
 			var err error
-			converted[index], err = convertJSON(item, depth+1, items)
+			converted[index], err = convertHTTPJSON(item, depth+1, items)
 			if err != nil {
 				return contract.Value{}, err
 			}
@@ -206,7 +206,7 @@ func convertJSON(raw any, depth int, items *int) (contract.Value, error) {
 		sort.Strings(keys)
 		for _, key := range keys {
 			item := value[key]
-			converted, err := convertJSON(item, depth+1, items)
+			converted, err := convertHTTPJSON(item, depth+1, items)
 			if err != nil {
 				return contract.Value{}, err
 			}
@@ -218,7 +218,7 @@ func convertJSON(raw any, depth int, items *int) (contract.Value, error) {
 	}
 }
 
-func validateUniqueJSONKeys(payload []byte) error {
+func validateUniqueHTTPJSONKeys(payload []byte) error {
 	decoder := json.NewDecoder(strings.NewReader(string(payload)))
 	var consume func() error
 	consume = func() error {

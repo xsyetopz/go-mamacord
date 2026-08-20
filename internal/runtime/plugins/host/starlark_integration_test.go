@@ -16,7 +16,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type recordingDiscordBridge struct {
@@ -141,11 +141,11 @@ func (kv *conflictingKV) PutPluginKV(_ context.Context, _ uint64, _, _, value st
 	return nil
 }
 func (kv *conflictingKV) DeletePluginKV(context.Context, uint64, string, string) error { return nil }
-func (kv *conflictingKV) GetPluginKVVersioned(context.Context, uint64, string, string) (pluginstore.PluginKVValue, bool, error) {
+func (kv *conflictingKV) GetPluginKVVersioned(context.Context, uint64, string, string) (storage.PluginKVValue, bool, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 	kv.reads++
-	return pluginstore.PluginKVValue{ValueJSON: kv.value, Version: kv.version}, kv.exists, nil
+	return storage.PluginKVValue{ValueJSON: kv.value, Version: kv.version}, kv.exists, nil
 }
 func (kv *conflictingKV) CompareAndSwapPluginKV(_ context.Context, _ uint64, _, _, value string, expected uint64) (uint64, bool, error) {
 	kv.mu.Lock()

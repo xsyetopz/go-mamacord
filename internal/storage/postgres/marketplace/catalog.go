@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
 )
 
 type marketplaceSourceStore struct {
@@ -17,10 +16,10 @@ type marketplaceSourceStore struct {
 	now func() time.Time
 }
 
-func (s marketplaceSourceStore) GetMarketplaceSource(ctx context.Context, sourceID string) (marketstore.MarketplaceSource, bool, error) {
+func (s marketplaceSourceStore) GetMarketplaceSource(ctx context.Context, sourceID string) (storage.MarketplaceSource, bool, error) {
 	sourceID = strings.TrimSpace(sourceID)
 	if sourceID == "" {
-		return marketstore.MarketplaceSource{}, false, nil
+		return storage.MarketplaceSource{}, false, nil
 	}
 
 	const query = `
@@ -29,7 +28,7 @@ FROM plugin_sources
 WHERE source_id = $1`
 
 	var (
-		source               marketstore.MarketplaceSource
+		source               storage.MarketplaceSource
 		gitRef, gitSubdir    sql.NullString
 		tokenEnvVar          sql.NullString
 		createdAt, updatedAt int64
@@ -48,9 +47,9 @@ WHERE source_id = $1`
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return marketstore.MarketplaceSource{}, false, nil
+			return storage.MarketplaceSource{}, false, nil
 		}
-		return marketstore.MarketplaceSource{}, false, fmt.Errorf("get marketplace source: %w", err)
+		return storage.MarketplaceSource{}, false, fmt.Errorf("get marketplace source: %w", err)
 	}
 
 	source.SourceID = strings.TrimSpace(source.SourceID)
@@ -64,7 +63,7 @@ WHERE source_id = $1`
 	return source, true, nil
 }
 
-func (s marketplaceSourceStore) ListMarketplaceSources(ctx context.Context) ([]marketstore.MarketplaceSource, error) {
+func (s marketplaceSourceStore) ListMarketplaceSources(ctx context.Context) ([]storage.MarketplaceSource, error) {
 	const query = `
 SELECT source_id, kind, git_url, git_ref, git_subdir, token_env_var, enabled, created_at, updated_at
 FROM plugin_sources
@@ -76,10 +75,10 @@ ORDER BY source_id`
 	}
 	defer rows.Close()
 
-	var out []marketstore.MarketplaceSource
+	var out []storage.MarketplaceSource
 	for rows.Next() {
 		var (
-			source               marketstore.MarketplaceSource
+			source               storage.MarketplaceSource
 			gitRef, gitSubdir    sql.NullString
 			tokenEnvVar          sql.NullString
 			createdAt, updatedAt int64
@@ -113,7 +112,7 @@ ORDER BY source_id`
 	return out, nil
 }
 
-func (s marketplaceSourceStore) PutMarketplaceSource(ctx context.Context, source marketstore.MarketplaceSource) error {
+func (s marketplaceSourceStore) PutMarketplaceSource(ctx context.Context, source storage.MarketplaceSource) error {
 	sourceID := strings.TrimSpace(source.SourceID)
 	if sourceID == "" {
 		return errors.New("source_id is required")
@@ -181,10 +180,10 @@ type marketplaceSourceSyncStore struct {
 	now func() time.Time
 }
 
-func (s marketplaceSourceSyncStore) GetMarketplaceSourceSync(ctx context.Context, sourceID string) (marketstore.MarketplaceSourceSync, bool, error) {
+func (s marketplaceSourceSyncStore) GetMarketplaceSourceSync(ctx context.Context, sourceID string) (storage.MarketplaceSourceSync, bool, error) {
 	sourceID = strings.TrimSpace(sourceID)
 	if sourceID == "" {
-		return marketstore.MarketplaceSourceSync{}, false, nil
+		return storage.MarketplaceSourceSync{}, false, nil
 	}
 
 	const query = `
@@ -193,7 +192,7 @@ FROM plugin_source_sync
 WHERE source_id = $1`
 
 	var (
-		out          marketstore.MarketplaceSourceSync
+		out          storage.MarketplaceSourceSync
 		lastSyncedAt sql.NullInt64
 		lastRevision sql.NullString
 		lastError    sql.NullString
@@ -201,9 +200,9 @@ WHERE source_id = $1`
 
 	if err := s.db.QueryRowContext(ctx, query, sourceID).Scan(&out.SourceID, &lastSyncedAt, &lastRevision, &lastError); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return marketstore.MarketplaceSourceSync{}, false, nil
+			return storage.MarketplaceSourceSync{}, false, nil
 		}
-		return marketstore.MarketplaceSourceSync{}, false, fmt.Errorf("get marketplace source sync: %w", err)
+		return storage.MarketplaceSourceSync{}, false, fmt.Errorf("get marketplace source sync: %w", err)
 	}
 	if lastSyncedAt.Valid {
 		ts := time.Unix(lastSyncedAt.Int64, 0).UTC()
@@ -215,7 +214,7 @@ WHERE source_id = $1`
 	return out, true, nil
 }
 
-func (s marketplaceSourceSyncStore) ListMarketplaceSourceSyncs(ctx context.Context) ([]marketstore.MarketplaceSourceSync, error) {
+func (s marketplaceSourceSyncStore) ListMarketplaceSourceSyncs(ctx context.Context) ([]storage.MarketplaceSourceSync, error) {
 	const query = `
 SELECT source_id, last_synced_at, last_revision, last_error
 FROM plugin_source_sync
@@ -227,10 +226,10 @@ ORDER BY source_id`
 	}
 	defer rows.Close()
 
-	var out []marketstore.MarketplaceSourceSync
+	var out []storage.MarketplaceSourceSync
 	for rows.Next() {
 		var (
-			item         marketstore.MarketplaceSourceSync
+			item         storage.MarketplaceSourceSync
 			lastSyncedAt sql.NullInt64
 			lastRevision sql.NullString
 			lastError    sql.NullString
@@ -253,7 +252,7 @@ ORDER BY source_id`
 	return out, nil
 }
 
-func (s marketplaceSourceSyncStore) PutMarketplaceSourceSync(ctx context.Context, sync marketstore.MarketplaceSourceSync) error {
+func (s marketplaceSourceSyncStore) PutMarketplaceSourceSync(ctx context.Context, sync storage.MarketplaceSourceSync) error {
 	sourceID := strings.TrimSpace(sync.SourceID)
 	if sourceID == "" {
 		return errors.New("source_id is required")
@@ -294,10 +293,10 @@ type pluginInstallStore struct {
 	now func() time.Time
 }
 
-func (s pluginInstallStore) GetPluginInstall(ctx context.Context, pluginID string) (marketstore.PluginInstall, bool, error) {
+func (s pluginInstallStore) GetPluginInstall(ctx context.Context, pluginID string) (storage.PluginInstall, bool, error) {
 	pluginID = strings.TrimSpace(pluginID)
 	if pluginID == "" {
-		return marketstore.PluginInstall{}, false, nil
+		return storage.PluginInstall{}, false, nil
 	}
 
 	const query = `
@@ -306,7 +305,7 @@ FROM plugin_installs
 WHERE plugin_id = $1`
 
 	var (
-		item        marketstore.PluginInstall
+		item        storage.PluginInstall
 		sourceID    sql.NullString
 		gitRef      sql.NullString
 		bundleRel   sql.NullString
@@ -328,9 +327,9 @@ WHERE plugin_id = $1`
 		&item.InstalledHashB64,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return marketstore.PluginInstall{}, false, nil
+			return storage.PluginInstall{}, false, nil
 		}
-		return marketstore.PluginInstall{}, false, fmt.Errorf("get plugin install: %w", err)
+		return storage.PluginInstall{}, false, fmt.Errorf("get plugin install: %w", err)
 	}
 	item.PluginID = strings.TrimSpace(item.PluginID)
 	item.InstallKind = strings.TrimSpace(item.InstallKind)
@@ -345,14 +344,14 @@ WHERE plugin_id = $1`
 	if installedBy.Valid {
 		v, err := sqlvalue.Int64ToUint64(installedBy.Int64, "installed_by")
 		if err != nil {
-			return marketstore.PluginInstall{}, false, err
+			return storage.PluginInstall{}, false, err
 		}
 		item.InstalledBy = &v
 	}
 	return item, true, nil
 }
 
-func (s pluginInstallStore) ListPluginInstalls(ctx context.Context) ([]marketstore.PluginInstall, error) {
+func (s pluginInstallStore) ListPluginInstalls(ctx context.Context) ([]storage.PluginInstall, error) {
 	const query = `
 SELECT plugin_id, install_kind, source_id, git_url, git_ref, git_revision, source_path, bundle_relative_dir, installed_at, installed_by, installed_hash_b64
 FROM plugin_installs
@@ -364,10 +363,10 @@ ORDER BY plugin_id`
 	}
 	defer rows.Close()
 
-	var out []marketstore.PluginInstall
+	var out []storage.PluginInstall
 	for rows.Next() {
 		var (
-			item        marketstore.PluginInstall
+			item        storage.PluginInstall
 			sourceID    sql.NullString
 			gitRef      sql.NullString
 			bundleRel   sql.NullString
@@ -414,7 +413,7 @@ ORDER BY plugin_id`
 	return out, nil
 }
 
-func (s pluginInstallStore) PutPluginInstall(ctx context.Context, install marketstore.PluginInstall) error {
+func (s pluginInstallStore) PutPluginInstall(ctx context.Context, install storage.PluginInstall) error {
 	pluginID := strings.TrimSpace(install.PluginID)
 	if pluginID == "" {
 		return errors.New("plugin_id is required")
@@ -508,10 +507,10 @@ type trustedVendorStore struct {
 	now func() time.Time
 }
 
-func (s trustedVendorStore) GetTrustedVendor(ctx context.Context, vendorID string) (marketstore.TrustedVendor, bool, error) {
+func (s trustedVendorStore) GetTrustedVendor(ctx context.Context, vendorID string) (storage.TrustedVendor, bool, error) {
 	vendorID = strings.TrimSpace(vendorID)
 	if vendorID == "" {
-		return marketstore.TrustedVendor{}, false, nil
+		return storage.TrustedVendor{}, false, nil
 	}
 
 	const query = `
@@ -520,7 +519,7 @@ FROM trusted_vendors
 WHERE vendor_id = $1`
 
 	var (
-		item                   marketstore.TrustedVendor
+		item                   storage.TrustedVendor
 		websiteURL, supportURL sql.NullString
 		addedAt, updatedAt     int64
 	)
@@ -533,9 +532,9 @@ WHERE vendor_id = $1`
 		&updatedAt,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return marketstore.TrustedVendor{}, false, nil
+			return storage.TrustedVendor{}, false, nil
 		}
-		return marketstore.TrustedVendor{}, false, fmt.Errorf("get trusted vendor: %w", err)
+		return storage.TrustedVendor{}, false, fmt.Errorf("get trusted vendor: %w", err)
 	}
 	item.VendorID = strings.TrimSpace(item.VendorID)
 	item.Name = strings.TrimSpace(item.Name)
@@ -546,7 +545,7 @@ WHERE vendor_id = $1`
 	return item, true, nil
 }
 
-func (s trustedVendorStore) ListTrustedVendors(ctx context.Context) ([]marketstore.TrustedVendor, error) {
+func (s trustedVendorStore) ListTrustedVendors(ctx context.Context) ([]storage.TrustedVendor, error) {
 	const query = `
 SELECT vendor_id, name, website_url, support_url, added_at, updated_at
 FROM trusted_vendors
@@ -558,10 +557,10 @@ ORDER BY vendor_id`
 	}
 	defer rows.Close()
 
-	var out []marketstore.TrustedVendor
+	var out []storage.TrustedVendor
 	for rows.Next() {
 		var (
-			item                   marketstore.TrustedVendor
+			item                   storage.TrustedVendor
 			websiteURL, supportURL sql.NullString
 			addedAt, updatedAt     int64
 		)
@@ -582,7 +581,7 @@ ORDER BY vendor_id`
 	return out, nil
 }
 
-func (s trustedVendorStore) PutTrustedVendor(ctx context.Context, vendor marketstore.TrustedVendor) error {
+func (s trustedVendorStore) PutTrustedVendor(ctx context.Context, vendor storage.TrustedVendor) error {
 	vendorID := strings.TrimSpace(vendor.VendorID)
 	if vendorID == "" {
 		return errors.New("vendor_id is required")
@@ -639,7 +638,7 @@ type trustedVendorKeyStore struct {
 	db *sql.DB
 }
 
-func (s trustedVendorKeyStore) ListTrustedVendorKeys(ctx context.Context, vendorID string) ([]marketstore.TrustedVendorKey, error) {
+func (s trustedVendorKeyStore) ListTrustedVendorKeys(ctx context.Context, vendorID string) ([]storage.TrustedVendorKey, error) {
 	vendorID = strings.TrimSpace(vendorID)
 	if vendorID == "" {
 		return nil, errors.New("vendor_id is required")
@@ -651,9 +650,9 @@ func (s trustedVendorKeyStore) ListTrustedVendorKeys(ctx context.Context, vendor
 	}
 	defer rows.Close()
 
-	var out []marketstore.TrustedVendorKey
+	var out []storage.TrustedVendorKey
 	for rows.Next() {
-		var item marketstore.TrustedVendorKey
+		var item storage.TrustedVendorKey
 		if err := rows.Scan(&item.VendorID, &item.KeyID); err != nil {
 			return nil, fmt.Errorf("scan trusted vendor key: %w", err)
 		}
@@ -667,7 +666,7 @@ func (s trustedVendorKeyStore) ListTrustedVendorKeys(ctx context.Context, vendor
 	return out, nil
 }
 
-func (s trustedVendorKeyStore) ReplaceTrustedVendorKeys(ctx context.Context, vendorID string, keys []marketstore.TrustedVendorKey) error {
+func (s trustedVendorKeyStore) ReplaceTrustedVendorKeys(ctx context.Context, vendorID string, keys []storage.TrustedVendorKey) error {
 	vendorID = strings.TrimSpace(vendorID)
 	if vendorID == "" {
 		return errors.New("vendor_id is required")

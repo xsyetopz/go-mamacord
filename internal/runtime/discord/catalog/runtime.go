@@ -19,7 +19,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/projection"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Snapshot struct {
@@ -35,13 +35,13 @@ type Snapshot struct {
 type Runtime struct {
 	logger       *slog.Logger
 	moduleSeed   config.ModulesFile
-	moduleStates pluginstore.ModuleStateStore
-	pluginKV     pluginstore.PluginKVStore
+	moduleStates storage.ModuleStateStore
+	pluginKV     storage.PluginKVStore
 	pluginHost   *pluginhost.Host
 	snapshot     atomic.Pointer[Snapshot]
 }
 
-func NewRuntime(logger *slog.Logger, seed config.ModulesFile, states pluginstore.ModuleStateStore, kv pluginstore.PluginKVStore, host *pluginhost.Host) *Runtime {
+func NewRuntime(logger *slog.Logger, seed config.ModulesFile, states storage.ModuleStateStore, kv storage.PluginKVStore, host *pluginhost.Host) *Runtime {
 	return &Runtime{logger: logger, moduleSeed: seed, moduleStates: states, pluginKV: kv, pluginHost: host}
 }
 
@@ -111,7 +111,7 @@ func (runtime *Runtime) Refresh(ctx context.Context) (Stats, error) {
 	return RuntimeStats(modules, order, len(pluginCommands), len(pluginUserCommands), len(pluginMessageCommands)), nil
 }
 
-func (runtime *Runtime) appendPluginModules(ctx context.Context, modules map[string]moduleapi.Info, pluginRoutes, pluginCommands, pluginUserCommands, pluginMessageCommands map[string]discordpluginbridge.Route, builtinCommands map[string]slashcmd.Command, states map[string]pluginstore.ModuleState) {
+func (runtime *Runtime) appendPluginModules(ctx context.Context, modules map[string]moduleapi.Info, pluginRoutes, pluginCommands, pluginUserCommands, pluginMessageCommands map[string]discordpluginbridge.Route, builtinCommands map[string]slashcmd.Command, states map[string]storage.ModuleState) {
 	host := runtime.pluginHost
 	if host == nil {
 		return
@@ -175,7 +175,7 @@ func (runtime *Runtime) warn(ctx context.Context, message, command, module strin
 	}
 }
 
-func (runtime *Runtime) loadModuleStates(ctx context.Context) (map[string]pluginstore.ModuleState, error) {
+func (runtime *Runtime) loadModuleStates(ctx context.Context) (map[string]storage.ModuleState, error) {
 	if runtime == nil || runtime.moduleStates == nil {
 		return nil, errors.New("store not configured")
 	}
@@ -183,7 +183,7 @@ func (runtime *Runtime) loadModuleStates(ctx context.Context) (map[string]plugin
 	if err != nil {
 		return nil, err
 	}
-	out := make(map[string]pluginstore.ModuleState, len(states))
+	out := make(map[string]storage.ModuleState, len(states))
 	for _, state := range states {
 		if id := strings.TrimSpace(state.ModuleID); id != "" {
 			out[id] = state
@@ -225,7 +225,7 @@ func (runtime *Runtime) SetModuleEnabled(ctx context.Context, moduleID string, e
 	if !info.Toggleable {
 		return fmt.Errorf("module %q is required and cannot be disabled", moduleID)
 	}
-	state := pluginstore.ModuleState{ModuleID: moduleID, Enabled: enabled, UpdatedAt: time.Now().UTC()}
+	state := storage.ModuleState{ModuleID: moduleID, Enabled: enabled, UpdatedAt: time.Now().UTC()}
 	if actorID != 0 {
 		state.UpdatedBy = &actorID
 	}

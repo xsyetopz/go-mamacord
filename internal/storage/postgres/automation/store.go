@@ -2,9 +2,8 @@ package automationpg
 
 import (
 	"database/sql"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"time"
-
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
 )
 
 type Store struct {
@@ -19,10 +18,10 @@ func New(db *sql.DB, now func() time.Time) Store {
 	return Store{db: db, now: now}
 }
 
-func (s Store) Reminders() automationstore.ReminderStore {
+func (s Store) Reminders() storage.ReminderStore {
 	return reminderStore{db: s.db, now: s.now}
 }
 
-func (s Store) CheckIns() automationstore.CheckInStore {
+func (s Store) CheckIns() storage.CheckInStore {
 	return checkInStore{db: s.db, now: s.now}
 }

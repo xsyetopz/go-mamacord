@@ -1,4 +1,4 @@
-package cdn_test
+package pluginbridge
 
 import (
 	"context"
@@ -7,14 +7,12 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/cdn"
 )
 
 func TestDiscordCDNFetcher_RejectsHost(t *testing.T) {
 	t.Parallel()
 
-	f := cdn.NewDiscordCDNFetcher()
+	f := newDiscordCDNFetcher()
 	_, err := f.Fetch(context.Background(), "https://example.com/x.png", 10)
 	if err == nil {
 		t.Fatalf("expected error")
@@ -39,7 +37,7 @@ func TestDiscordCDNFetcher_AllowsMediaAndCdn(t *testing.T) {
 			}, nil
 		}),
 	}
-	f := cdn.NewDiscordCDNFetcherWithClient(client)
+	f := newDiscordCDNFetcherWithClient(client)
 
 	if _, err := f.Fetch(context.Background(), "https://cdn.discordapp.com/x", 10); err != nil {
 		t.Fatalf("cdn fetch: %v", err)
@@ -60,7 +58,7 @@ func TestDiscordCDNFetcher_EnforcesSizeLimit(t *testing.T) {
 			}, nil
 		}),
 	}
-	f := cdn.NewDiscordCDNFetcherWithClient(client)
+	f := newDiscordCDNFetcherWithClient(client)
 
 	if _, err := f.Fetch(context.Background(), "https://cdn.discordapp.com/x", 5); err == nil {
 		t.Fatalf("expected error")
@@ -73,7 +71,7 @@ func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) { r
 
 func TestDiscordCDNFetcherRejectsNoncanonicalAuthority(t *testing.T) {
 	t.Parallel()
-	fetcher := cdn.NewDiscordCDNFetcher()
+	fetcher := newDiscordCDNFetcher()
 	for _, raw := range []string{"https://user@cdn.discordapp.com/x", "https://cdn.discordapp.com:444/x", "https://cdn.discordapp.com/x#fragment"} {
 		if _, err := fetcher.Fetch(context.Background(), raw, 10); err == nil {
 			t.Errorf("accepted %q", raw)

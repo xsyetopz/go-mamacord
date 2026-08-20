@@ -1,4 +1,4 @@
-package parse
+package executor
 
 import (
 	"net/url"
@@ -15,7 +15,7 @@ const (
 	hexColorDigits       = 6
 )
 
-func ParseEmojiID(raw string) (snowflake.ID, bool) {
+func parseEmojiID(raw string) (snowflake.ID, bool) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return 0, false
@@ -46,7 +46,7 @@ func ParseEmojiID(raw string) (snowflake.ID, bool) {
 	return 0, false
 }
 
-func ParseStickerID(raw string) (snowflake.ID, bool) {
+func parseStickerID(raw string) (snowflake.ID, bool) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return 0, false
@@ -77,7 +77,7 @@ func ParseStickerID(raw string) (snowflake.ID, bool) {
 	return 0, false
 }
 
-func ParseHexColor(raw string) (int, bool) {
+func parseHexColor(raw string) (int, bool) {
 	raw = strings.TrimSpace(raw)
 	raw = strings.TrimPrefix(raw, "#")
 	if len(raw) != hexColorDigits {
@@ -91,7 +91,7 @@ func ParseHexColor(raw string) (int, bool) {
 	return int(v), true
 }
 
-func ParseMessageID(raw string) (snowflake.ID, bool) {
+func parseMessageID(raw string) (snowflake.ID, bool) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return 0, false

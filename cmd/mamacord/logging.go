@@ -1,4 +1,4 @@
-package logging
+package main
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func New(level string) (*slog.Logger, error) {
-	lvl, err := parseLevel(level)
+func newLogger(level string) (*slog.Logger, error) {
+	lvl, err := parseLogLevel(level)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func New(level string) (*slog.Logger, error) {
 	return slog.New(handler), nil
 }
 
-func parseLevel(level string) (slog.Level, error) {
+func parseLogLevel(level string) (slog.Level, error) {
 	switch strings.ToLower(strings.TrimSpace(level)) {
 	case "debug":
 		return slog.LevelDebug, nil

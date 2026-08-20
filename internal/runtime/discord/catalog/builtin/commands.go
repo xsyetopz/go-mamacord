@@ -15,14 +15,13 @@ import (
 
 	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/commands"
-	commandspec "github.com/xsyetopz/go-mamacord/internal/commands/spec"
 	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func Commands(desc commands.ModuleDescriptor) []slashcmd.Command {
@@ -32,7 +31,7 @@ func Commands(desc commands.ModuleDescriptor) []slashcmd.Command {
 	return nil
 }
 
-func builtinCommandsFromDefinitions(moduleID string, defs []commandspec.SlashCommand) []slashcmd.Command {
+func builtinCommandsFromDefinitions(moduleID string, defs []commands.SlashCommand) []slashcmd.Command {
 	out := make([]slashcmd.Command, 0, len(defs))
 	for _, def := range defs {
 		switch strings.TrimSpace(moduleID) {
@@ -49,7 +48,7 @@ func builtinCommandsFromDefinitions(moduleID string, defs []commandspec.SlashCom
 	return out
 }
 
-func coreBuiltinCommand(def commandspec.SlashCommand) (slashcmd.Command, bool) {
+func coreBuiltinCommand(def commands.SlashCommand) (slashcmd.Command, bool) {
 	switch strings.TrimSpace(def.Name) {
 	case "ping":
 		return slashcmd.Command{
@@ -107,7 +106,7 @@ func coreBuiltinCommand(def commandspec.SlashCommand) (slashcmd.Command, bool) {
 	}
 }
 
-func adminBuiltinCommand(def commandspec.SlashCommand) (slashcmd.Command, bool) {
+func adminBuiltinCommand(def commands.SlashCommand) (slashcmd.Command, bool) {
 	switch strings.TrimSpace(def.Name) {
 	case "block":
 		return slashcmd.Command{
@@ -187,15 +186,15 @@ func blockBuiltinHandle(
 func blockBuiltinUser(
 	ctx context.Context,
 	t commandtext.Translator,
-	restrictions moderationstore.RestrictionStore,
+	restrictions storage.RestrictionStore,
 	actorID uint64,
 	data discord.SlashCommandInteractionData,
 ) (interactions.SlashAction, error) {
 	user := data.User("user")
 	reason := strings.TrimSpace(data.String("reason"))
 
-	if err := restrictions.PutRestriction(ctx, moderationstore.Restriction{
-		TargetType: moderationstore.TargetTypeUser,
+	if err := restrictions.PutRestriction(ctx, storage.Restriction{
+		TargetType: storage.TargetTypeUser,
 		TargetID:   uint64(user.ID),
 		Reason:     reason,
 		CreatedBy:  actorID,
@@ -213,7 +212,7 @@ func blockBuiltinGuild(
 	ctx context.Context,
 	e *events.ApplicationCommandInteractionCreate,
 	t commandtext.Translator,
-	restrictions moderationstore.RestrictionStore,
+	restrictions storage.RestrictionStore,
 	actorID uint64,
 	data discord.SlashCommandInteractionData,
 ) (interactions.SlashAction, error) {
@@ -228,8 +227,8 @@ func blockBuiltinGuild(
 	}
 
 	reason := strings.TrimSpace(data.String("reason"))
-	if err := restrictions.PutRestriction(ctx, moderationstore.Restriction{
-		TargetType: moderationstore.TargetTypeGuild,
+	if err := restrictions.PutRestriction(ctx, storage.Restriction{
+		TargetType: storage.TargetTypeGuild,
 		TargetID:   guildID,
 		Reason:     reason,
 		CreatedBy:  actorID,
@@ -607,7 +606,7 @@ func unblockBuiltinHandle(
 	switch *sub {
 	case "user":
 		user := data.User("user")
-		if err := restrictions.DeleteRestriction(ctx, moderationstore.TargetTypeUser, uint64(user.ID)); err != nil {
+		if err := restrictions.DeleteRestriction(ctx, storage.TargetTypeUser, uint64(user.ID)); err != nil {
 			return nil, err
 		}
 		return interactions.SlashMessage{
@@ -626,7 +625,7 @@ func unblockBuiltinHandle(
 					WithContent(t.S("admin.unblock.guild.invalid", map[string]any{"GuildID": raw})),
 			}, nil
 		}
-		if err := restrictions.DeleteRestriction(ctx, moderationstore.TargetTypeGuild, guildID); err != nil {
+		if err := restrictions.DeleteRestriction(ctx, storage.TargetTypeGuild, guildID); err != nil {
 			return nil, err
 		}
 		return interactions.SlashMessage{

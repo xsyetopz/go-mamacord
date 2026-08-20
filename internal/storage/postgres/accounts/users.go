@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type userStore struct {
@@ -15,7 +14,7 @@ type userStore struct {
 	now func() time.Time
 }
 
-func (s userStore) UpsertUserSeen(ctx context.Context, u accountstore.UserSeen) error {
+func (s userStore) UpsertUserSeen(ctx context.Context, u storage.UserSeen) error {
 	now := s.now().UTC()
 	createdAt := u.CreatedAt
 	if createdAt.IsZero() {

@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var signerKeyIDPattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$`)
@@ -82,7 +82,7 @@ func ReadTrustedKeysFile(path string) (map[string]ed25519.PublicKey, error) {
 func LoadTrustedKeys(
 	ctx context.Context,
 	filePath string,
-	signers marketstore.TrustedSignerStore,
+	signers storage.TrustedSignerStore,
 ) (map[string]ed25519.PublicKey, error) {
 	out := map[string]ed25519.PublicKey{}
 

@@ -1,4 +1,4 @@
-package commandspec
+package commands
 
 type SlashCommand struct {
 	Name   string

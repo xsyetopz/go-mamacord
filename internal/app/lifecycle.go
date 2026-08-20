@@ -23,7 +23,6 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	discordplatform "github.com/xsyetopz/go-mamacord/internal/runtime/discord"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
-	bootstrap "github.com/xsyetopz/go-mamacord/internal/storage/postgres/bootstrap"
 )
 
 var (
@@ -241,7 +240,7 @@ func (a *App) initStorage(ctx context.Context) error {
 	if a.store != nil {
 		return nil
 	}
-	store, version, err := bootstrap.OpenRuntimeStore(ctx, a.cfg)
+	store, version, err := postgresstore.OpenRuntimeStore(ctx, a.cfg)
 	if err != nil {
 		return err
 	}

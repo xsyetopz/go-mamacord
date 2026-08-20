@@ -2,12 +2,11 @@ package automationpg_test
 
 import (
 	"context"
-	"testing"
-	"time"
-
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 	pgtest "github.com/xsyetopz/go-mamacord/internal/storage/postgres/testkit"
+	"testing"
+	"time"
 )
 
 func TestPostgresReminderLifecycleAndLeaseFlow(t *testing.T) {
@@ -20,41 +19,41 @@ func TestPostgresReminderLifecycleAndLeaseFlow(t *testing.T) {
 	channelID := uint64(777)
 	guildID := uint64(888)
 
-	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, automationstore.Reminder{
-		ReminderIdentity: automationstore.ReminderIdentity{
+	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, storage.Reminder{
+		ReminderIdentity: storage.ReminderIdentity{
 			ID:     "due",
 			UserID: 42,
 		},
-		ReminderSchedule: automationstore.ReminderSchedule{
+		ReminderSchedule: storage.ReminderSchedule{
 			Schedule: "0 * * * *",
 			Kind:     "hydrate",
 			Note:     "water",
 		},
-		ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{
-			Delivery: automationstore.ReminderDeliveryDM,
+		ReminderDeliveryTarget: storage.ReminderDeliveryTarget{
+			Delivery: storage.ReminderDeliveryDM,
 		},
-		ReminderState: automationstore.ReminderState{
+		ReminderState: storage.ReminderState{
 			Enabled:   true,
 			NextRunAt: now,
 		},
 	}), "CreateReminder(due)")
 
-	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, automationstore.Reminder{
-		ReminderIdentity: automationstore.ReminderIdentity{
+	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, storage.Reminder{
+		ReminderIdentity: storage.ReminderIdentity{
 			ID:     "future",
 			UserID: 42,
 		},
-		ReminderSchedule: automationstore.ReminderSchedule{
+		ReminderSchedule: storage.ReminderSchedule{
 			Schedule: "0 * * * *",
 			Kind:     "stretch",
 			Note:     "legs",
 		},
-		ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{
-			Delivery:  automationstore.ReminderDeliveryChannel,
+		ReminderDeliveryTarget: storage.ReminderDeliveryTarget{
+			Delivery:  storage.ReminderDeliveryChannel,
 			GuildID:   &guildID,
 			ChannelID: &channelID,
 		},
-		ReminderState: automationstore.ReminderState{
+		ReminderState: storage.ReminderState{
 			Enabled:   true,
 			NextRunAt: now.Add(2 * time.Hour),
 		},
@@ -93,7 +92,7 @@ func TestPostgresReminderLifecycleAndLeaseFlow(t *testing.T) {
 	reminders, err := storeDB.Reminders().ListReminders(ctx, 42, 10)
 	mustNoErr(t, err, "ListReminders")
 
-	byID := map[string]automationstore.Reminder{}
+	byID := map[string]storage.Reminder{}
 	for _, reminder := range reminders {
 		byID[reminder.ID] = reminder
 	}
@@ -137,19 +136,19 @@ func TestPostgresClaimDueReminders_ReclaimsExpiredLease(t *testing.T) {
 	storeDB := newReminderTestStore(t, ctx)
 	now := time.Unix(1700000000, 0).UTC()
 
-	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, automationstore.Reminder{
-		ReminderIdentity: automationstore.ReminderIdentity{
+	mustNoErr(t, storeDB.Reminders().CreateReminder(ctx, storage.Reminder{
+		ReminderIdentity: storage.ReminderIdentity{
 			ID:     "due",
 			UserID: 7,
 		},
-		ReminderSchedule: automationstore.ReminderSchedule{
+		ReminderSchedule: storage.ReminderSchedule{
 			Schedule: "0 * * * *",
 			Kind:     "breathe",
 		},
-		ReminderDeliveryTarget: automationstore.ReminderDeliveryTarget{
-			Delivery: automationstore.ReminderDeliveryDM,
+		ReminderDeliveryTarget: storage.ReminderDeliveryTarget{
+			Delivery: storage.ReminderDeliveryDM,
 		},
-		ReminderState: automationstore.ReminderState{
+		ReminderState: storage.ReminderState{
 			Enabled:   true,
 			NextRunAt: now,
 		},

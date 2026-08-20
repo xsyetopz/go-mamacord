@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 type pluginKVStore struct {
@@ -86,27 +85,27 @@ func (s pluginKVStore) DeletePluginKV(ctx context.Context, guildID uint64, plugi
 	return nil
 }
 
-func (s pluginKVStore) GetPluginKVVersioned(ctx context.Context, guildID uint64, pluginID, key string) (pluginstore.PluginKVValue, bool, error) {
+func (s pluginKVStore) GetPluginKVVersioned(ctx context.Context, guildID uint64, pluginID, key string) (storage.PluginKVValue, bool, error) {
 	pluginID = strings.TrimSpace(pluginID)
 	key = strings.TrimSpace(key)
 	if pluginID == "" || key == "" {
-		return pluginstore.PluginKVValue{}, false, nil
+		return storage.PluginKVValue{}, false, nil
 	}
 	guildIDDB, err := sqlvalue.Uint64ToInt64(guildID, "guild_id")
 	if err != nil {
-		return pluginstore.PluginKVValue{}, false, err
+		return storage.PluginKVValue{}, false, err
 	}
-	var value pluginstore.PluginKVValue
+	var value storage.PluginKVValue
 	var version int64
 	err = s.db.QueryRowContext(ctx, `SELECT value_json, version FROM plugin_kv WHERE guild_id = $1 AND plugin_id = $2 AND key = $3`, guildIDDB, pluginID, key).Scan(&value.ValueJSON, &version)
 	if errors.Is(err, sql.ErrNoRows) {
-		return pluginstore.PluginKVValue{}, false, nil
+		return storage.PluginKVValue{}, false, nil
 	}
 	if err != nil {
-		return pluginstore.PluginKVValue{}, false, fmt.Errorf("get versioned plugin kv: %w", err)
+		return storage.PluginKVValue{}, false, fmt.Errorf("get versioned plugin kv: %w", err)
 	}
 	if version <= 0 {
-		return pluginstore.PluginKVValue{}, false, errors.New("plugin kv version is invalid")
+		return storage.PluginKVValue{}, false, errors.New("plugin kv version is invalid")
 	}
 	value.Version = uint64(version)
 	return value, true, nil

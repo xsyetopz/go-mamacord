@@ -10,7 +10,6 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/author"
-	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/execution"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/internal/evaluation"
 	starlarkgo "go.starlark.net/starlark"
 )
@@ -94,7 +93,7 @@ func (generation *Generation) InvokeWithServices(ctx context.Context, invocation
 	defer release()
 	ctx, stopRetirement := generation.invocationContext(ctx)
 	defer stopRetirement()
-	return execution.Invoke(ctx, generation.executionProgram(), invocation, services, print)
+	return invokeProgram(ctx, generation.executionProgram(), invocation, services, print)
 }
 
 func (generation *Generation) Check(ctx context.Context, invocation contract.Invocation, print func(string)) (contract.CheckDecision, error) {
@@ -115,9 +114,9 @@ func (generation *Generation) CheckWithServices(ctx context.Context, invocation 
 	defer release()
 	ctx, stopRetirement := generation.invocationContext(ctx)
 	defer stopRetirement()
-	return execution.Check(ctx, generation.executionProgram(), invocation, services, print)
+	return checkProgram(ctx, generation.executionProgram(), invocation, services, print)
 }
 
-func (generation *Generation) executionProgram() execution.Program {
-	return execution.Program{Limits: generation.limits, Catalog: generation.catalog, Routes: generation.routes}
+func (generation *Generation) executionProgram() executionProgram {
+	return executionProgram{Limits: generation.limits, Catalog: generation.catalog, Routes: generation.routes}
 }

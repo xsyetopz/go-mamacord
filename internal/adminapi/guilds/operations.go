@@ -11,7 +11,7 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
 	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func (s *Service) pluginSection(pluginID, name string, cfg guildconfig.PluginConfig) PluginSection {
@@ -129,7 +129,7 @@ func (s *Service) CreateWarning(ctx context.Context, accessToken string, guildID
 	}
 
 	now := time.Now().UTC()
-	if err := s.Warnings.CreateWarning(ctx, moderationstore.Warning{
+	if err := s.Warnings.CreateWarning(ctx, storage.Warning{
 		ID:          warningID(guildID, targetID, now),
 		GuildID:     guildID,
 		UserID:      targetID,
@@ -139,11 +139,11 @@ func (s *Service) CreateWarning(ctx context.Context, accessToken string, guildID
 	}); err != nil {
 		return nil, err
 	}
-	if err := s.Audit.Append(ctx, moderationstore.AuditEntry{
+	if err := s.Audit.Append(ctx, storage.AuditEntry{
 		GuildID:    &guildID,
 		ActorID:    &actorID,
 		Action:     "warn.create",
-		TargetType: ptrTargetType(moderationstore.TargetTypeUser),
+		TargetType: ptrTargetType(storage.TargetTypeUser),
 		TargetID:   &targetID,
 		CreatedAt:  now,
 		MetaJSON:   "{}",
@@ -161,11 +161,11 @@ func (s *Service) CreateWarning(ctx context.Context, accessToken string, guildID
 			timeoutFailed = true
 		} else {
 			timeoutMinutes = cfg.TimeoutMinutes
-			_ = s.Audit.Append(ctx, moderationstore.AuditEntry{
+			_ = s.Audit.Append(ctx, storage.AuditEntry{
 				GuildID:    &guildID,
 				ActorID:    &actorID,
 				Action:     "warn.timeout",
-				TargetType: ptrTargetType(moderationstore.TargetTypeUser),
+				TargetType: ptrTargetType(storage.TargetTypeUser),
 				TargetID:   &targetID,
 				CreatedAt:  now,
 				MetaJSON:   `{"until":` + strconv.FormatInt(untilUnix, 10) + `}`,
@@ -199,7 +199,7 @@ func (s *Service) DeleteWarning(ctx context.Context, accessToken string, guildID
 	if err := s.Warnings.DeleteWarning(ctx, strings.TrimSpace(warningID)); err != nil {
 		return err
 	}
-	return s.Audit.Append(ctx, moderationstore.AuditEntry{
+	return s.Audit.Append(ctx, storage.AuditEntry{
 		GuildID:   &guildID,
 		ActorID:   &actorID,
 		Action:    "warn.delete",
@@ -433,7 +433,7 @@ func decodeBase64File(raw string) ([]byte, error) {
 	return body, nil
 }
 
-func ptrTargetType(value moderationstore.TargetType) *moderationstore.TargetType {
+func ptrTargetType(value storage.TargetType) *storage.TargetType {
 	return &value
 }
 

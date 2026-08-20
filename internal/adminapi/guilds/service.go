@@ -13,8 +13,7 @@ import (
 	adminauth "github.com/xsyetopz/go-mamacord/internal/adminapi/auth"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var ErrGuildNotAccessible = errors.New("guild is not accessible to this user")
@@ -26,9 +25,9 @@ type ServiceCore struct {
 }
 
 type ServiceStores struct {
-	PluginKV pluginstore.PluginKVStore
-	Warnings moderationstore.WarningStore
-	Audit    moderationstore.AuditStore
+	PluginKV storage.PluginKVStore
+	Warnings storage.WarningStore
+	Audit    storage.AuditStore
 }
 
 type DiscordAccess struct {

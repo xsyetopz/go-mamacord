@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/signing"
+	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 	"log/slog"
 	"net"
 	"net/url"
@@ -23,11 +24,8 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/config"
-	"github.com/xsyetopz/go-mamacord/internal/dotenv"
-	"github.com/xsyetopz/go-mamacord/internal/logging"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
-	bootstrap "github.com/xsyetopz/go-mamacord/internal/storage/postgres/bootstrap"
 )
 
 func main() {
@@ -83,7 +81,7 @@ func runMain() int {
 		return 1
 	}
 
-	logger, err := logging.New(cfg.Runtime.LogLevel)
+	logger, err := newLogger(cfg.Runtime.LogLevel)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
@@ -190,29 +188,29 @@ func runDoctorCommand(args []string) int {
 	return 0
 }
 
-func autoLoadEnvFile() (dotenv.SearchResult, error) {
+func autoLoadEnvFile() (envSearchResult, error) {
 	if strings.TrimSpace(os.Getenv("MAMACORD_DISABLE_DOTENV")) == "1" {
-		return dotenv.SearchResult{}, nil
+		return envSearchResult{}, nil
 	}
 	if bad := forbiddenDotenvFile(); bad != "" {
-		return dotenv.SearchResult{}, fmt.Errorf("forbidden env file detected: %s (only .env.dev/.env.prod are allowed)", bad)
+		return envSearchResult{}, fmt.Errorf("forbidden env file detected: %s (only .env.dev/.env.prod are allowed)", bad)
 	}
 
-	searchDirs := []dotenv.SearchResult{
+	searchDirs := []envSearchResult{
 		{Path: ".", Source: "working_dir"},
 	}
 	if execPath, err := os.Executable(); err == nil {
 		if execDir := strings.TrimSpace(filepath.Dir(execPath)); execDir != "" && execDir != "." {
-			searchDirs = append(searchDirs, dotenv.SearchResult{Path: execDir, Source: "executable_dir"})
+			searchDirs = append(searchDirs, envSearchResult{Path: execDir, Source: "executable_dir"})
 		}
 	}
 
 	if explicit := strings.TrimSpace(os.Getenv("MAMACORD_ENV_FILE")); explicit != "" {
 		base := filepath.Base(explicit)
 		if base != ".env.dev" && base != ".env.prod" {
-			return dotenv.SearchResult{}, fmt.Errorf("refusing to load non-standard env file %s; use .env.dev or .env.prod instead", base)
+			return envSearchResult{}, fmt.Errorf("refusing to load non-standard env file %s; use .env.dev or .env.prod instead", base)
 		}
-		return dotenv.LoadAutoWithSearch([]string{explicit}, searchDirs)
+		return loadEnvAutoWithSearch([]string{explicit}, searchDirs)
 	}
 
 	subcmd := ""
@@ -222,11 +220,11 @@ func autoLoadEnvFile() (dotenv.SearchResult, error) {
 
 	switch subcmd {
 	case "dev", "init":
-		return dotenv.LoadAutoWithSearch([]string{".env.dev"}, searchDirs)
+		return loadEnvAutoWithSearch([]string{".env.dev"}, searchDirs)
 	case "doctor":
-		return dotenv.LoadAutoWithSearch([]string{".env.prod", ".env.dev"}, searchDirs)
+		return loadEnvAutoWithSearch([]string{".env.prod", ".env.dev"}, searchDirs)
 	default:
-		return dotenv.LoadAutoWithSearch([]string{".env.prod"}, searchDirs)
+		return loadEnvAutoWithSearch([]string{".env.prod"}, searchDirs)
 	}
 }
 
@@ -264,7 +262,7 @@ func runDevCommand(ctx context.Context) int {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
 	}
-	logger, err := logging.New(cfg.Runtime.LogLevel)
+	logger, err := newLogger(cfg.Runtime.LogLevel)
 	if err != nil {
 		_, _ = os.Stderr.WriteString(err.Error() + "\n")
 		return 1
@@ -451,7 +449,7 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 
 	switch args[0] {
 	case "status":
-		status, err := bootstrap.MigrationStatus(ctx, cfg)
+		status, err := postgresstore.MigrationStatus(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
@@ -459,7 +457,7 @@ func runMigrateCommand(ctx context.Context, args []string) int {
 		printStatus(status)
 		return 0
 	case "up":
-		status, err := bootstrap.MigrateUp(ctx, cfg)
+		status, err := postgresstore.MigrateUp(ctx, cfg)
 		if err != nil {
 			_, _ = os.Stderr.WriteString(err.Error() + "\n")
 			return 1
@@ -687,11 +685,11 @@ func openMarketplaceManager(ctx context.Context) (*marketplace.Manager, func(), 
 	if err != nil {
 		return nil, nil, err
 	}
-	logger, err := logging.New(cfg.Runtime.LogLevel)
+	logger, err := newLogger(cfg.Runtime.LogLevel)
 	if err != nil {
 		return nil, nil, err
 	}
-	store, _, err := bootstrap.OpenRuntimeStore(ctx, cfg)
+	store, _, err := postgresstore.OpenRuntimeStore(ctx, cfg)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -21,10 +21,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Dependencies struct {
@@ -64,14 +61,14 @@ type PluginDependencies struct {
 
 type StorageDependencies struct {
 	I18n         i18n.Registry
-	Restrictions moderationstore.RestrictionStore
-	PluginKV     pluginstore.PluginKVStore
-	ModuleStates pluginstore.ModuleStateStore
-	UserSettings accountstore.UserSettingsStore
-	Reminders    automationstore.ReminderStore
-	Guilds       accountstore.GuildStore
-	Users        accountstore.UserStore
-	GuildMembers accountstore.GuildMemberStore
+	Restrictions storage.RestrictionStore
+	PluginKV     storage.PluginKVStore
+	ModuleStates storage.ModuleStateStore
+	UserSettings storage.UserSettingsStore
+	Reminders    storage.ReminderStore
+	Guilds       storage.GuildStore
+	Users        storage.UserStore
+	GuildMembers storage.GuildMemberStore
 	PluginStore  pluginhost.Store
 }
 
@@ -105,14 +102,14 @@ type botServices struct {
 }
 
 type botStores struct {
-	restrictions  moderationstore.RestrictionStore
-	pluginKV      pluginstore.PluginKVStore
-	moduleStates  pluginstore.ModuleStateStore
-	userSettings  accountstore.UserSettingsStore
-	reminderStore automationstore.ReminderStore
-	guilds        accountstore.GuildStore
-	users         accountstore.UserStore
-	guildMembers  accountstore.GuildMemberStore
+	restrictions  storage.RestrictionStore
+	pluginKV      storage.PluginKVStore
+	moduleStates  storage.ModuleStateStore
+	userSettings  storage.UserSettingsStore
+	reminderStore storage.ReminderStore
+	guilds        storage.GuildStore
+	users         storage.UserStore
+	guildMembers  storage.GuildMemberStore
 }
 
 type botRuntimeConfig struct {

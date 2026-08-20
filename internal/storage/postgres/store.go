@@ -3,18 +3,13 @@ package postgresstore
 import (
 	"database/sql"
 	"errors"
-	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
-	automationstore "github.com/xsyetopz/go-mamacord/internal/storage/automation"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	accountspg "github.com/xsyetopz/go-mamacord/internal/storage/postgres/accounts"
 	automationpg "github.com/xsyetopz/go-mamacord/internal/storage/postgres/automation"
 	marketplacepg "github.com/xsyetopz/go-mamacord/internal/storage/postgres/marketplace"
 	moderationpg "github.com/xsyetopz/go-mamacord/internal/storage/postgres/moderation"
 	pluginspg "github.com/xsyetopz/go-mamacord/internal/storage/postgres/plugins"
+	"time"
 )
 
 type Store struct {
@@ -45,82 +40,82 @@ func (s *Store) Close() error {
 	return s.db.Close()
 }
 
-func (s *Store) Restrictions() moderationstore.RestrictionStore {
+func (s *Store) Restrictions() storage.RestrictionStore {
 	return s.moderation.Restrictions()
 }
 
-func (s *Store) Warnings() moderationstore.WarningStore {
+func (s *Store) Warnings() storage.WarningStore {
 	return s.moderation.Warnings()
 }
 
-func (s *Store) Audit() moderationstore.AuditStore {
+func (s *Store) Audit() storage.AuditStore {
 	return s.moderation.Audit()
 }
 
-func (s *Store) PluginKV() pluginstore.PluginKVStore {
+func (s *Store) PluginKV() storage.PluginKVStore {
 	return s.plugins.PluginKV()
 }
 
-func (s *Store) AdminSessions() accountstore.AdminSessionStore {
+func (s *Store) AdminSessions() storage.AdminSessionStore {
 	return s.accounts.AdminSessions()
 }
 
-func (s *Store) ModuleStates() pluginstore.ModuleStateStore {
+func (s *Store) ModuleStates() storage.ModuleStateStore {
 	return s.plugins.ModuleStates()
 }
 
-func (s *Store) Users() accountstore.UserStore {
+func (s *Store) Users() storage.UserStore {
 	return s.accounts.Users()
 }
 
-func (s *Store) Guilds() accountstore.GuildStore {
+func (s *Store) Guilds() storage.GuildStore {
 	return s.accounts.Guilds()
 }
 
-func (s *Store) GuildMembers() accountstore.GuildMemberStore {
+func (s *Store) GuildMembers() storage.GuildMemberStore {
 	return s.accounts.GuildMembers()
 }
 
-func (s *Store) UserSettings() accountstore.UserSettingsStore {
+func (s *Store) UserSettings() storage.UserSettingsStore {
 	return s.accounts.UserSettings()
 }
 
-func (s *Store) Reminders() automationstore.ReminderStore {
+func (s *Store) Reminders() storage.ReminderStore {
 	return s.automation.Reminders()
 }
 
-func (s *Store) CheckIns() automationstore.CheckInStore {
+func (s *Store) CheckIns() storage.CheckInStore {
 	return s.automation.CheckIns()
 }
 
-func (s *Store) DiscordOAuthTokens() accountstore.DiscordOAuthTokenStore {
+func (s *Store) DiscordOAuthTokens() storage.DiscordOAuthTokenStore {
 	return s.accounts.DiscordOAuthTokens()
 }
 
-func (s *Store) PluginOAuthGrants() pluginstore.PluginOAuthGrantStore {
+func (s *Store) PluginOAuthGrants() storage.PluginOAuthGrantStore {
 	return s.plugins.PluginOAuthGrants()
 }
 
-func (s *Store) TrustedSigners() marketstore.TrustedSignerStore {
+func (s *Store) TrustedSigners() storage.TrustedSignerStore {
 	return s.marketplace.TrustedSigners()
 }
 
-func (s *Store) MarketplaceSources() marketstore.MarketplaceSourceStore {
+func (s *Store) MarketplaceSources() storage.MarketplaceSourceStore {
 	return s.marketplace.Sources()
 }
 
-func (s *Store) MarketplaceSourceSyncs() marketstore.MarketplaceSourceSyncStore {
+func (s *Store) MarketplaceSourceSyncs() storage.MarketplaceSourceSyncStore {
 	return s.marketplace.SourceSyncs()
 }
 
-func (s *Store) PluginInstalls() marketstore.PluginInstallStore {
+func (s *Store) PluginInstalls() storage.PluginInstallStore {
 	return s.marketplace.PluginInstalls()
 }
 
-func (s *Store) TrustedVendors() marketstore.TrustedVendorStore {
+func (s *Store) TrustedVendors() storage.TrustedVendorStore {
 	return s.marketplace.TrustedVendors()
 }
 
-func (s *Store) TrustedVendorKeys() marketstore.TrustedVendorKeyStore {
+func (s *Store) TrustedVendorKeys() storage.TrustedVendorKeyStore {
 	return s.marketplace.TrustedVendorKeys()
 }

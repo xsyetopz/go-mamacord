@@ -14,7 +14,6 @@ import (
 	"github.com/disgoorg/omit"
 	"github.com/disgoorg/snowflake/v2"
 
-	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/cdn"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
 )
@@ -514,7 +513,7 @@ func fetchContractAttachment(ctx context.Context, attachment contract.Attachment
 	if attachment.Size > limit {
 		return nil, errors.New("attachment exceeds byte limit")
 	}
-	return cdn.NewDiscordCDNFetcher().Fetch(ctx, attachment.URL, limit)
+	return newDiscordCDNFetcher().Fetch(ctx, attachment.URL, limit)
 }
 
 func ContractMessageCreate(pluginID string, value contract.MessageOperation) (discord.MessageCreate, error) {

@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type adminSessionStore struct {
@@ -16,9 +15,9 @@ type adminSessionStore struct {
 	now func() time.Time
 }
 
-func (s adminSessionStore) GetAdminSession(ctx context.Context, id string) (accountstore.AdminSession, bool, error) {
+func (s adminSessionStore) GetAdminSession(ctx context.Context, id string) (storage.AdminSession, bool, error) {
 	if s.db == nil {
-		return accountstore.AdminSession{}, false, errors.New("db is required")
+		return storage.AdminSession{}, false, errors.New("db is required")
 	}
 
 	row := s.db.QueryRowContext(ctx, `
@@ -28,7 +27,7 @@ WHERE id = $1
 `, id)
 
 	var (
-		sess    accountstore.AdminSession
+		sess    storage.AdminSession
 		userID  int64
 		isOwner bool
 	)
@@ -44,21 +43,21 @@ WHERE id = $1
 		&sess.ExpiresAt,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return accountstore.AdminSession{}, false, nil
+			return storage.AdminSession{}, false, nil
 		}
-		return accountstore.AdminSession{}, false, fmt.Errorf("get admin session: %w", err)
+		return storage.AdminSession{}, false, fmt.Errorf("get admin session: %w", err)
 	}
 
 	userIDU64, err := sqlvalue.Int64ToUint64(userID, "user_id")
 	if err != nil {
-		return accountstore.AdminSession{}, false, err
+		return storage.AdminSession{}, false, err
 	}
 	sess.UserID = userIDU64
 	sess.IsOwner = isOwner
 	return sess, true, nil
 }
 
-func (s adminSessionStore) PutAdminSession(ctx context.Context, sess accountstore.AdminSession) error {
+func (s adminSessionStore) PutAdminSession(ctx context.Context, sess storage.AdminSession) error {
 	if s.db == nil {
 		return errors.New("db is required")
 	}

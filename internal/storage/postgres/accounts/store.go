@@ -2,9 +2,8 @@ package accountspg
 
 import (
 	"database/sql"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type Store struct {
@@ -19,26 +18,26 @@ func New(db *sql.DB, now func() time.Time) Store {
 	return Store{db: db, now: now}
 }
 
-func (s Store) AdminSessions() accountstore.AdminSessionStore {
+func (s Store) AdminSessions() storage.AdminSessionStore {
 	return adminSessionStore{db: s.db, now: s.now}
 }
 
-func (s Store) Users() accountstore.UserStore {
+func (s Store) Users() storage.UserStore {
 	return userStore{db: s.db, now: s.now}
 }
 
-func (s Store) Guilds() accountstore.GuildStore {
+func (s Store) Guilds() storage.GuildStore {
 	return guildStore{db: s.db, now: s.now}
 }
 
-func (s Store) GuildMembers() accountstore.GuildMemberStore {
+func (s Store) GuildMembers() storage.GuildMemberStore {
 	return guildMemberStore{db: s.db, now: s.now}
 }
 
-func (s Store) UserSettings() accountstore.UserSettingsStore {
+func (s Store) UserSettings() storage.UserSettingsStore {
 	return userSettingsStore{db: s.db, now: s.now}
 }
 
-func (s Store) DiscordOAuthTokens() accountstore.DiscordOAuthTokenStore {
+func (s Store) DiscordOAuthTokens() storage.DiscordOAuthTokenStore {
 	return discordOAuthTokenStore{db: s.db, now: s.now}
 }

@@ -5,11 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"strings"
 	"time"
-
-	pluginstore "github.com/xsyetopz/go-mamacord/internal/storage/plugins"
 )
 
 type moduleStateStore struct {
@@ -17,10 +16,10 @@ type moduleStateStore struct {
 	now func() time.Time
 }
 
-func (s moduleStateStore) GetModuleState(ctx context.Context, moduleID string) (pluginstore.ModuleState, bool, error) {
+func (s moduleStateStore) GetModuleState(ctx context.Context, moduleID string) (storage.ModuleState, bool, error) {
 	moduleID = strings.TrimSpace(moduleID)
 	if moduleID == "" {
-		return pluginstore.ModuleState{}, false, nil
+		return storage.ModuleState{}, false, nil
 	}
 
 	const query = `
@@ -37,14 +36,14 @@ WHERE module_id = $1`
 
 	if err := s.db.QueryRowContext(ctx, query, moduleID).Scan(&id, &enabled, &updatedAt, &updatedBy); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return pluginstore.ModuleState{}, false, nil
+			return storage.ModuleState{}, false, nil
 		}
-		return pluginstore.ModuleState{}, false, fmt.Errorf("get module state: %w", err)
+		return storage.ModuleState{}, false, fmt.Errorf("get module state: %w", err)
 	}
 	return scanModuleState(id, enabled, updatedAt, updatedBy)
 }
 
-func (s moduleStateStore) ListModuleStates(ctx context.Context) ([]pluginstore.ModuleState, error) {
+func (s moduleStateStore) ListModuleStates(ctx context.Context) ([]storage.ModuleState, error) {
 	const query = `
 SELECT module_id, enabled, updated_at, updated_by
 FROM module_states
@@ -56,7 +55,7 @@ ORDER BY module_id`
 	}
 	defer rows.Close()
 
-	var out []pluginstore.ModuleState
+	var out []storage.ModuleState
 	for rows.Next() {
 		var (
 			id        string
@@ -81,7 +80,7 @@ ORDER BY module_id`
 	return out, nil
 }
 
-func (s moduleStateStore) PutModuleState(ctx context.Context, state pluginstore.ModuleState) error {
+func (s moduleStateStore) PutModuleState(ctx context.Context, state storage.ModuleState) error {
 	moduleID := strings.TrimSpace(state.ModuleID)
 	if moduleID == "" {
 		return errors.New("module_id is required")
@@ -126,22 +125,22 @@ func (s moduleStateStore) DeleteModuleState(ctx context.Context, moduleID string
 	return nil
 }
 
-func scanModuleState(moduleID string, enabled bool, updatedAt int64, updatedBy sql.NullInt64) (pluginstore.ModuleState, bool, error) {
+func scanModuleState(moduleID string, enabled bool, updatedAt int64, updatedBy sql.NullInt64) (storage.ModuleState, bool, error) {
 	moduleID = strings.TrimSpace(moduleID)
 	if moduleID == "" {
-		return pluginstore.ModuleState{}, false, nil
+		return storage.ModuleState{}, false, nil
 	}
 
 	var actor *uint64
 	if updatedBy.Valid {
 		id, err := sqlvalue.Int64ToUint64(updatedBy.Int64, "updated_by")
 		if err != nil {
-			return pluginstore.ModuleState{}, false, err
+			return storage.ModuleState{}, false, err
 		}
 		actor = &id
 	}
 
-	return pluginstore.ModuleState{
+	return storage.ModuleState{
 		ModuleID:  moduleID,
 		Enabled:   enabled,
 		UpdatedAt: time.Unix(updatedAt, 0).UTC(),

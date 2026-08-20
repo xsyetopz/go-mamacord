@@ -11,7 +11,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/host"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 func (s *Service) Plugins() ([]PluginSummary, error) {
@@ -29,7 +29,7 @@ func (s *Service) Plugins() ([]PluginSummary, error) {
 		{dir: strings.TrimSpace(s.Config.Bundles.BundledPluginsDir), bundled: true},
 		{dir: strings.TrimSpace(s.Config.Bundles.UserPluginsDir), bundled: false},
 	}
-	installsByID := map[string]marketstore.PluginInstall{}
+	installsByID := map[string]storage.PluginInstall{}
 	if s.PluginInstalls != nil {
 		installs, err := s.PluginInstalls.ListPluginInstalls(context.Background())
 		if err != nil {

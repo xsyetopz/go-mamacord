@@ -5,10 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"strings"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type discordOAuthTokenStore struct {
@@ -16,12 +15,12 @@ type discordOAuthTokenStore struct {
 	now func() time.Time
 }
 
-func (s discordOAuthTokenStore) GetDiscordOAuthToken(ctx context.Context, userID uint64) (accountstore.DiscordOAuthToken, bool, error) {
+func (s discordOAuthTokenStore) GetDiscordOAuthToken(ctx context.Context, userID uint64) (storage.DiscordOAuthToken, bool, error) {
 	if s.db == nil {
-		return accountstore.DiscordOAuthToken{}, false, errors.New("db unavailable")
+		return storage.DiscordOAuthToken{}, false, errors.New("db unavailable")
 	}
 	if userID == 0 {
-		return accountstore.DiscordOAuthToken{}, false, errors.New("invalid user id")
+		return storage.DiscordOAuthToken{}, false, errors.New("invalid user id")
 	}
 
 	row := s.db.QueryRowContext(
@@ -31,7 +30,7 @@ func (s discordOAuthTokenStore) GetDiscordOAuthToken(ctx context.Context, userID
 		 WHERE user_id = $1`,
 		userID,
 	)
-	var token accountstore.DiscordOAuthToken
+	var token storage.DiscordOAuthToken
 	var expiresAt int64
 	var updatedAt int64
 	if err := row.Scan(
@@ -43,16 +42,16 @@ func (s discordOAuthTokenStore) GetDiscordOAuthToken(ctx context.Context, userID
 		&updatedAt,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return accountstore.DiscordOAuthToken{}, false, nil
+			return storage.DiscordOAuthToken{}, false, nil
 		}
-		return accountstore.DiscordOAuthToken{}, false, err
+		return storage.DiscordOAuthToken{}, false, err
 	}
 	token.ExpiresAt = time.Unix(expiresAt, 0).UTC()
 	token.UpdatedAt = time.Unix(updatedAt, 0).UTC()
 	return token, true, nil
 }
 
-func (s discordOAuthTokenStore) PutDiscordOAuthToken(ctx context.Context, token accountstore.DiscordOAuthToken) error {
+func (s discordOAuthTokenStore) PutDiscordOAuthToken(ctx context.Context, token storage.DiscordOAuthToken) error {
 	if s.db == nil {
 		return errors.New("db unavailable")
 	}

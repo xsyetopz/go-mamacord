@@ -22,7 +22,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/compile"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark/generation"
 	"github.com/xsyetopz/go-mamacord/internal/scheduling"
-	marketstore "github.com/xsyetopz/go-mamacord/internal/storage/marketplace"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type pluginLoadLocation struct {
@@ -40,7 +40,7 @@ func (m *Host) LoadAll(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	var trustedSigners marketstore.TrustedSignerStore
+	var trustedSigners storage.TrustedSignerStore
 	if m.store != nil {
 		trustedSigners = m.store.TrustedSigners()
 	}

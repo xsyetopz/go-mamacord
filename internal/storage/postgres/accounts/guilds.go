@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	accountstore "github.com/xsyetopz/go-mamacord/internal/storage/accounts"
 )
 
 type guildStore struct {
@@ -15,7 +14,7 @@ type guildStore struct {
 	now func() time.Time
 }
 
-func (s guildStore) UpsertGuildSeen(ctx context.Context, g accountstore.GuildSeen) error {
+func (s guildStore) UpsertGuildSeen(ctx context.Context, g storage.GuildSeen) error {
 	now := s.now().UTC()
 	createdAt := g.CreatedAt
 	if createdAt.IsZero() {

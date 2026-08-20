@@ -1,4 +1,4 @@
-package dotenv
+package main
 
 import (
 	"bufio"
@@ -8,24 +8,24 @@ import (
 	"strings"
 )
 
-type SearchResult struct {
+type envSearchResult struct {
 	Path   string
 	Source string
 }
 
-// LoadAuto loads the first existing env file from the provided candidates.
+// loadEnvAuto loads the first existing env file from the provided candidates.
 // It never overrides already-set environment variables.
 //
 // Intended usage: call once at process start (before config.LoadFromEnv()).
-func LoadAuto(candidates []string) (string, error) {
-	res, err := LoadAutoWithSearch(candidates, nil)
+func loadEnvAuto(candidates []string) (string, error) {
+	res, err := loadEnvAutoWithSearch(candidates, nil)
 	if err != nil {
 		return res.Path, err
 	}
 	return res.Path, nil
 }
 
-func LoadAutoWithSearch(candidates []string, searchDirs []SearchResult) (SearchResult, error) {
+func loadEnvAutoWithSearch(candidates []string, searchDirs []envSearchResult) (envSearchResult, error) {
 	for _, cand := range candidates {
 		cand = strings.TrimSpace(cand)
 		if cand == "" {
@@ -35,10 +35,10 @@ func LoadAutoWithSearch(candidates []string, searchDirs []SearchResult) (SearchR
 			if _, err := os.Stat(cand); err != nil {
 				continue
 			}
-			if err := LoadFile(cand); err != nil {
-				return SearchResult{Path: cand, Source: "explicit"}, err
+			if err := loadEnvFile(cand); err != nil {
+				return envSearchResult{Path: cand, Source: "explicit"}, err
 			}
-			return SearchResult{Path: cand, Source: "explicit"}, nil
+			return envSearchResult{Path: cand, Source: "explicit"}, nil
 		}
 	}
 	for _, dir := range searchDirs {
@@ -55,10 +55,10 @@ func LoadAutoWithSearch(candidates []string, searchDirs []SearchResult) (SearchR
 			if _, err := os.Stat(path); err != nil {
 				continue
 			}
-			if err := LoadFile(path); err != nil {
-				return SearchResult{Path: path, Source: dir.Source}, err
+			if err := loadEnvFile(path); err != nil {
+				return envSearchResult{Path: path, Source: dir.Source}, err
 			}
-			return SearchResult{Path: path, Source: dir.Source}, nil
+			return envSearchResult{Path: path, Source: dir.Source}, nil
 		}
 	}
 	for _, cand := range candidates {
@@ -69,15 +69,15 @@ func LoadAutoWithSearch(candidates []string, searchDirs []SearchResult) (SearchR
 		if _, err := os.Stat(cand); err != nil {
 			continue
 		}
-		if err := LoadFile(cand); err != nil {
-			return SearchResult{Path: cand, Source: "working_dir"}, err
+		if err := loadEnvFile(cand); err != nil {
+			return envSearchResult{Path: cand, Source: "working_dir"}, err
 		}
-		return SearchResult{Path: cand, Source: "working_dir"}, nil
+		return envSearchResult{Path: cand, Source: "working_dir"}, nil
 	}
-	return SearchResult{}, nil
+	return envSearchResult{}, nil
 }
 
-// LoadFile parses a simple KEY=VALUE env file and sets variables that are not
+// loadEnvFile parses a simple KEY=VALUE env file and sets variables that are not
 // already present in the environment.
 //
 // Supported:
@@ -85,7 +85,7 @@ func LoadAutoWithSearch(candidates []string, searchDirs []SearchResult) (SearchR
 // - blank lines
 // - optional "export " prefix
 // - quoted values with '...' or "..."
-func LoadFile(path string) error {
+func loadEnvFile(path string) error {
 	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		return err

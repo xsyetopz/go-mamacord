@@ -19,7 +19,6 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
-	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/parse"
 )
 
 const (
@@ -143,7 +142,7 @@ func (e Discord) EditEmoji(ctx context.Context, spec discordcontrol.EmojiEditSpe
 	if e.Client() == nil {
 		return discordcontrol.EmojiResult{}, errors.New("discord client unavailable")
 	}
-	id, ok := parse.ParseEmojiID(spec.RawEmoji)
+	id, ok := parseEmojiID(spec.RawEmoji)
 	if spec.GuildID == 0 || !ok || strings.TrimSpace(spec.Name) == "" {
 		return discordcontrol.EmojiResult{}, errors.New("invalid emoji spec")
 	}
@@ -158,7 +157,7 @@ func (e Discord) DeleteEmoji(ctx context.Context, spec discordcontrol.EmojiDelet
 	if e.Client() == nil {
 		return errors.New("discord client unavailable")
 	}
-	id, ok := parse.ParseEmojiID(spec.RawEmoji)
+	id, ok := parseEmojiID(spec.RawEmoji)
 	if spec.GuildID == 0 || !ok {
 		return errors.New("invalid emoji spec")
 	}
@@ -189,7 +188,7 @@ func (e Discord) EditSticker(ctx context.Context, spec discordcontrol.StickerEdi
 	if e.Client() == nil {
 		return discordcontrol.StickerResult{}, errors.New("discord client unavailable")
 	}
-	id, ok := parse.ParseStickerID(spec.RawID)
+	id, ok := parseStickerID(spec.RawID)
 	if spec.GuildID == 0 || !ok || strings.TrimSpace(spec.Name) == "" {
 		return discordcontrol.StickerResult{}, errors.New("invalid sticker spec")
 	}
@@ -205,7 +204,7 @@ func (e Discord) DeleteSticker(ctx context.Context, spec discordcontrol.StickerD
 	if e.Client() == nil {
 		return errors.New("discord client unavailable")
 	}
-	id, ok := parse.ParseStickerID(spec.RawID)
+	id, ok := parseStickerID(spec.RawID)
 	if spec.GuildID == 0 || !ok {
 		return errors.New("invalid sticker spec")
 	}
@@ -269,13 +268,13 @@ func purgeAnchorIDs(mode, raw string) (snowflake.ID, snowflake.ID, snowflake.ID,
 	case "all":
 		return 0, 0, 0, true
 	case "before":
-		id, ok := parse.ParseMessageID(raw)
+		id, ok := parseMessageID(raw)
 		return 0, id, 0, ok
 	case "after":
-		id, ok := parse.ParseMessageID(raw)
+		id, ok := parseMessageID(raw)
 		return 0, 0, id, ok
 	case "around":
-		id, ok := parse.ParseMessageID(raw)
+		id, ok := parseMessageID(raw)
 		return id, 0, 0, ok
 	}
 	return 0, 0, 0, false

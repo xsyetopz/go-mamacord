@@ -4,10 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	storage "github.com/xsyetopz/go-mamacord/internal/storage"
 	"github.com/xsyetopz/go-mamacord/internal/storage/postgres/internal/sqlvalue"
 	"time"
-
-	moderationstore "github.com/xsyetopz/go-mamacord/internal/storage/moderation"
 )
 
 type warningStore struct {
@@ -34,7 +33,7 @@ func (s warningStore) CountWarnings(ctx context.Context, guildID, userID uint64)
 	return count, nil
 }
 
-func (s warningStore) ListWarnings(ctx context.Context, guildID, userID uint64, limit int) ([]moderationstore.Warning, error) {
+func (s warningStore) ListWarnings(ctx context.Context, guildID, userID uint64, limit int) ([]storage.Warning, error) {
 	if limit <= 0 {
 		limit = 25
 	}
@@ -61,9 +60,9 @@ LIMIT $3`
 	}
 	defer rows.Close()
 
-	var out []moderationstore.Warning
+	var out []storage.Warning
 	for rows.Next() {
-		var w moderationstore.Warning
+		var w storage.Warning
 		var guildIDDBRow int64
 		var userIDDBRow int64
 		var moderatorIDDBRow int64
@@ -105,7 +104,7 @@ LIMIT $3`
 	return out, nil
 }
 
-func (s warningStore) CreateWarning(ctx context.Context, w moderationstore.Warning) error {
+func (s warningStore) CreateWarning(ctx context.Context, w storage.Warning) error {
 	const query = `
 INSERT INTO warnings(id, guild_id, user_id, moderator_id, reason, created_at)
 VALUES ($1, $2, $3, $4, $5, $6)`

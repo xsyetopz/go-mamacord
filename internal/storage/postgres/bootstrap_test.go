@@ -1,4 +1,4 @@
-package bootstrap_test
+package postgresstore_test
 
 import (
 	"context"
@@ -12,7 +12,6 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
-	bootstrap "github.com/xsyetopz/go-mamacord/internal/storage/postgres/bootstrap"
 )
 
 func TestOpenRuntimeStorePostgresBackendIntegration(t *testing.T) {
@@ -46,7 +45,7 @@ func TestOpenRuntimeStorePostgresBackendIntegration(t *testing.T) {
 		},
 	}
 
-	store, version, err := bootstrap.OpenRuntimeStore(ctx, cfg)
+	store, version, err := postgresstore.OpenRuntimeStore(ctx, cfg)
 	if err != nil {
 		t.Fatalf("OpenRuntimeStore: %v", err)
 	}
@@ -56,7 +55,7 @@ func TestOpenRuntimeStorePostgresBackendIntegration(t *testing.T) {
 		t.Fatalf("unexpected migration version: %d", version)
 	}
 
-	status, err := bootstrap.MigrationStatus(ctx, cfg)
+	status, err := postgresstore.MigrationStatus(ctx, cfg)
 	if err != nil {
 		t.Fatalf("MigrationStatus: %v", err)
 	}
