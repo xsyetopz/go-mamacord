@@ -1,4 +1,4 @@
-package archcheck
+package main
 
 import (
 	"fmt"
