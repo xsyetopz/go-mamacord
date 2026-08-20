@@ -406,6 +406,7 @@ function OwnerShell({
 									"/api/owner/plugins/scaffold",
 									{
 										...scaffold,
+										network_hosts: scaffold.network_hosts.split(",").map((host) => host.trim()).filter(Boolean),
 										permissions: scaffoldPermissions,
 									},
 									csrfToken,

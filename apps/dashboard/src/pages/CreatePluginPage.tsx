@@ -54,8 +54,8 @@ export function CreatePluginPage({
 	const files = [
 		`plugins/${pluginID}/.mamacord-bundle.json`,
 		`plugins/${pluginID}/${bundleDir}/plugin.json`,
-		`plugins/${pluginID}/${bundleDir}/plugin.lua`,
-		`plugins/${pluginID}/${bundleDir}/commands/hello.lua`,
+		`plugins/${pluginID}/${bundleDir}/plugin.star`,
+		`plugins/${pluginID}/${bundleDir}/commands/hello.star`,
 		`plugins/${pluginID}/${bundleDir}/locales/${locale}/messages.json`,
 	];
 
@@ -107,6 +107,13 @@ export function CreatePluginPage({
 							onChange={(event) =>
 								onFieldChange("locale", event.currentTarget.value)
 							}
+						/>
+						<TextInput
+							label="Allowed HTTPS hosts"
+							description="Comma-separated exact hostnames. Required when network HTTP is enabled."
+							placeholder="api.example.com"
+							value={scaffold.network_hosts}
+							onChange={(event) => onFieldChange("network_hosts", event.currentTarget.value)}
 						/>
 					</Stack>
 				</Card>

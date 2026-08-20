@@ -16,6 +16,7 @@ export type PermissionsShape = {
 	storage: Record<string, boolean>;
 	discord: Record<string, boolean>;
 	network: Record<string, boolean>;
+	resources: Record<string, boolean>;
 	automation: {
 		jobs: boolean;
 		events: Record<string, boolean>;
@@ -37,6 +38,7 @@ export type ScaffoldState = {
 	command_name: string;
 	command_description: string;
 	response_message: string;
+	network_hosts: string;
 	sign: boolean;
 };
 
@@ -66,6 +68,9 @@ export const emptyPermissions: PermissionsShape = {
 	network: {
 		http: false,
 	},
+	resources: {
+		read: false,
+	},
 	automation: {
 		jobs: false,
 		events: {
@@ -83,6 +88,7 @@ export const emptyScaffold: ScaffoldState = {
 	command_name: "",
 	command_description: "",
 	response_message: "",
+	network_hosts: "",
 	sign: false,
 };
 
@@ -97,6 +103,7 @@ export function cloneEmptyPermissions(): PermissionsShape {
 		storage: { ...emptyPermissions.storage },
 		discord: { ...emptyPermissions.discord },
 		network: { ...emptyPermissions.network },
+		resources: { ...emptyPermissions.resources },
 		automation: {
 			jobs: emptyPermissions.automation.jobs,
 			events: { ...emptyPermissions.automation.events },

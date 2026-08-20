@@ -113,7 +113,7 @@ export function SiteApp() {
 						<SectionTitle
 							eyebrow="Docs"
 							title="Public plugin API reference"
-							description="The public site exposes the stable Lua host surface, configuration schemas, and deployment guidance without mixing it into the authenticated dashboard."
+							description="The public site exposes the stable Starlark host surface, configuration schemas, and deployment guidance without mixing it into the authenticated dashboard."
 						/>
 						<SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
 							<SectionCard>
@@ -122,7 +122,7 @@ export function SiteApp() {
 										<ThemeIcon size={34} variant="light" color="brand">
 											<IconCodeDots size={18} />
 										</ThemeIcon>
-										<Text fw={700}>Core Lua APIs</Text>
+										<Text fw={700}>Core Starlark APIs</Text>
 									</Group>
 									<List size="sm" spacing="xs">
 										{pluginAPIs.map((item) => (
