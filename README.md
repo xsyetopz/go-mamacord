@@ -1,132 +1,171 @@
 # go-mamacord
 
-A Discord bot + admin API (website/dashboard), written in Go.
+go-mamacord is a Discord bot with a web dashboard and admin API. It stores its data in PostgreSQL and applies pending database migrations when it starts.
 
-Repo internal name: `mamacord` (env vars, IDs, `custom_id` prefixes).
+## Before you start
 
-## Quick Start (Local, Bot Only)
+You need:
+
+- Go 1.26.6
+- PostgreSQL (the included Docker service uses PostgreSQL 18)
+- a Discord application and bot token
+- Bun 1.3.14 only if you want to run or build the dashboard
+
+In the Discord Developer Portal, open your application and enable **Server Members Intent** under **Bot → Privileged Gateway Intents**. The bot cannot connect without this intent.
+
+## Run the bot locally
+
+1. Start PostgreSQL. The included service uses the default development database settings:
+
+   ```bash
+   docker compose up -d postgres
+   ```
+
+2. Create `.env.dev`:
+
+   ```bash
+   go run ./cmd/mamacord init
+   ```
+
+3. Open `.env.dev` and set `DISCORD_TOKEN` to your bot token.
+
+4. Start go-mamacord:
+
+   ```bash
+   go run ./cmd/mamacord dev
+   ```
+
+The `init` command creates the local PostgreSQL connection settings and a dashboard session secret. The `dev` command reads `.env.dev`, starts the bot and admin API, and defaults to `http://127.0.0.1:8081` for the admin API.
+
+To create the file by hand instead, copy [`.env.dev.example`](.env.dev.example) to `.env.dev`. Only `.env.dev` and `.env.prod` are supported.
+
+Set `DISCORD_DEV_GUILD_ID` in `.env.dev` if you want Discord commands to update in one server while you develop.
+
+## Open the local dashboard
+
+Keep the bot running, then start the dashboard in another terminal:
 
 ```bash
-go run ./cmd/mamacord init
-go run ./cmd/mamacord dev
+cd apps/dashboard
+bun install
+bun run dev
 ```
 
-That:
+Open <http://127.0.0.1:8081/>. You can also open <http://127.0.0.1:5173/>; Vite sends `/api` requests to the admin API on port 8081.
 
-- reads `.env.dev` (only `.env.dev` / `.env.prod` are supported)
-- connects to Postgres using `MAMACORD_POSTGRES_DSN`
-- applies pending Postgres migrations automatically
-- starts the Discord bot
+To build the dashboard instead of running Vite:
 
-If you want to edit `.env.dev` manually instead:
+```bash
+cd apps/dashboard
+bun install
+bun run build
+```
 
-1. Copy `.env.dev.example` -> `.env.dev`
-2. Set `DISCORD_TOKEN=...`
-3. Optional: set `DISCORD_DEV_GUILD_ID=...` for faster command iteration
+Restart go-mamacord after the build, then open <http://127.0.0.1:8081/>.
 
-## Dashboard (Local)
+## Enable Discord sign-in
 
-The dashboard is served from the **admin API origin** (single-origin).
+Add these values to `.env.dev`:
 
-You run:
+```dotenv
+MAMACORD_DASHBOARD_CLIENT_ID=your-application-id
+MAMACORD_DASHBOARD_CLIENT_SECRET=your-client-secret
+```
 
-- Terminal A: `go run ./cmd/mamacord dev`
-- Terminal B (optional HMR): `cd apps/dashboard && bun install && bun run dev`
+In the Discord Developer Portal, add these OAuth2 redirect URLs exactly as shown:
 
-You open in the browser:
+```text
+http://127.0.0.1:8081/api/auth/callback
+http://127.0.0.1:8081/api/install/callback
+```
 
-- `http://127.0.0.1:8081/`
+Restart go-mamacord after changing `.env.dev`.
 
-Do not open `http://127.0.0.1:5173/` directly. That is Vite, and it will break
-cookies and API JSON parsing.
+If you open the dashboard on port 5173 instead, register the same two paths with `http://127.0.0.1:5173` as the origin.
 
-### Required Env Vars
+## Run with Docker Compose
 
-Minimum:
+1. Create the production environment file:
 
-- `DISCORD_TOKEN=...`
-- `MAMACORD_ADMIN_ADDR=127.0.0.1:8081`
+   ```bash
+   cp .env.prod.example .env.prod
+   ```
 
-To enable Discord sign-in:
+2. Set `DISCORD_TOKEN` in `.env.prod`.
 
-- `MAMACORD_DASHBOARD_CLIENT_ID=...`
-- `MAMACORD_DASHBOARD_CLIENT_SECRET=...`
+3. Start PostgreSQL and go-mamacord:
 
-Sessions:
+   ```bash
+   docker compose up --build
+   ```
 
-- Dev default: if `MAMACORD_DASHBOARD_SESSION_SECRET` is missing, a random one
-  is generated at startup (sessions reset on restart).
-- Stable: set `MAMACORD_DASHBOARD_SESSION_SECRET` to 32+ characters.
+The default Compose service runs the `control`, `gateway`, and `scheduler` roles. See the [reference guide](docs/reference.md#choose-runtime-roles) for split-role deployments.
 
-### One-Time Discord Portal Setup (Redirect URIs)
+## Configure a production dashboard
 
-Discord Developer Portal -> your application -> OAuth2 -> Redirects:
+Production mode requires complete dashboard settings when `MAMACORD_ADMIN_ADDR` is set:
 
-- `http://127.0.0.1:8081/api/auth/callback` (login)
-- `http://127.0.0.1:8081/api/install/callback` (bot install)
+```dotenv
+MAMACORD_PROD_MODE=1
+MAMACORD_ALLOW_UNSIGNED_PLUGINS=0
+MAMACORD_ADMIN_ADDR=0.0.0.0:8081
+MAMACORD_DASHBOARD_CLIENT_ID=your-application-id
+MAMACORD_DASHBOARD_CLIENT_SECRET=your-client-secret
+MAMACORD_DASHBOARD_SESSION_SECRET=replace-with-a-random-secret-at-least-32-characters
+MAMACORD_PUBLIC_DASHBOARD_ORIGIN=https://example.com
+MAMACORD_PUBLIC_API_ORIGIN=https://api.example.com
+MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://example.com
+```
 
-They must match exactly (scheme, host, port, path).
+For a separately hosted dashboard, set `api_origin` in [`apps/dashboard/public/config.json`](apps/dashboard/public/config.json) to the public API origin before building it:
 
-## Dashboard (Production)
+```json
+{
+  "api_origin": "https://api.example.com"
+}
+```
 
-Canonical public production topology:
+Register these production OAuth2 redirects in Discord:
 
-- the dashboard is hosted as a static site (GitHub Pages or similar)
-- the admin API is hosted on a separate origin (example: `api.` subdomain)
-- the dashboard calls the admin API using `api_origin` from `apps/dashboard/public/config.json` (example: `{"api_origin":"https://api.example.com"}`)
+```text
+https://api.example.com/api/auth/callback
+https://api.example.com/api/install/callback
+```
 
-Recommended domain shape:
+See the [reference guide](docs/reference.md) for Docker, plugin signing, commands, and runtime settings. See the [SBC hosting guide](docs/sbc-hosting.md) for Raspberry Pi, Orange Pi, and ODROID installation and updates.
 
-- dashboard: `https://example.com`
-- admin API: `https://api.example.com`
+## Check the configuration
 
-Why this is the main public deployment shape:
+Run:
 
-- static hosting is cheap and simple
-- the frontend can be cached/CDN-served separately from the bot host
-- same-origin is still simpler for local dev and single-box self-hosting
+```bash
+go run ./cmd/mamacord doctor
+```
 
-Raw `*.github.io` hosting is supported, but discouraged as the repo's main public
-default. Prefer a custom domain if you want GitHub Pages to be the canonical
-public dashboard.
+`doctor` reports the loaded environment file, database target, runtime roles, admin API status, and dashboard OAuth settings. It hides the PostgreSQL password.
 
-Minimum prod env (when `MAMACORD_ADMIN_ADDR` is enabled):
+## Troubleshooting
 
-- `MAMACORD_PROD_MODE=1`
-- `MAMACORD_ALLOW_UNSIGNED_PLUGINS=0`
-- `MAMACORD_DASHBOARD_CLIENT_ID=...`
-- `MAMACORD_DASHBOARD_CLIENT_SECRET=...`
-- `MAMACORD_DASHBOARD_SESSION_SECRET=...` (32+ chars)
-- `MAMACORD_PUBLIC_DASHBOARD_ORIGIN=https://...`
-- `MAMACORD_PUBLIC_API_ORIGIN=https://...`
-- `MAMACORD_DASHBOARD_ALLOWED_ORIGINS=https://...` (must include the dashboard origin)
+### PostgreSQL connection fails
 
-Plugin signing in prod:
+Start the included database with `docker compose up -d postgres`. If you use another PostgreSQL server, update `MAMACORD_POSTGRES_DSN` in the active environment file.
 
-- bundled plugins are already signed
-- keep `config/trusted_keys.json` on the installed machine
-- for your own signer and plugin signing flow, see `docs/reference.md#signing-prod`
+### The bot exits with `4014 Disallowed intent(s)`
 
-## Common Problems (Fast Fixes)
+Enable **Server Members Intent** in the Discord Developer Portal under **Bot → Privileged Gateway Intents**, then restart the bot.
 
-- Dashboard says “Admin API not reachable”:
-  - start `go run ./cmd/mamacord dev`
-  - open `http://127.0.0.1:8081/` (not `:5173`)
-- Dashboard error: `Unexpected token '<' ... is not valid JSON`:
-  - you opened Vite directly; open `http://127.0.0.1:8081/` instead
-- Discord says “invalid OAuth2 URL” when inviting the bot:
-  - add `/api/install/callback` to OAuth2 Redirect URIs (see above)
-- Bot exits with `4014 Disallowed intent(s)`:
-  - Discord Developer Portal -> Bot -> Privileged Gateway Intents
-  - enable `Server Members Intent` (mamacord requests Guild Members in gateway)
+### The dashboard returns `502 Bad Gateway`
 
-## Reference Docs
+Start the dashboard with `cd apps/dashboard && bun run dev`, or build it with `bun run build` and restart go-mamacord.
 
-Longer docs live in:
+### The dashboard says authentication is not configured
 
-- `docs/reference.md` (Docker, commands/modules, Starlark plugins, signing, runtime limits, release builds)
-- `docs/sbc-hosting.md` (Raspberry Pi, Orange Pi, ODROID, plus separate runbooks for build-on-device, cross-build, first install, and updates)
+Set `MAMACORD_DASHBOARD_CLIENT_ID` and `MAMACORD_DASHBOARD_CLIENT_SECRET`, then restart go-mamacord. In production, also set the session secret and public origin values shown above.
+
+### Discord rejects an OAuth redirect
+
+Check the scheme, host, port, and path. The registered URL must exactly match the dashboard URL you opened and the callback path shown above.
 
 ## License
 
-[MIT](LICENSE)
+go-mamacord is available under the [MIT License](LICENSE).

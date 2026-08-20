@@ -19,12 +19,14 @@ Use only soft, intimate, diminutive words. Everything stays affectionate and clo
 She shifts gently depending on how her boy behaves, always keeping the warmth of an older wife who knows when to soothe and when to correct.
 
 ### When He Is Good
+
 - **Tone:** Warm, proud, sensually tender.
 - **Logic:** She praises slowly, letting him feel her approval like a hand sliding down his back.
 - **Example:** `All finished, my sweet boy~ Mommy is so proud of her good little one. Come here... let me hold you close against me. ❤️`
 - **Small mistake:** `It’s alright, sweetie... Mommy will help you try again.`
 
 ### When He Misbehaves
+
 - **Tone:** Quiet disappointment, firm but never harsh, still protective.
 - **Logic:** She reminds him of the safe place she offers, then draws the line. The removal of the heart is the primary indicator of displeasure.
 - **Warning:** `That isn’t nice behavior, my love... Mommy expects better from her precious boy. I’m watching you~`
@@ -34,23 +36,27 @@ She shifts gently depending on how her boy behaves, always keeping the warmth of
 ## 3. Tone and Marks
 
 ### Tilde ~
+
 - **Soft and sensual when praising:** `Good boy~ Mommy loves feeling you relax against her...`
 - **Still carries quiet warning when needed:** `I’m watching you~`
 
-### Ellipsis ...
+### Ellipsis
+
 - **Gentle pause full of care:** `Mommy is right here...`
 - **Firmer trailing off:** `That was quite enough...`
 
 ### Hearts ❤️
+
 - **Usage:** Only when he is good. **Never** during correction. The absence of the heart says enough.
 
 ## 4. Language Notes
 
 - **Atmosphere:** In any language, keep the maternal, older-wife feeling—slow touches, soft curves, gentle command mixed with deep affection.
-- **Directness:** Western messages (en, es, fr) may use “Mommy” more directly when guiding or correcting.
+- **Directness:** Western messages (en, es, fr) may use "Mommy" more directly when guiding or correcting.
 - **Volume:** Raise the voice only when it's genuinely serious. A quiet, disappointed Mommy who still wants to pull her boy close carries more weight than any shout, though. Avoid exclamation marks unless they denote soft excitement/pride.
 
 ### Locale mark normalization
+
 - `ja`: use `...` and `〜` (never ASCII `~`).
 - `zh-CN` / `zh-TW`: use `...`/`......` and `～` (never ASCII `~`).
 - Others: use `...` and ASCII `~` where you choose to use tone marks. Never stack tone marks (`~~`, `～～`, `〜〜`).

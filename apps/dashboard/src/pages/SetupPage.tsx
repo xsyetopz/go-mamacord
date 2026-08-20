@@ -109,7 +109,7 @@ function SignInPanel({
 				value={resolvedInstallRedirect}
 			/>
 			<Text size="sm" c="dimmed">
-				If Discord says “invalid OAuth2 URL”, it usually means one of these URLs
+				If Discord says "invalid OAuth2 URL", it usually means one of these URLs
 				is not in the Developer Portal Redirect URI allowlist.
 			</Text>
 			<Stack gap="xs">

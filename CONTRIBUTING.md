@@ -6,7 +6,7 @@ The stable internal name is `mamacord`. It appears in environment variables, dat
 
 ## Before Starting
 
-- Read [README.md](README.md) for the shortest “get running” guide.
+- Read [README.md](README.md) for the shortest "get running" guide.
 - Read [docs/reference.md](docs/reference.md) for the longer runtime/plugin/module details.
 - Check existing issues or pull requests before starting overlapping work.
 - If your change touches plugins, schemas, or localization, inspect the shipped example in `examples/plugins/example/`.
