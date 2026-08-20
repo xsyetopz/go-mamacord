@@ -109,7 +109,6 @@ jobs:
             ./internal/runtime/plugins/starlark \
             ./internal/runtime/plugins/httpjson \
             ./internal/runtime/plugins/contract \
-\
             -count=1 -v
 
   web:
