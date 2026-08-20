@@ -1,6 +1,6 @@
 # internal/ tree audit — 2026-05-23
 
-This file is the exported baseline `internal/` snapshot from 2026-05-23. It is not a live tree listing; current implementation progress and later structural changes are tracked in `docs/superpowers/plans/2026-05-23-architecture-alignment.md`.
+This file is the exported baseline `internal/` snapshot from 2026-05-23. It is not a live tree listing; current implementation progress and later structural changes are classified in the re-audit section of `docs/architecture-audit-2026-05-23.md`.
 
 ## Exported tree
 
@@ -224,7 +224,6 @@ internal/
 - `internal/commands/core` uses package `corecmd` (dir name `core`)
 - `internal/commands/api` uses package `commandapi` (dir name `api`)
 - `internal/migration` uses package `migrate` (dir name `migration`)
-
 
 ## Structural pressure points from inspected code
 

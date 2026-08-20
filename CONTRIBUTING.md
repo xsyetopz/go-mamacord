@@ -1,6 +1,6 @@
 # Contributing to go-mamacord
 
-This project is a Go Discord bot with a Lua plugin host. Keep changes small, readable, and easy to review.
+This project is a Go Discord bot with a Mamacord-owned Starlark plugin runtime. Keep changes small, readable, and easy to review.
 
 The stable internal name is `mamacord`. It appears in environment variables, database paths, plugin IDs, and Discord `custom_id` prefixes. Do not rename it casually.
 
@@ -30,8 +30,8 @@ The main code paths are:
 - `internal/runtime/discord/` for Discord transport and runtime behavior.
 - `internal/commands/` for built-in kernel commands and shared command contracts.
 - `internal/runtime/plugins/` for plugin discovery, policy, signing, and dispatch.
-- `internal/runtime/plugins/lua/` for the embedded Lua runtime and SDK bridge.
-- `sdk/lua/` for Lua editor stubs.
+- `internal/runtime/plugins/starlark/` for compilation, author APIs, invocation, and generation lifecycle.
+- `internal/runtime/plugins/contract/` for the language-neutral typed plugin boundary.
 - `examples/plugins/` for shipped sample plugins.
 - `plugins/` for runtime-loaded plugins.
 
@@ -53,11 +53,13 @@ Keep those boundaries intact. Avoid mixing Discord transport concerns, feature l
 - Keep error messages specific and actionable.
 - Avoid hidden behavior in refactors. Structural changes should preserve behavior unless the pull request explicitly changes behavior.
 
-### Lua Plugins
+### Starlark Plugins
 
-- New plugin examples and docs should use the `bot` API, not legacy callback-style globals.
-- Prefer the descriptor model: `bot.plugin`, `bot.command`, typed `ctx`, and `bot.ui` or `bot.effects`.
-- Keep example plugins beginner-friendly. A new contributor should be able to understand the sample without knowing Discord payload internals.
+- Load the Mamacord API only with `load("@mamacord//api.star", ...)`.
+- Keep `plugin.star` declarative: load complete declarations from concern-specific modules, register cogs from `setup(bot)`, and export `PLUGIN = plugin(setup=setup)`.
+- Use ordinary spacing and multiline declarations. Do not compress function bodies or conditionals onto one line.
+- Return ordered lists or tuples of typed effects from callbacks. Do not perform direct I/O.
+- Keep examples readable without exposing Discord or Go implementation objects.
 
 ### Comments
 
@@ -100,7 +102,7 @@ That default audit checks the shipped JSON files and schemas for required metada
 - [ ] Edited Go files are formatted.
 - [ ] Relevant `go test` commands pass.
 - [ ] Docs, examples, or schemas were updated if the public contract changed.
-- [ ] Plugin-related changes keep the `bot` authoring model and shipped example coherent.
+- [ ] Plugin-related changes keep the Starlark author API and shipped example coherent.
 - [ ] Commit messages and the PR description explain the motivation and the verification performed.
 
 ## Reporting Issues
@@ -119,7 +121,7 @@ For plugin issues, include the relevant `plugin.json`, the route being exercised
 
 ### Prerequisites
 
-- Go 1.26.5 or newer
+- Go 1.26.6 or newer
 - Git
 - A Discord bot token for local runtime testing
 

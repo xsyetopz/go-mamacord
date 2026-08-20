@@ -9,10 +9,6 @@ This is the baseline repo-wide audit for the `go-mamacord` architecture and runt
 
 Related tree export: `docs/internal-tree-audit-2026-05-23.md`
 
-Current implementation progress against this audit is tracked in:
-
-- `docs/superpowers/plans/2026-05-23-architecture-alignment.md`
-
 Completion audit status:
 
 - 2026-05-24: the alignment tracker is fully checked and re-verified against current repo state
@@ -24,6 +20,48 @@ Completion audit status:
   - `docker build .`
 
 The file below is a baseline audit document, not a live generated inventory. Historical package paths, tree names, and pressure-point notes may describe the 2026-05-23 baseline that the tracker has since been driving out of the repo.
+
+## Re-audit — 2026-08-18
+
+> Historical note: this re-audit was recorded before the production Starlark migration. Its Lua-specific implementation statements describe that intermediate state, not the current runtime. The current plugin authority is `docs/reference.md` and `internal/runtime/plugins/starlark`.
+
+The baseline was checked again against the current producers, consumers, runtime roles, tests, deployment files, and public surfaces. The current architecture keeps the parts of the proposal that have an implemented owner and contract. It does not recreate the proposed package tree or preserve obsolete paths through aliases.
+
+### Confirmed current architecture
+
+- `cmd/mamacord` remains the single public executable. `control`, `gateway`, and `scheduler` are runtime roles selected through `internal/config` and composed by `internal/app`.
+- The control API starts before the Discord runtime and remains available when Discord initialization fails. Operations that need live Discord state still return `503` when no in-process Discord runtime exists.
+- The obsolete `internal/commands/api` and `internal/runtime/discord/commands` trees are gone. Transport-neutral command definitions live under `internal/commands`; Discord ingress stays under `internal/runtime/discord`.
+- The broad `internal/commandruntime.Store` contract is gone. Storage bootstrap returns the current Postgres provider to the `internal/app` composition root, which injects existing domain repository interfaces into command execution, guild configuration, admin, gateway, reminder, marketplace, and plugin boundaries.
+- Plugin host responsibilities are split across load, registry, dispatch, and command files. The host-to-Discord boundary uses `lua.EncodedValue` instead of a raw `any` result.
+- Reminder polling and plugin cron tasks share one `internal/scheduling.Runtime` lifecycle.
+- Versioned bundle repositories support local, cached, and directory-backed object-store modes. No network object-store contract is currently defined.
+- Postgres is the only runtime storage backend. The earlier single-node text about WAL mode and busy timeouts does not apply.
+- Bundled plugins remain immutable image content at `/app/plugins`. Mutable plugins use `/data/plugins`, supplied by the Compose `./data` mount.
+- CI runs Go tests, reachable-vulnerability analysis, split-role doctor checks, web builds, and a Docker image build. The Pages workflow deploys the public site; the dashboard is a separate deployment boundary.
+
+### Baseline findings that remain open
+
+- The split control role is startup-independent, but module reloads and live Discord guild operations still depend on the in-process Discord runtime. A cross-role control contract has not been selected.
+- `internal/modules` owns module metadata and administration, not one shared builtin/Lua execution interface. The old proposed `Module` contract is not current source authority.
+- Plugin translation remains complex across `internal/runtime/plugins/lua`, `internal/runtime/discord/plugin`, and `internal/runtime/discord/pluginbridge`, despite the clearer encoded boundary.
+- `internal/adminapi` is split into smaller files but still owns HTTP, OAuth/session, guild operations, module/plugin administration, marketplace operations, scaffolding, configuration editing, and migrations.
+- Reminder work uses database leasing; plugin cron callbacks do not. Multiple scheduler-role instances therefore do not yet have a defined exactly-once or at-least-once contract for plugin jobs.
+- The configured object-store backend is directory-backed. Remote multi-host consistency and activation semantics are undefined.
+
+These open items are not permission to invent a cross-role protocol, remote object-store adapter, execution interface, or scheduler lease policy. Each needs a current producer, consumer, failure model, and migration contract before implementation.
+
+### Repository automation audit
+
+- `scripts/audit_coverage.sh` is a repository-source inventory and schema check.
+- `scripts/build-release.sh` builds the Go release binary and injects build metadata through the existing `internal/buildinfo` contract.
+- `scripts/install-go-on-pi.sh` is a Linux/root host bootstrapper with network, architecture, and installation side effects. It has no in-repository caller; external consumers remain unverified.
+
+These scripts do not share inputs, outputs, dependencies, lifecycle, or platform guarantees. Replacing them with one Python command surface would preserve the same Go, Git, Linux/root, and network dependencies while inventing a new public contract, so no Python migration is justified by current evidence.
+
+### Historical-only findings
+
+The old hard dependency on bot-first admin startup, command umbrella paths, 1,523-line plugin host, malformed Docker build, missing Docker CI build, collapsed container plugin paths, duplicated scheduler lifecycle, and Twitch/WeatherKit site claims no longer describe the repository. The proposed `mamacordd`/`mamacordctl`, `domain/`, `adapters/`, and `moduleapi/` tree remains a rejected speculative topology unless a later decision selects it from current evidence.
 
 ---
 

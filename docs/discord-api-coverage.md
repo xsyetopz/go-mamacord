@@ -1,54 +1,43 @@
 # Discord API Coverage (Plugins)
 
-This repo exposes a Discord API surface to Lua plugins via `bot.discord.*`.
+Mamacord plugins use a closed, typed host boundary. Starlark code never receives a Discord client or a Go object.
 
-The goal is practical completeness: everything Discord supports that is usable
-with the bot token and makes sense for plugins. Anything that requires user OAuth
-tokens is out of scope unless explicitly added as a separate feature set.
+## Reads
 
-## Current Surface (High Level)
+Each read requires its matching manifest capability and counts against the callback host-call budget:
 
-Coverage is implemented in the Lua runtime under `internal/runtime/plugins/lua/`.
+- user details
+- guild member details
+- guild details
 
-**Lookup**
+Storage-backed reads cover user settings, check-ins, reminders, warnings, timezone normalization, and reminder planning under separate storage capabilities.
 
-- guild, user, member, role, channel
+## Effects
 
-**Management**
+Callbacks return ordered typed effects. Go validates the route, response state, Discord limits, and capabilities before the Discord adapter executes them.
 
-- slowmode, nicknames
-- role CRUD + add/remove role from members
-- message listing + delete + purge
-- emoji CRUD
-- sticker CRUD
+Supported Discord effects are:
 
-**Messages**
+- interaction replies, response edits, source-message updates, modals, and autocomplete choices
+- channel messages and direct messages
+- member timeouts and nickname changes
+- channel slowmode and message purge
+- role create, edit, delete, add, and remove
+- emoji create, edit, and delete
+- sticker create, edit, and delete
 
-- get message
-- channel send, DM send
-- reactions: list/add/remove/clear
-- pins: pin/unpin
-- crosspost
+Storage effects cover versioned guild KV, timezones, check-ins, reminders, warnings, and audit records.
 
-**Channels / Threads / Invites / Webhooks**
+## Authority
 
-- channel create/edit/delete
-- permission overwrite set/delete
-- thread create/update + membership operations
-- invites create/get/delete + list
-- webhooks create/get/edit/delete/list + execute
+A plugin must request each capability in its strict v2 manifest. The host grants only the intersection with `config/permissions.json`. Missing capabilities deny both reads and effects.
 
-## How To Extend
+Network access is available only through `ctx.http_get_json`. It requires `network.http`, an exact declared HTTPS hostname, public DNS results, TLS 1.2 or newer, no redirects, and a bounded JSON response.
 
-1. Add/extend a spec type in the Lua host layer (a `*Spec` struct) so payloads are
-   explicit and validated.
-2. Add a method to the plugin Discord interface (Go), then wire it through the
-   Lua runtime (`bot.discord.*`) with clear names and beginner-readable errors.
-3. Add tests that cover:
-   - request decoding and validation
-   - permission checks (when applicable)
-   - any Discord API ordering constraints (for example required options first)
+## Extending the Surface
 
-If you add a new family (for example scheduled events, automod, or fuller
-interaction coverage), extend this doc with a new section and list the exported
-Lua functions.
+1. Add a closed typed operation or reader DTO in `internal/runtime/plugins/contract`.
+2. Define its validation, cloning, capability, and invocation-scope rules.
+3. Expose a bounded Starlark constructor or context method.
+4. Implement the Discord or storage adapter without moving Disgo or infrastructure types into the contract.
+5. Test denial, invalid values, limits, cancellation, and successful execution.

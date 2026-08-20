@@ -124,7 +124,7 @@ Plugin signing in prod:
 
 Longer docs live in:
 
-- `docs/reference.md` (Docker, commands/modules, Lua plugins, signing, compatibility, release builds)
+- `docs/reference.md` (Docker, commands/modules, Starlark plugins, signing, runtime limits, release builds)
 - `docs/sbc-hosting.md` (Raspberry Pi, Orange Pi, ODROID, plus separate runbooks for build-on-device, cross-build, first install, and updates)
 
 ## License

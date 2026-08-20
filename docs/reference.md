@@ -115,8 +115,7 @@ For shared/split deployments, also set:
 
 `compose.yml` now reads `.env.prod` and bind-mounts:
 
-- `./data` → `/data`
-- `./plugins` → `/data/plugins` (mutable/user-installed plugins)
+- `./data` → `/data`, including mutable/user-installed plugins at `./data/plugins`
 - `./config` → `/app/config` (read-only)
 
 Bundled first-party plugins stay in the image at `/app/plugins`.
@@ -144,31 +143,63 @@ mamacord treats built-ins and plugins as modules.
 Default module seeds: `config/modules.json`
 Runtime overrides: stored in the configured storage backend.
 
-## Lua Plugins
+## Starlark Plugins
 
 Runtime plugin roots live under `plugins/<plugin>/`.
 
-Runtime plugin roots use:
+Each root contains:
 
-- `.mamacord-bundle.json` at the root
-- `bundles/<revision>/plugin.json` (manifest)
-- `bundles/<revision>/plugin.lua` (entrypoint; returns a plugin descriptor table)
-- `bundles/<revision>/commands/*.lua`, `lib/*.lua`, or any layout you want, loaded via `bot.require("...")`
-- `bundles/<revision>/locales/<locale>/messages.json` (optional plugin i18n)
+- `.mamacord-bundle.json`, which selects one immutable bundle revision
+- `bundles/<revision>/plugin.json`, a strict `Mamacord Starlark` manifest
+- `bundles/<revision>/plugin.star`, the fixed entrypoint
+- `bundles/<revision>/locales/<locale>/messages.json` for every declared locale
+- exactly the assets declared by the manifest, if any
+- `signature.json` for signed bundles
 
-The active bundle path comes from `.mamacord-bundle.json`.
+The entrypoint is declarative and loads complete declarations from concern-specific modules:
 
-Plugins are sandboxed:
+```starlark
+# plugin.star
+load("@mamacord//api.star", "cog", "plugin")
+load("//commands:hello.star", "HELLO_COMMAND")
 
-- no filesystem access
-- no network access except through explicitly granted host capabilities
 
-Any plugin capability must be both:
+def setup(bot):
+    bot.add_cog(cog(
+        name="Example",
+        commands=[HELLO_COMMAND],
+    ))
 
-1. requested in `plugin.json`, and
-2. granted by the host in `config/permissions.json` (default `MAMACORD_PERMISSIONS_FILE`).
 
-The host injects a namespaced global `bot` into plugin scripts (see `sdk/lua/bot_api.lua:1`).
+PLUGIN = plugin(setup=setup)
+```
+
+```starlark
+# commands/hello.star
+load("@mamacord//api.star", "reply", "slash_command")
+
+
+def hello(ctx):
+    return [reply(
+        content="Hello",
+        ephemeral=True,
+    )]
+
+
+HELLO_COMMAND = slash_command(
+    name="hello",
+    description="Say hello",
+    handler=hello,
+)
+```
+
+`plugin.star` owns setup only. Commands, components, listeners, tasks, and their helpers live in modules named for their concern. A plugin with declared assets and an effective `resources.read` grant can read an exact manifest-declared asset as bounded immutable bytes with `ctx.resource(path)`.
+
+Only `@mamacord//api.star` and canonical bundle-relative `//path:module.star` labels may load. Bundles cannot contain symlinks or undeclared files. Plugins have no ambient filesystem, network, process, environment, database, secret, Go-object, or Discord-client access.
+
+Callbacks receive immutable typed context values. Reads use bounded capability-gated context methods. Callbacks return ordered typed effects, which Go validates and executes. Capability authority is the intersection of the strict manifest request and `config/permissions.json`.
+
+Runtime compilation, initialization, setup, callbacks, host calls, values, source bytes, module count, load depth, output operations, and HTTP response bytes are bounded. Reload verifies and initializes a new immutable generation before the atomic swap, then drains and releases the old generation. These limits do not provide a hard per-plugin heap quota; use process or container isolation for hostile-code memory containment.
 
 ### Bundle Backends
 
@@ -205,11 +236,13 @@ In objectstore mode:
 
 ### JSON Schemas
 
-- `plugins/<plugin>/bundles/<revision>/plugin.json` → `schemas/plugin.schema.v1.json`
-- `config/permissions.json` → `schemas/permissions.schema.v1.json`
-- `config/modules.json` → `schemas/modules.schema.v1.json`
-- `config/trusted_keys.json` → `schemas/trusted_keys.schema.v1.json`
-- `plugins/<plugin>/bundles/<revision>/signature.json` → `schemas/signature.schema.v1.json`
+- `plugins/<plugin>/bundles/<revision>/plugin.json` → `schemas/plugin.schema.json`
+- `config/permissions.json` → `schemas/permissions.schema.json`
+- `config/modules.json` → `schemas/modules.schema.json`
+- `config/trusted_keys.json` → `schemas/trusted_keys.schema.json`
+- `plugins/<plugin>/bundles/<revision>/signature.json` → `schemas/signature.schema.json`
+
+These schemas define the canonical JSON structure and the cross-field rules that JSON Schema can express. The Go loaders remain the acceptance authority for data-dependent rules, including canonical ordering and requiring `locales.default` to occur in `locales.supported`.
 
 ### Hot Reload
 
