@@ -31,7 +31,7 @@ The main code paths are:
 - `internal/adminapi/` for HTTP composition, with auth, guild, plugin, status, and service ownership in its subpackages.
 - `internal/commands/` for built-in kernel commands and shared command contracts.
 - `internal/runtime/plugins/` for plugin discovery, policy, signing, and dispatch.
-- `internal/runtime/plugins/starlark/` for compile, author, execution, and generation packages; invocation context belongs in `execution/context/`.
+- `internal/runtime/plugins/starlark/` for compile, author, and generation packages; generation owns invocation execution and invocation context belongs in `execution/context/`.
 - `internal/runtime/plugins/contract/` for the language-neutral typed plugin boundary.
 - `internal/storage/` for domain contracts and `internal/storage/postgres/` for inward-depending PostgreSQL adapters.
 - `examples/plugins/` for shipped sample plugins.
@@ -56,7 +56,7 @@ Keep those boundaries intact. Avoid mixing Discord transport concerns, feature l
 - Do not keep flat categorical filenames. Two or more grouped Go units sharing a categorical prefix or suffix, including a root such as `service.go` plus `service_config.go`, belong in a cohesive package. Do not rename or concatenate unrelated files to hide the category.
 - Do not repeat the package directory in a Go filename: use `signing/cli.go`, not `signing/signing_cli.go`, and `projection/contract.go`, not `projection/contract_projection.go`.
 - Keep each struct at no more than 10 declared fields through meaningful composition, not metric-only buckets.
-- Do not create `foo/foo.go` solely to satisfy counts. A singleton package needs an independent dependency or consumer boundary.
+- Flatten one-file subpackages into their owning parent unless an independent dependency or consumer boundary requires the package. For example, storage contracts belong in `internal/storage/accounts_store.go`, not `internal/storage/accounts/store.go`.
 - Keep error messages specific and actionable.
 - Avoid hidden behavior in refactors. Structural changes should preserve behavior unless the pull request explicitly changes behavior.
 
@@ -88,7 +88,7 @@ go test ./...
 go test ./internal/runtime/plugins/...
 
 # Enforce internal package layout and struct limits
-go run ./cmd/archcheck
+go run ./scripts/archcheck.go
 
 # Format edited Go files
 gofmt -w ./internal/...
