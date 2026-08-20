@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -33,6 +34,7 @@ func TestReadTrustedKeysFileAndLoadTrustedKeys(t *testing.T) {
 	}
 
 	payload := pluginhost.TrustedKeys{
+		Schema: pluginhost.TrustedKeysSchemaURL,
 		Keys: []pluginhost.TrustedKey{
 			{
 				KeyID:        "file-key",
@@ -59,14 +61,12 @@ func TestReadTrustedKeysFileAndLoadTrustedKeys(t *testing.T) {
 	loadedKeys, err := pluginhost.LoadTrustedKeys(
 		context.Background(),
 		filePath,
-		trustedSignerSourceStub{
-			store: trustedSignerStoreStub{
-				signers: []store.TrustedSigner{
-					{
-						KeyID:        "store-key",
-						PublicKeyB64: base64.StdEncoding.EncodeToString(storePublicKey),
-						AddedAt:      time.Unix(1700000000, 0).UTC(),
-					},
+		trustedSignerStoreStub{
+			signers: []store.TrustedSigner{
+				{
+					KeyID:        "store-key",
+					PublicKeyB64: base64.StdEncoding.EncodeToString(storePublicKey),
+					AddedAt:      time.Unix(1700000000, 0).UTC(),
 				},
 			},
 		},
@@ -87,7 +87,7 @@ func TestVerifyDirSignatureAndHashDir(t *testing.T) {
 
 	dir := t.TempDir()
 	mustWriteFile(t, filepath.Join(dir, "plugin.json"), []byte(`{"id":"example"}`))
-	mustWriteFile(t, filepath.Join(dir, "plugin.lua"), []byte(`return "ok"`))
+	mustWriteFile(t, filepath.Join(dir, "plugin.star"), []byte(`return "ok"`))
 
 	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -111,6 +111,7 @@ func TestVerifyDirSignatureAndHashDir(t *testing.T) {
 
 	signatureBytes := ed25519.Sign(privateKey, hashBefore[:])
 	signature := pluginhost.Signature{
+		Schema:       pluginhost.SignatureSchemaURL,
 		KeyID:        "key-1",
 		HashB64:      base64.StdEncoding.EncodeToString(hashBefore[:]),
 		SignatureB64: base64.StdEncoding.EncodeToString(signatureBytes),
@@ -136,7 +137,7 @@ func TestSignDir(t *testing.T) {
 	t.Parallel()
 
 	dir := t.TempDir()
-	mustWriteFile(t, filepath.Join(dir, "plugin.lua"), []byte("return {}"))
+	mustWriteFile(t, filepath.Join(dir, "plugin.star"), []byte("return {}"))
 
 	_, privateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -232,18 +233,14 @@ func TestUpsertTrustedKeyFile(t *testing.T) {
 		t.Fatalf("ReadFile: %v", err)
 	}
 	var payload struct {
-		Schema  string                  `json:"$schema"`
-		Version string                  `json:"version"`
-		Keys    []pluginhost.TrustedKey `json:"keys"`
+		Schema string                  `json:"$schema"`
+		Keys   []pluginhost.TrustedKey `json:"keys"`
 	}
 	if err := json.Unmarshal(bytes, &payload); err != nil {
 		t.Fatalf("json.Unmarshal: %v", err)
 	}
 	if payload.Schema != pluginhost.TrustedKeysSchemaURL {
 		t.Fatalf("unexpected schema: %q", payload.Schema)
-	}
-	if payload.Version != "1" {
-		t.Fatalf("unexpected version: %q", payload.Version)
 	}
 	if len(payload.Keys) != 2 {
 		t.Fatalf("unexpected key count: %d", len(payload.Keys))
@@ -304,14 +301,6 @@ func mustWriteFile(t *testing.T, path string, bytes []byte) {
 	}
 }
 
-type trustedSignerSourceStub struct {
-	store trustedSignerStoreStub
-}
-
-func (s trustedSignerSourceStub) TrustedSigners() store.TrustedSignerStore {
-	return s.store
-}
-
 type trustedSignerStoreStub struct {
 	signers []store.TrustedSigner
 	err     error
@@ -327,4 +316,22 @@ func (trustedSignerStoreStub) PutTrustedSigner(context.Context, store.TrustedSig
 
 func (trustedSignerStoreStub) DeleteTrustedSigner(context.Context, string) error {
 	return nil
+}
+
+func TestReadSignatureRejectsNoncanonicalAuthority(t *testing.T) {
+	t.Parallel()
+	valid := `{"$schema":"` + pluginhost.SignatureSchemaURL + `","key_id":"release-key","hash_b64":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","signature_b64":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==","algorithm":"ed25519-sha256"}`
+	cases := map[string]string{"unknown": valid[:len(valid)-1] + `,"extra":true}`, "duplicate": strings.Replace(valid, `"key_id":"release-key"`, `"key_id":"release-key","key_id":"other"`, 1), "missing_hash": strings.Replace(valid, `"hash_b64":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",`, "", 1), "null_algorithm": strings.Replace(valid, `"algorithm":"ed25519-sha256"`, `"algorithm":null`, 1)}
+	for name, payload := range cases {
+		name, payload := name, payload
+		t.Run(name, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "signature.json")
+			if err := os.WriteFile(path, []byte(payload), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := pluginhost.ReadSignature(path); err == nil {
+				t.Fatal("expected rejection")
+			}
+		})
+	}
 }

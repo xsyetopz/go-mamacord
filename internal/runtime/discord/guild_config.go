@@ -13,7 +13,7 @@ func (b *Bot) guildCommandEnabled(ctx context.Context, guildID uint64, pluginID,
 	if !b.moduleEnabled(pluginID) {
 		return false, nil
 	}
-	return guildconfig.CommandEnabled(ctx, b.store, guildID, pluginID, commandName)
+	return guildconfig.CommandEnabled(ctx, b.pluginKV, guildID, pluginID, commandName)
 }
 
 func (b *Bot) guildPluginEnabled(ctx context.Context, guildID uint64, pluginID string) (bool, error) {
@@ -23,5 +23,5 @@ func (b *Bot) guildPluginEnabled(ctx context.Context, guildID uint64, pluginID s
 	if !b.moduleEnabled(pluginID) {
 		return false, nil
 	}
-	return guildconfig.PluginEnabled(ctx, b.store, guildID, pluginID)
+	return guildconfig.PluginEnabled(ctx, b.pluginKV, guildID, pluginID)
 }

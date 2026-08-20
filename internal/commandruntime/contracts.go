@@ -10,27 +10,6 @@ import (
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
-type Store interface {
-	Restrictions() store.RestrictionStore
-	Warnings() store.WarningStore
-	Audit() store.AuditStore
-	TrustedSigners() store.TrustedSignerStore
-	MarketplaceSources() store.MarketplaceSourceStore
-	MarketplaceSourceSyncs() store.MarketplaceSourceSyncStore
-	PluginInstalls() store.PluginInstallStore
-	TrustedVendors() store.TrustedVendorStore
-	TrustedVendorKeys() store.TrustedVendorKeyStore
-	AdminSessions() store.AdminSessionStore
-	PluginKV() store.PluginKVStore
-	ModuleStates() store.ModuleStateStore
-	Users() store.UserStore
-	Guilds() store.GuildStore
-	GuildMembers() store.GuildMemberStore
-	UserSettings() store.UserSettingsStore
-	Reminders() store.ReminderStore
-	CheckIns() store.CheckInStore
-}
-
 type PluginAdmin interface {
 	Configured() bool
 	Infos() []pluginhost.PluginInfo
@@ -52,9 +31,9 @@ type MarketplaceAdmin interface {
 }
 
 type Services struct {
-	Logger   *slog.Logger
-	Store    Store
-	ProdMode bool
+	Logger       *slog.Logger
+	Restrictions store.RestrictionStore
+	ProdMode     bool
 
 	IsOwner func(userID uint64) bool
 

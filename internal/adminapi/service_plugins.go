@@ -29,8 +29,8 @@ func (s *Service) Plugins() ([]PluginSummary, error) {
 		{dir: strings.TrimSpace(s.Config.UserPluginsDir), bundled: false},
 	}
 	installsByID := map[string]store.PluginInstall{}
-	if s.Store != nil {
-		installs, err := s.Store.PluginInstalls().ListPluginInstalls(context.Background())
+	if s.PluginInstalls != nil {
+		installs, err := s.PluginInstalls.ListPluginInstalls(context.Background())
 		if err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func (s *Service) Plugins() ([]PluginSummary, error) {
 			} else {
 				summary.ProvenanceKind = string(marketplace.ProvenanceKindManual)
 			}
-			if manifest, err := pluginhost.ParseManifest(inspection.ManifestBytes); err == nil {
+			if manifest, err := pluginhost.ParseStarlarkManifest(inspection.ManifestBytes); err == nil {
 				summary.ID = manifest.ID
 				summary.Name = manifest.Name
 				summary.Version = manifest.Version
@@ -101,7 +101,7 @@ func (s *Service) Plugins() ([]PluginSummary, error) {
 			}
 		}
 		if bundleDir := bundleDirsByID[id]; bundleDir != "" {
-			state, _ := marketplace.SignatureStateForDir(context.Background(), bundleDir, s.Config.TrustedKeysFile, s.Store)
+			state, _ := marketplace.SignatureStateForDir(context.Background(), bundleDir, s.Config.TrustedKeysFile, s.TrustedSigners)
 			summary.SignatureState = string(state)
 		}
 		if info, ok := infosByID[id]; ok {

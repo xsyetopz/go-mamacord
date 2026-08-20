@@ -86,6 +86,7 @@ func TestPolicyGranted(t *testing.T) {
 	p := filepath.Join(dir, "permissions.json")
 
 	if err := os.WriteFile(p, []byte(`{
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.json",
   "defaults": { "storage": { "kv": false, "user_settings": false }, "discord": { "messages": false } },
   "plugins": {
     "a": { "storage": { "kv": true, "user_settings": true, "checkins": true, "reminders": true }, "discord": { "messages": true }, "network": { "http": true } }

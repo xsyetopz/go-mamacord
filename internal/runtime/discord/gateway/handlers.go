@@ -11,9 +11,8 @@ import (
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
@@ -25,29 +24,33 @@ const (
 )
 
 type PluginEmitter interface {
-	FireEvent(eventName string, payload pluginhost.Payload)
+	FireEvent(eventName string, invocation contract.Invocation)
 }
 
 type Handlers struct {
 	Logger                   *slog.Logger
-	Store                    commandruntime.Store
+	Restrictions             store.RestrictionStore
+	Guilds                   store.GuildStore
+	Users                    store.UserStore
+	GuildMembers             store.GuildMemberStore
 	I18n                     i18n.Registry
 	Client                   *bot.Client
 	CommandRegisterAllGuilds bool
 	DevGuildID               *uint64
 	CommandCreates           func(locales []string) []discord.ApplicationCommandCreate
 	PluginEvents             PluginEmitter
+	IsOwner                  func(uint64) bool
 }
 
 func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
-	if e == nil || h.Store == nil {
+	if e == nil || h.Restrictions == nil || h.Guilds == nil || h.Users == nil {
 		return
 	}
 
 	ctx := context.Background()
 	guildID := uint64(e.GuildID)
 
-	restrictions := h.Store.Restrictions()
+	restrictions := h.Restrictions
 	if _, ok, err := restrictions.GetRestriction(ctx, store.TargetTypeGuild, guildID); err != nil {
 		h.logger().Error(
 			"guild restriction check failed",
@@ -64,7 +67,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 	guildName := strings.TrimSpace(e.Guild.Name)
 	ownerID := uint64(e.Guild.OwnerID)
 
-	_ = h.Store.Guilds().UpsertGuildSeen(ctx, store.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, store.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   ownerID,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -83,7 +86,7 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 			isSystem = owner.System
 		}
 
-		_ = h.Store.Users().UpsertUserSeen(ctx, store.UserSeen{
+		_ = h.Users.UpsertUserSeen(ctx, store.UserSeen{
 			UserID:      ownerID,
 			CreatedAt:   snowflake.ID(ownerID).Time().UTC(),
 			IsBot:       isBot,
@@ -114,21 +117,21 @@ func (h Handlers) OnGuildJoin(e *events.GuildJoin) {
 }
 
 func (h Handlers) OnGuildLeave(e *events.GuildLeave) {
-	if e == nil || h.Store == nil {
+	if e == nil || h.Guilds == nil {
 		return
 	}
 	ctx := context.Background()
 	now := time.Now().UTC()
 	guildID := uint64(e.GuildID)
 
-	_ = h.Store.Guilds().MarkGuildLeft(ctx, guildID, now)
+	_ = h.Guilds.MarkGuildLeft(ctx, guildID, now)
 
 	guildName := strings.TrimSpace(e.Guild.Name)
 	h.logger().Info("left guild", slog.Uint64("guild_id", guildID), slog.String("guild_name", guildName))
 }
 
 func (h Handlers) OnGuildUpdate(e *events.GuildUpdate) {
-	if e == nil || h.Store == nil {
+	if e == nil || h.Guilds == nil {
 		return
 	}
 
@@ -138,7 +141,7 @@ func (h Handlers) OnGuildUpdate(e *events.GuildUpdate) {
 	now := time.Now().UTC()
 
 	guildName := strings.TrimSpace(e.Guild.Name)
-	_ = h.Store.Guilds().UpsertGuildSeen(ctx, store.GuildSeen{
+	_ = h.Guilds.UpsertGuildSeen(ctx, store.GuildSeen{
 		GuildID:   guildID,
 		OwnerID:   newOwner,
 		CreatedAt: e.Guild.ID.Time().UTC(),
@@ -157,7 +160,7 @@ func (h Handlers) OnGuildUpdate(e *events.GuildUpdate) {
 }
 
 func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
-	if e == nil || h.Store == nil {
+	if e == nil || h.Users == nil || h.GuildMembers == nil {
 		return
 	}
 
@@ -171,7 +174,7 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 	guildID := uint64(e.GuildID)
 	userID := uint64(user.ID)
 
-	_ = h.Store.Users().UpsertUserSeen(ctx, store.UserSeen{
+	_ = h.Users.UpsertUserSeen(ctx, store.UserSeen{
 		UserID:      userID,
 		CreatedAt:   user.ID.Time().UTC(),
 		IsBot:       user.Bot,
@@ -179,7 +182,7 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 		FirstSeenAt: now,
 		LastSeenAt:  now,
 	})
-	_ = h.Store.GuildMembers().MarkMemberJoined(ctx, guildID, userID, now)
+	_ = h.GuildMembers.MarkMemberJoined(ctx, guildID, userID, now)
 
 	h.logger().Info(
 		"member joined",
@@ -189,18 +192,12 @@ func (h Handlers) OnGuildMemberJoin(e *events.GuildMemberJoin) {
 	)
 
 	if h.PluginEvents != nil {
-		h.PluginEvents.FireEvent(EventMemberJoin, pluginhost.Payload{
-			GuildID:   snowflake.ID(guildID).String(),
-			ChannelID: "",
-			UserID:    user.ID.String(),
-			Locale:    "",
-			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
-		})
+		h.PluginEvents.FireEvent(EventMemberJoin, gatewayPluginInvocation(snowflake.ID(guildID).String(), user, EventMemberJoin, h.isOwner(userID)))
 	}
 }
 
 func (h Handlers) OnGuildMemberLeave(e *events.GuildMemberLeave) {
-	if e == nil || h.Store == nil {
+	if e == nil || h.Users == nil || h.GuildMembers == nil {
 		return
 	}
 
@@ -214,8 +211,8 @@ func (h Handlers) OnGuildMemberLeave(e *events.GuildMemberLeave) {
 	guildID := uint64(e.GuildID)
 	userID := uint64(user.ID)
 
-	_ = h.Store.GuildMembers().MarkMemberLeft(ctx, guildID, userID, now)
-	_ = h.Store.Users().TouchUserSeen(ctx, userID, now)
+	_ = h.GuildMembers.MarkMemberLeft(ctx, guildID, userID, now)
+	_ = h.Users.TouchUserSeen(ctx, userID, now)
 
 	h.logger().Info(
 		"member left",
@@ -225,13 +222,7 @@ func (h Handlers) OnGuildMemberLeave(e *events.GuildMemberLeave) {
 	)
 
 	if h.PluginEvents != nil {
-		h.PluginEvents.FireEvent(EventMemberLeave, pluginhost.Payload{
-			GuildID:   snowflake.ID(guildID).String(),
-			ChannelID: "",
-			UserID:    user.ID.String(),
-			Locale:    "",
-			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
-		})
+		h.PluginEvents.FireEvent(EventMemberLeave, gatewayPluginInvocation(snowflake.ID(guildID).String(), user, EventMemberLeave, h.isOwner(userID)))
 	}
 }
 
@@ -247,13 +238,7 @@ func (h Handlers) OnGuildBan(e *events.GuildBan) {
 	)
 
 	if h.PluginEvents != nil {
-		h.PluginEvents.FireEvent(EventGuildBan, pluginhost.Payload{
-			GuildID:   e.GuildID.String(),
-			ChannelID: "",
-			UserID:    e.User.ID.String(),
-			Locale:    "",
-			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
-		})
+		h.PluginEvents.FireEvent(EventGuildBan, gatewayPluginInvocation(e.GuildID.String(), e.User, EventGuildBan, h.isOwner(uint64(e.User.ID))))
 	}
 }
 
@@ -269,13 +254,7 @@ func (h Handlers) OnGuildUnban(e *events.GuildUnban) {
 	)
 
 	if h.PluginEvents != nil {
-		h.PluginEvents.FireEvent(EventGuildUnban, pluginhost.Payload{
-			GuildID:   e.GuildID.String(),
-			ChannelID: "",
-			UserID:    e.User.ID.String(),
-			Locale:    "",
-			Options:   pluginhost.PayloadOptionsFromMap(map[string]any{}),
-		})
+		h.PluginEvents.FireEvent(EventGuildUnban, gatewayPluginInvocation(e.GuildID.String(), e.User, EventGuildUnban, h.isOwner(uint64(e.User.ID))))
 	}
 }
 
@@ -371,9 +350,17 @@ func (h Handlers) OnInviteDelete(e *events.InviteDelete) {
 	)
 }
 
+func (h Handlers) isOwner(userID uint64) bool { return h.IsOwner != nil && h.IsOwner(userID) }
+
 func (h Handlers) logger() *slog.Logger {
 	if h.Logger != nil {
 		return h.Logger
 	}
 	return slog.Default()
+}
+
+func gatewayPluginInvocation(guildID string, user discord.User, eventName string, isOwner bool) contract.Invocation {
+	data, _ := contract.ObjectValue([]contract.Field{{Key: "guild_id", Value: contract.StringValue(guildID)}, {Key: "user_id", Value: contract.StringValue(user.ID.String())}})
+	author := contract.UserRef{ID: user.ID.String(), Username: strings.TrimSpace(user.Username), Name: strings.TrimSpace(user.EffectiveName()), AvatarURL: strings.TrimSpace(user.EffectiveAvatarURL()), Bot: user.Bot, System: user.System}
+	return contract.Invocation{Guild: &contract.GuildRef{ID: guildID}, Author: &author, IsOwner: isOwner, Kind: contract.InvocationEvent, Event: &contract.EventInput{Name: eventName, Data: data}}
 }

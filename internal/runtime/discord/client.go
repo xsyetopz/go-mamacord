@@ -54,12 +54,12 @@ func (b *Bot) initPlugins(deps Dependencies) error {
 			TrustedKeysFile:     deps.TrustedKeysFile,
 			Bundles:             deps.Bundles,
 			PermissionsFile:     deps.PermissionsFile,
-			Store:               deps.Store,
+			Store:               deps.PluginStore,
 			Bridge: pluginhost.Bridge{
-				Discord: discordpluginbridge.Executor{
+				Discord: discordpluginbridge.StarlarkBridge{Executor: discordpluginbridge.Executor{
 					ClientProvider:      func() *bot.Client { return b.client },
 					EnsureDMChannelFunc: b.ensureDMChannel,
-				},
+				}},
 			},
 			Logger: b.logger,
 			I18n:   &b.i18n,

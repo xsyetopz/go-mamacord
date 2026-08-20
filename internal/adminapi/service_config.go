@@ -48,8 +48,8 @@ func (s *Service) TrustedKeys(ctx context.Context) (TrustedKeysResponse, error) 
 			})
 		}
 	}
-	if s.Store != nil {
-		keys, err := s.Store.TrustedSigners().ListTrustedSigners(ctx)
+	if s.TrustedSigners != nil {
+		keys, err := s.TrustedSigners.ListTrustedSigners(ctx)
 		if err != nil {
 			return TrustedKeysResponse{}, err
 		}

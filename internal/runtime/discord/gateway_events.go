@@ -61,12 +61,16 @@ func (b *Bot) onInviteDelete(e *events.InviteDelete) {
 func (b *Bot) gatewayHandlers() discordgateway.Handlers {
 	return discordgateway.Handlers{
 		Logger:                   b.logger,
-		Store:                    b.store,
+		Restrictions:             b.restrictions,
+		Guilds:                   b.guilds,
+		Users:                    b.users,
+		GuildMembers:             b.guildMembers,
 		I18n:                     b.i18n,
 		Client:                   b.client,
 		CommandRegisterAllGuilds: b.commandRegisterAllGuilds,
 		DevGuildID:               b.devGuildID,
 		CommandCreates:           b.commandCreates,
 		PluginEvents:             b.pluginAuto,
+		IsOwner:                  b.isOwner,
 	}
 }

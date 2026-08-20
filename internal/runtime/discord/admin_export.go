@@ -13,9 +13,9 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
+	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
 	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 type GuildChannelInfo struct {
@@ -281,11 +281,11 @@ func (b *Bot) TimeoutMember(ctx context.Context, guildID, userID uint64, untilUn
 	return b.executor().TimeoutMember(ctx, guildID, userID, time.Unix(untilUnix, 0).UTC())
 }
 
-func (b *Bot) CreateRole(ctx context.Context, spec pluginhostlua.RoleCreateSpec) (pluginhostlua.RoleResult, error) {
+func (b *Bot) CreateRole(ctx context.Context, spec discordcontrol.RoleCreateSpec) (discordcontrol.RoleResult, error) {
 	return b.executor().CreateRole(ctx, spec)
 }
 
-func (b *Bot) EditRole(ctx context.Context, spec pluginhostlua.RoleEditSpec) (pluginhostlua.RoleResult, error) {
+func (b *Bot) EditRole(ctx context.Context, spec discordcontrol.RoleEditSpec) (discordcontrol.RoleResult, error) {
 	return b.executor().EditRole(ctx, spec)
 }
 
@@ -293,27 +293,27 @@ func (b *Bot) DeleteRole(ctx context.Context, guildID, roleID uint64) error {
 	return b.executor().DeleteRole(ctx, guildID, roleID)
 }
 
-func (b *Bot) AddRole(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error {
+func (b *Bot) AddRole(ctx context.Context, spec discordcontrol.RoleMemberSpec) error {
 	return b.executor().AddRole(ctx, spec)
 }
 
-func (b *Bot) RemoveRole(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error {
+func (b *Bot) RemoveRole(ctx context.Context, spec discordcontrol.RoleMemberSpec) error {
 	return b.executor().RemoveRole(ctx, spec)
 }
 
-func (b *Bot) PurgeMessages(ctx context.Context, spec pluginhostlua.PurgeSpec) (int, error) {
+func (b *Bot) PurgeMessages(ctx context.Context, spec discordcontrol.PurgeSpec) (int, error) {
 	return b.executor().PurgeMessages(ctx, spec)
 }
 
-func (b *Bot) CreateEmojiUpload(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (pluginhostlua.EmojiResult, error) {
+func (b *Bot) CreateEmojiUpload(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (discordcontrol.EmojiResult, error) {
 	return b.executor().CreateEmojiUpload(ctx, guildID, name, filename, body, width, height)
 }
 
-func (b *Bot) EditEmoji(ctx context.Context, spec pluginhostlua.EmojiEditSpec) (pluginhostlua.EmojiResult, error) {
+func (b *Bot) EditEmoji(ctx context.Context, spec discordcontrol.EmojiEditSpec) (discordcontrol.EmojiResult, error) {
 	return b.executor().EditEmoji(ctx, spec)
 }
 
-func (b *Bot) DeleteEmoji(ctx context.Context, spec pluginhostlua.EmojiDeleteSpec) error {
+func (b *Bot) DeleteEmoji(ctx context.Context, spec discordcontrol.EmojiDeleteSpec) error {
 	return b.executor().DeleteEmoji(ctx, spec)
 }
 
@@ -323,15 +323,15 @@ func (b *Bot) CreateStickerUpload(
 	name, description, emojiTag, filename string,
 	body []byte,
 	width, height int,
-) (pluginhostlua.StickerResult, error) {
+) (discordcontrol.StickerResult, error) {
 	return b.executor().CreateStickerUpload(ctx, guildID, name, description, emojiTag, filename, body, width, height)
 }
 
-func (b *Bot) EditSticker(ctx context.Context, spec pluginhostlua.StickerEditSpec) (pluginhostlua.StickerResult, error) {
+func (b *Bot) EditSticker(ctx context.Context, spec discordcontrol.StickerEditSpec) (discordcontrol.StickerResult, error) {
 	return b.executor().EditSticker(ctx, spec)
 }
 
-func (b *Bot) DeleteSticker(ctx context.Context, spec pluginhostlua.StickerDeleteSpec) error {
+func (b *Bot) DeleteSticker(ctx context.Context, spec discordcontrol.StickerDeleteSpec) error {
 	return b.executor().DeleteSticker(ctx, spec)
 }
 

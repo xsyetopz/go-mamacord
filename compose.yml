@@ -17,14 +17,13 @@ x-mamacord-common: &mamacord-common
     MAMACORD_BUNDLE_STORE_DIR: /data/bundles/store
     MAMACORD_BUNDLE_CACHE_DIR: /data/bundles/cache
     MAMACORD_PERMISSIONS_FILE: /app/config/permissions.json
-  volumes: &mamacord-volumes
+  volumes:
     - ./data:/data
-    - ./plugins:/data/plugins
     - ./config:/app/config:ro
 
 services:
   postgres:
-    image: postgres:18-bookworm
+    image: postgres:18-bookworm@sha256:7d2695c3aa88e792e8b3b233e7e4adb296a20412c6c0ca361e3edaaacfada108
     restart: unless-stopped
     environment:
       POSTGRES_DB: mamacord

@@ -25,7 +25,8 @@ import (
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var pluginIDPattern = regexp.MustCompile(`^[a-z][a-z0-9_]{1,31}$`)
@@ -35,16 +36,20 @@ type Service struct {
 	Config  config.Config
 	Bundles bundles.Repository
 
-	Snapshot      func() ops.Snapshot
-	ModuleAdmin   moduleapi.Admin
-	PluginAdmin   commandruntime.PluginAdmin
-	Marketplace   commandruntime.MarketplaceAdmin
-	Store         commandruntime.Store
-	BuildInfo     func() buildinfo.Info
-	OAuth         OAuthClient
-	OwnerStatus   func() OwnerStatus
-	KnownGuildIDs func() []uint64
-	BotHasGuild   func(ctx context.Context, guildID uint64) (bool, error)
+	Snapshot       func() ops.Snapshot
+	ModuleAdmin    moduleapi.Admin
+	PluginAdmin    commandruntime.PluginAdmin
+	Marketplace    commandruntime.MarketplaceAdmin
+	PluginKV       store.PluginKVStore
+	Warnings       store.WarningStore
+	Audit          store.AuditStore
+	TrustedSigners store.TrustedSignerStore
+	PluginInstalls store.PluginInstallStore
+	BuildInfo      func() buildinfo.Info
+	OAuth          OAuthClient
+	OwnerStatus    func() OwnerStatus
+	KnownGuildIDs  func() []uint64
+	BotHasGuild    func(ctx context.Context, guildID uint64) (bool, error)
 
 	ListGuildChannels  func(ctx context.Context, guildID uint64) ([]GuildChannelInfo, error)
 	ListGuildRoles     func(ctx context.Context, guildID uint64) ([]GuildRoleInfo, error)
@@ -55,18 +60,18 @@ type Service struct {
 	SetSlowmode         func(ctx context.Context, channelID uint64, seconds int) error
 	SetNickname         func(ctx context.Context, guildID, userID uint64, nickname *string) error
 	TimeoutMember       func(ctx context.Context, guildID, userID uint64, untilUnix int64) error
-	CreateRole          func(ctx context.Context, spec pluginhostlua.RoleCreateSpec) (pluginhostlua.RoleResult, error)
-	EditRole            func(ctx context.Context, spec pluginhostlua.RoleEditSpec) (pluginhostlua.RoleResult, error)
+	CreateRole          func(ctx context.Context, spec discordcontrol.RoleCreateSpec) (discordcontrol.RoleResult, error)
+	EditRole            func(ctx context.Context, spec discordcontrol.RoleEditSpec) (discordcontrol.RoleResult, error)
 	DeleteRole          func(ctx context.Context, guildID, roleID uint64) error
-	AddRole             func(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error
-	RemoveRole          func(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error
-	PurgeMessages       func(ctx context.Context, spec pluginhostlua.PurgeSpec) (int, error)
-	CreateEmojiUpload   func(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (pluginhostlua.EmojiResult, error)
-	EditEmoji           func(ctx context.Context, spec pluginhostlua.EmojiEditSpec) (pluginhostlua.EmojiResult, error)
-	DeleteEmoji         func(ctx context.Context, spec pluginhostlua.EmojiDeleteSpec) error
-	CreateStickerUpload func(ctx context.Context, guildID uint64, name, description, emojiTag, filename string, body []byte, width, height int) (pluginhostlua.StickerResult, error)
-	EditSticker         func(ctx context.Context, spec pluginhostlua.StickerEditSpec) (pluginhostlua.StickerResult, error)
-	DeleteSticker       func(ctx context.Context, spec pluginhostlua.StickerDeleteSpec) error
+	AddRole             func(ctx context.Context, spec discordcontrol.RoleMemberSpec) error
+	RemoveRole          func(ctx context.Context, spec discordcontrol.RoleMemberSpec) error
+	PurgeMessages       func(ctx context.Context, spec discordcontrol.PurgeSpec) (int, error)
+	CreateEmojiUpload   func(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (discordcontrol.EmojiResult, error)
+	EditEmoji           func(ctx context.Context, spec discordcontrol.EmojiEditSpec) (discordcontrol.EmojiResult, error)
+	DeleteEmoji         func(ctx context.Context, spec discordcontrol.EmojiDeleteSpec) error
+	CreateStickerUpload func(ctx context.Context, guildID uint64, name, description, emojiTag, filename string, body []byte, width, height int) (discordcontrol.StickerResult, error)
+	EditSticker         func(ctx context.Context, spec discordcontrol.StickerEditSpec) (discordcontrol.StickerResult, error)
+	DeleteSticker       func(ctx context.Context, spec discordcontrol.StickerDeleteSpec) error
 
 	guildsMu       sync.Mutex
 	guildsCache    map[string]guildsCacheEntry
@@ -435,6 +440,7 @@ type PluginScaffoldRequest struct {
 	CommandName        string                  `json:"command_name"`
 	CommandDescription string                  `json:"command_description"`
 	ResponseMessage    string                  `json:"response_message"`
+	NetworkHosts       []string                `json:"network_hosts"`
 	Permissions        permissions.Permissions `json:"permissions"`
 	Sign               bool                    `json:"sign"`
 }

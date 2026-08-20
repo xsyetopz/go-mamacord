@@ -1,0 +1,40 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/modules.schema.json",
+	"title": "mamacord module defaults",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"const": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/modules.schema.json"
+		},
+		"defaults": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"plugin_enabled": {
+					"type": "boolean"
+				},
+				"official_enabled": {
+					"type": "boolean"
+				},
+				"user_enabled": {
+					"type": "boolean"
+				}
+			}
+		},
+		"modules": {
+			"type": "object",
+			"additionalProperties": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"enabled": {
+						"type": "boolean"
+					}
+				}
+			}
+		}
+	},
+	"required": ["$schema"]
+}

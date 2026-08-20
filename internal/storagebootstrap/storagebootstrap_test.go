@@ -50,7 +50,7 @@ func TestOpenRuntimeStorePostgresBackendIntegration(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = store.Close() })
 
-	if version != 8 {
+	if version != 9 {
 		t.Fatalf("unexpected migration version: %d", version)
 	}
 
@@ -58,7 +58,7 @@ func TestOpenRuntimeStorePostgresBackendIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("MigrationStatus: %v", err)
 	}
-	if status.CurrentVersion != 8 {
+	if status.CurrentVersion != 9 {
 		t.Fatalf("unexpected status version: %d", status.CurrentVersion)
 	}
 }

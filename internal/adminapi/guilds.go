@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
-	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 var ErrGuildNotAccessible = errors.New("guild is not accessible to this user")
 
-func (s Service) pluginSection(pluginID, name string, cfg guildconfig.PluginConfig) PluginSection {
+func (s *Service) pluginSection(pluginID, name string, cfg guildconfig.PluginConfig) PluginSection {
 	return PluginSection{
 		ID:            pluginID,
 		Name:          name,
@@ -26,7 +26,7 @@ func (s Service) pluginSection(pluginID, name string, cfg guildconfig.PluginConf
 	}
 }
 
-func (s Service) globalModuleEnabled(moduleID string) bool {
+func (s *Service) globalModuleEnabled(moduleID string) bool {
 	if s.ModuleAdmin == nil {
 		return false
 	}
@@ -51,7 +51,7 @@ func commandStates(pluginID string, commandMap map[string]bool) []PluginCommandS
 	return out
 }
 
-func (s Service) accessibleGuild(ctx context.Context, accessToken string, guildID uint64) (UserGuildSummary, error) {
+func (s *Service) accessibleGuild(ctx context.Context, accessToken string, guildID uint64) (UserGuildSummary, error) {
 	guilds, err := s.UserGuilds(ctx, accessToken)
 	if err != nil {
 		return UserGuildSummary{}, err
@@ -64,28 +64,28 @@ func (s Service) accessibleGuild(ctx context.Context, accessToken string, guildI
 	return UserGuildSummary{}, ErrGuildNotAccessible
 }
 
-func (s Service) GuildConfig(ctx context.Context, accessToken string, guildID uint64, pluginID string) (guildconfig.PluginConfig, error) {
+func (s *Service) GuildConfig(ctx context.Context, accessToken string, guildID uint64, pluginID string) (guildconfig.PluginConfig, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return guildconfig.PluginConfig{}, err
 	}
-	return guildconfig.Load(ctx, s.Store, guildID, pluginID)
+	return guildconfig.Load(ctx, s.PluginKV, guildID, pluginID)
 }
 
-func (s Service) PutGuildConfig(ctx context.Context, accessToken string, guildID uint64, pluginID string, cfg guildconfig.PluginConfig) (guildconfig.PluginConfig, error) {
+func (s *Service) PutGuildConfig(ctx context.Context, accessToken string, guildID uint64, pluginID string, cfg guildconfig.PluginConfig) (guildconfig.PluginConfig, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return guildconfig.PluginConfig{}, err
 	}
-	return guildconfig.Save(ctx, s.Store, guildID, pluginID, cfg)
+	return guildconfig.Save(ctx, s.PluginKV, guildID, pluginID, cfg)
 }
 
-func (s Service) GuildWarnings(ctx context.Context, accessToken string, guildID, userID uint64, limit int) ([]WarningInfo, error) {
+func (s *Service) GuildWarnings(ctx context.Context, accessToken string, guildID, userID uint64, limit int) ([]WarningInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
-	if s.Store == nil || s.Store.Warnings() == nil {
+	if s.Warnings == nil {
 		return nil, errors.New("warnings store unavailable")
 	}
-	items, err := s.Store.Warnings().ListWarnings(ctx, guildID, userID, limit)
+	items, err := s.Warnings.ListWarnings(ctx, guildID, userID, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (s Service) GuildWarnings(ctx context.Context, accessToken string, guildID,
 	return out, nil
 }
 
-func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID, actorID, targetID uint64, reason string) (map[string]any, error) {
+func (s *Service) CreateWarning(ctx context.Context, accessToken string, guildID, actorID, targetID uint64, reason string) (map[string]any, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
@@ -111,18 +111,18 @@ func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID,
 		return nil, errors.New("reason is required")
 	}
 
-	cfg, err := guildconfig.Load(ctx, s.Store, guildID, "moderation")
+	cfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "moderation")
 	if err != nil {
 		return nil, err
 	}
 	if !cfg.Enabled || !cfg.Commands["warn"] {
 		return nil, errors.New("moderation warn is disabled in this server")
 	}
-	if s.Store == nil || s.Store.Warnings() == nil || s.Store.Audit() == nil {
+	if s.Warnings == nil || s.Audit == nil {
 		return nil, errors.New("moderation storage unavailable")
 	}
 
-	count, err := s.Store.Warnings().CountWarnings(ctx, guildID, targetID)
+	count, err := s.Warnings.CountWarnings(ctx, guildID, targetID)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID,
 	}
 
 	now := time.Now().UTC()
-	if err := s.Store.Warnings().CreateWarning(ctx, store.Warning{
+	if err := s.Warnings.CreateWarning(ctx, store.Warning{
 		ID:          warningID(guildID, targetID, now),
 		GuildID:     guildID,
 		UserID:      targetID,
@@ -141,7 +141,7 @@ func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID,
 	}); err != nil {
 		return nil, err
 	}
-	if err := s.Store.Audit().Append(ctx, store.AuditEntry{
+	if err := s.Audit.Append(ctx, store.AuditEntry{
 		GuildID:    &guildID,
 		ActorID:    &actorID,
 		Action:     "warn.create",
@@ -163,7 +163,7 @@ func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID,
 			timeoutFailed = true
 		} else {
 			timeoutMinutes = cfg.TimeoutMinutes
-			_ = s.Store.Audit().Append(ctx, store.AuditEntry{
+			_ = s.Audit.Append(ctx, store.AuditEntry{
 				GuildID:    &guildID,
 				ActorID:    &actorID,
 				Action:     "warn.timeout",
@@ -184,24 +184,24 @@ func (s Service) CreateWarning(ctx context.Context, accessToken string, guildID,
 	}, nil
 }
 
-func (s Service) DeleteWarning(ctx context.Context, accessToken string, guildID, actorID uint64, warningID string) error {
+func (s *Service) DeleteWarning(ctx context.Context, accessToken string, guildID, actorID uint64, warningID string) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return err
 	}
-	cfg, err := guildconfig.Load(ctx, s.Store, guildID, "moderation")
+	cfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "moderation")
 	if err != nil {
 		return err
 	}
 	if !cfg.Enabled || !cfg.Commands["unwarn"] {
 		return errors.New("moderation unwarn is disabled in this server")
 	}
-	if s.Store == nil || s.Store.Warnings() == nil || s.Store.Audit() == nil {
+	if s.Warnings == nil || s.Audit == nil {
 		return errors.New("moderation storage unavailable")
 	}
-	if err := s.Store.Warnings().DeleteWarning(ctx, strings.TrimSpace(warningID)); err != nil {
+	if err := s.Warnings.DeleteWarning(ctx, strings.TrimSpace(warningID)); err != nil {
 		return err
 	}
-	return s.Store.Audit().Append(ctx, store.AuditEntry{
+	return s.Audit.Append(ctx, store.AuditEntry{
 		GuildID:   &guildID,
 		ActorID:   &actorID,
 		Action:    "warn.delete",
@@ -210,21 +210,21 @@ func (s Service) DeleteWarning(ctx context.Context, accessToken string, guildID,
 	})
 }
 
-func (s Service) GuildChannels(ctx context.Context, accessToken string, guildID uint64) ([]GuildChannelInfo, error) {
+func (s *Service) GuildChannels(ctx context.Context, accessToken string, guildID uint64) ([]GuildChannelInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
 	return s.guildChannels(ctx, guildID)
 }
 
-func (s Service) GuildRoles(ctx context.Context, accessToken string, guildID uint64) ([]GuildRoleInfo, error) {
+func (s *Service) GuildRoles(ctx context.Context, accessToken string, guildID uint64) ([]GuildRoleInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
 	return s.guildRoles(ctx, guildID)
 }
 
-func (s Service) GuildMembers(ctx context.Context, accessToken string, guildID uint64, query string, limit int) ([]GuildMemberInfo, error) {
+func (s *Service) GuildMembers(ctx context.Context, accessToken string, guildID uint64, query string, limit int) ([]GuildMemberInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
@@ -234,21 +234,21 @@ func (s Service) GuildMembers(ctx context.Context, accessToken string, guildID u
 	return s.SearchGuildMembers(ctx, guildID, query, limit)
 }
 
-func (s Service) GuildEmojis(ctx context.Context, accessToken string, guildID uint64) ([]GuildEmojiInfo, error) {
+func (s *Service) GuildEmojis(ctx context.Context, accessToken string, guildID uint64) ([]GuildEmojiInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
 	return s.guildEmojis(ctx, guildID)
 }
 
-func (s Service) GuildStickers(ctx context.Context, accessToken string, guildID uint64) ([]GuildStickerInfo, error) {
+func (s *Service) GuildStickers(ctx context.Context, accessToken string, guildID uint64) ([]GuildStickerInfo, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return nil, err
 	}
 	return s.guildStickers(ctx, guildID)
 }
 
-func (s Service) ManagerSlowmode(ctx context.Context, accessToken string, guildID, channelID uint64, seconds int) error {
+func (s *Service) ManagerSlowmode(ctx context.Context, accessToken string, guildID, channelID uint64, seconds int) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func (s Service) ManagerSlowmode(ctx context.Context, accessToken string, guildI
 	return s.SetSlowmode(ctx, channelID, seconds)
 }
 
-func (s Service) ManagerNickname(ctx context.Context, accessToken string, guildID, userID uint64, nickname *string) error {
+func (s *Service) ManagerNickname(ctx context.Context, accessToken string, guildID, userID uint64, nickname *string) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return err
 	}
@@ -268,27 +268,27 @@ func (s Service) ManagerNickname(ctx context.Context, accessToken string, guildI
 	return s.SetNickname(ctx, guildID, userID, nickname)
 }
 
-func (s Service) ManagerCreateRole(ctx context.Context, accessToken string, spec pluginhostlua.RoleCreateSpec) (pluginhostlua.RoleResult, error) {
+func (s *Service) ManagerCreateRole(ctx context.Context, accessToken string, spec discordcontrol.RoleCreateSpec) (discordcontrol.RoleResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
-		return pluginhostlua.RoleResult{}, err
+		return discordcontrol.RoleResult{}, err
 	}
 	if s.CreateRole == nil {
-		return pluginhostlua.RoleResult{}, discordRuntimeUnavailable("role control")
+		return discordcontrol.RoleResult{}, discordRuntimeUnavailable("role control")
 	}
 	return s.CreateRole(ctx, spec)
 }
 
-func (s Service) ManagerEditRole(ctx context.Context, accessToken string, spec pluginhostlua.RoleEditSpec) (pluginhostlua.RoleResult, error) {
+func (s *Service) ManagerEditRole(ctx context.Context, accessToken string, spec discordcontrol.RoleEditSpec) (discordcontrol.RoleResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
-		return pluginhostlua.RoleResult{}, err
+		return discordcontrol.RoleResult{}, err
 	}
 	if s.EditRole == nil {
-		return pluginhostlua.RoleResult{}, discordRuntimeUnavailable("role control")
+		return discordcontrol.RoleResult{}, discordRuntimeUnavailable("role control")
 	}
 	return s.EditRole(ctx, spec)
 }
 
-func (s Service) ManagerDeleteRole(ctx context.Context, accessToken string, guildID, roleID uint64) error {
+func (s *Service) ManagerDeleteRole(ctx context.Context, accessToken string, guildID, roleID uint64) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return err
 	}
@@ -298,7 +298,7 @@ func (s Service) ManagerDeleteRole(ctx context.Context, accessToken string, guil
 	return s.DeleteRole(ctx, guildID, roleID)
 }
 
-func (s Service) ManagerMemberRole(ctx context.Context, accessToken string, add bool, spec pluginhostlua.RoleMemberSpec) error {
+func (s *Service) ManagerMemberRole(ctx context.Context, accessToken string, add bool, spec discordcontrol.RoleMemberSpec) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func (s Service) ManagerMemberRole(ctx context.Context, accessToken string, add 
 	return s.RemoveRole(ctx, spec)
 }
 
-func (s Service) ManagerPurge(ctx context.Context, accessToken string, guildID uint64, spec pluginhostlua.PurgeSpec) (int, error) {
+func (s *Service) ManagerPurge(ctx context.Context, accessToken string, guildID uint64, spec discordcontrol.PurgeSpec) (int, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
 		return 0, err
 	}
@@ -324,31 +324,31 @@ func (s Service) ManagerPurge(ctx context.Context, accessToken string, guildID u
 	return s.PurgeMessages(ctx, spec)
 }
 
-func (s Service) ManagerCreateEmoji(ctx context.Context, accessToken string, guildID uint64, name, filename, contentB64 string, width, height int) (pluginhostlua.EmojiResult, error) {
+func (s *Service) ManagerCreateEmoji(ctx context.Context, accessToken string, guildID uint64, name, filename, contentB64 string, width, height int) (discordcontrol.EmojiResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
-		return pluginhostlua.EmojiResult{}, err
+		return discordcontrol.EmojiResult{}, err
 	}
 	if s.CreateEmojiUpload == nil {
-		return pluginhostlua.EmojiResult{}, discordRuntimeUnavailable("emoji control")
+		return discordcontrol.EmojiResult{}, discordRuntimeUnavailable("emoji control")
 	}
 	body, err := decodeBase64File(contentB64)
 	if err != nil {
-		return pluginhostlua.EmojiResult{}, err
+		return discordcontrol.EmojiResult{}, err
 	}
 	return s.CreateEmojiUpload(ctx, guildID, name, filename, body, width, height)
 }
 
-func (s Service) ManagerEditEmoji(ctx context.Context, accessToken string, spec pluginhostlua.EmojiEditSpec) (pluginhostlua.EmojiResult, error) {
+func (s *Service) ManagerEditEmoji(ctx context.Context, accessToken string, spec discordcontrol.EmojiEditSpec) (discordcontrol.EmojiResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
-		return pluginhostlua.EmojiResult{}, err
+		return discordcontrol.EmojiResult{}, err
 	}
 	if s.EditEmoji == nil {
-		return pluginhostlua.EmojiResult{}, discordRuntimeUnavailable("emoji control")
+		return discordcontrol.EmojiResult{}, discordRuntimeUnavailable("emoji control")
 	}
 	return s.EditEmoji(ctx, spec)
 }
 
-func (s Service) ManagerDeleteEmoji(ctx context.Context, accessToken string, spec pluginhostlua.EmojiDeleteSpec) error {
+func (s *Service) ManagerDeleteEmoji(ctx context.Context, accessToken string, spec discordcontrol.EmojiDeleteSpec) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
 		return err
 	}
@@ -358,31 +358,31 @@ func (s Service) ManagerDeleteEmoji(ctx context.Context, accessToken string, spe
 	return s.DeleteEmoji(ctx, spec)
 }
 
-func (s Service) ManagerCreateSticker(ctx context.Context, accessToken string, guildID uint64, name, description, emojiTag, filename, contentB64 string, width, height int) (pluginhostlua.StickerResult, error) {
+func (s *Service) ManagerCreateSticker(ctx context.Context, accessToken string, guildID uint64, name, description, emojiTag, filename, contentB64 string, width, height int) (discordcontrol.StickerResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, guildID); err != nil {
-		return pluginhostlua.StickerResult{}, err
+		return discordcontrol.StickerResult{}, err
 	}
 	if s.CreateStickerUpload == nil {
-		return pluginhostlua.StickerResult{}, discordRuntimeUnavailable("sticker control")
+		return discordcontrol.StickerResult{}, discordRuntimeUnavailable("sticker control")
 	}
 	body, err := decodeBase64File(contentB64)
 	if err != nil {
-		return pluginhostlua.StickerResult{}, err
+		return discordcontrol.StickerResult{}, err
 	}
 	return s.CreateStickerUpload(ctx, guildID, name, description, emojiTag, filename, body, width, height)
 }
 
-func (s Service) ManagerEditSticker(ctx context.Context, accessToken string, spec pluginhostlua.StickerEditSpec) (pluginhostlua.StickerResult, error) {
+func (s *Service) ManagerEditSticker(ctx context.Context, accessToken string, spec discordcontrol.StickerEditSpec) (discordcontrol.StickerResult, error) {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
-		return pluginhostlua.StickerResult{}, err
+		return discordcontrol.StickerResult{}, err
 	}
 	if s.EditSticker == nil {
-		return pluginhostlua.StickerResult{}, discordRuntimeUnavailable("sticker control")
+		return discordcontrol.StickerResult{}, discordRuntimeUnavailable("sticker control")
 	}
 	return s.EditSticker(ctx, spec)
 }
 
-func (s Service) ManagerDeleteSticker(ctx context.Context, accessToken string, spec pluginhostlua.StickerDeleteSpec) error {
+func (s *Service) ManagerDeleteSticker(ctx context.Context, accessToken string, spec discordcontrol.StickerDeleteSpec) error {
 	if _, err := s.accessibleGuild(ctx, accessToken, spec.GuildID); err != nil {
 		return err
 	}
@@ -392,28 +392,28 @@ func (s Service) ManagerDeleteSticker(ctx context.Context, accessToken string, s
 	return s.DeleteSticker(ctx, spec)
 }
 
-func (s Service) guildChannels(ctx context.Context, guildID uint64) ([]GuildChannelInfo, error) {
+func (s *Service) guildChannels(ctx context.Context, guildID uint64) ([]GuildChannelInfo, error) {
 	if s.ListGuildChannels == nil {
 		return nil, discordRuntimeUnavailable("channel listing")
 	}
 	return s.ListGuildChannels(ctx, guildID)
 }
 
-func (s Service) guildRoles(ctx context.Context, guildID uint64) ([]GuildRoleInfo, error) {
+func (s *Service) guildRoles(ctx context.Context, guildID uint64) ([]GuildRoleInfo, error) {
 	if s.ListGuildRoles == nil {
 		return nil, discordRuntimeUnavailable("role listing")
 	}
 	return s.ListGuildRoles(ctx, guildID)
 }
 
-func (s Service) guildEmojis(ctx context.Context, guildID uint64) ([]GuildEmojiInfo, error) {
+func (s *Service) guildEmojis(ctx context.Context, guildID uint64) ([]GuildEmojiInfo, error) {
 	if s.ListGuildEmojis == nil {
 		return nil, discordRuntimeUnavailable("emoji listing")
 	}
 	return s.ListGuildEmojis(ctx, guildID)
 }
 
-func (s Service) guildStickers(ctx context.Context, guildID uint64) ([]GuildStickerInfo, error) {
+func (s *Service) guildStickers(ctx context.Context, guildID uint64) ([]GuildStickerInfo, error) {
 	if s.ListGuildStickers == nil {
 		return nil, discordRuntimeUnavailable("sticker listing")
 	}

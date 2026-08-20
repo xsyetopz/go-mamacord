@@ -41,8 +41,7 @@ func TestScaffoldPluginCreatesExpectedFiles(t *testing.T) {
 	for _, rel := range []string{
 		bundles.StateFileName,
 		filepath.Join("bundles", "git-manual-v0.1.0", "plugin.json"),
-		filepath.Join("bundles", "git-manual-v0.1.0", "plugin.lua"),
-		filepath.Join("bundles", "git-manual-v0.1.0", "commands", "hello.lua"),
+		filepath.Join("bundles", "git-manual-v0.1.0", "plugin.star"),
 		filepath.Join("bundles", "git-manual-v0.1.0", "locales", "en-US", "messages.json"),
 	} {
 		if _, err := os.Stat(filepath.Join(dir, "sample", rel)); err != nil {
@@ -136,8 +135,8 @@ func TestSignPluginUsesConfiguredBundleRepositoryArtifactDir(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(srcDir, "plugin.json"), []byte(`{"id":"sample","name":"sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(srcDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	pluginRoot := filepath.Join(dir, "plugins", "sample")
@@ -204,8 +203,8 @@ func TestSignPluginUsesObjectStoreBundleRepositoryAndPersistsSignature(t *testin
 	if err := os.WriteFile(filepath.Join(srcDir, "plugin.json"), []byte(`{"id":"sample","name":"sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(srcDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	pluginRoot := filepath.Join(dir, "plugins", "sample")

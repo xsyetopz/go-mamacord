@@ -1,7 +1,7 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json",
+  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.json",
   "algorithm": "ed25519-sha256",
-  "hash_b64": "hBMt2bq7LUIG47KiGnryH/K2L634VbDQ3ws2yJACTY8=",
-  "key_id": "official-release-2026-05-23-bundle-layout",
-  "signature_b64": "1rZ8r3Eimqd3sL/16P235zLcr3jVH5H1PjaFZgHwnGGTUq/vWJkPTTP8/iE0OY8aFGdRZuIhgOBTmmrW79h2Bg=="
+  "hash_b64": "zAbrW4xzOluunV7Zla+/hvZXoo68WPizT+9wbEET2CQ=",
+  "key_id": "official-release-2026-08-20",
+  "signature_b64": "BQ4F3P8tM7TfIJB3G5/9oizenrpTP78sG5tVpTumrsoNzrE1i4BPtpG4aOomhDJgpC+qyUK7onZIQabPk7q7Aw=="
 }

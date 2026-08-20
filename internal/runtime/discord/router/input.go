@@ -8,6 +8,7 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 )
 
 func SnowflakePtrToString(id *snowflake.ID) string {
@@ -16,371 +17,270 @@ func SnowflakePtrToString(id *snowflake.ID) string {
 	}
 	return id.String()
 }
-
-func PluginOptions(data discord.SlashCommandInteractionData) map[string]any {
-	opts := map[string]any{}
-
+func CommandInput(data discord.SlashCommandInteractionData) contract.CommandInput {
+	path := []string{strings.TrimSpace(data.CommandName())}
 	if data.SubCommandGroupName != nil {
-		name := strings.TrimSpace(*data.SubCommandGroupName)
-		if name != "" {
-			opts["__group"] = name
-		}
+		path = append(path, strings.TrimSpace(*data.SubCommandGroupName))
 	}
 	if data.SubCommandName != nil {
-		name := strings.TrimSpace(*data.SubCommandName)
-		if name != "" {
-			opts["__subcommand"] = name
-		}
+		path = append(path, strings.TrimSpace(*data.SubCommandName))
 	}
-
-	for _, opt := range data.All() {
-		name := strings.TrimSpace(opt.Name)
-		if name == "" {
-			continue
-		}
-
-		if opt.Type == discord.ApplicationCommandOptionTypeString {
-			opts[name] = opt.String()
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeInt {
-			opts[name] = opt.Int()
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeBool {
-			opts[name] = opt.Bool()
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeFloat {
-			opts[name] = opt.Float()
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeUser ||
-			opt.Type == discord.ApplicationCommandOptionTypeMentionable {
-			opts[name] = opt.Snowflake().String()
-			if opt.Type == discord.ApplicationCommandOptionTypeUser {
-				user := data.User(name)
-				opts["__resolved:"+name] = map[string]any{
-					"id":      user.ID.String(),
-					"bot":     user.Bot,
-					"system":  user.System,
-					"mention": user.Mention(),
-				}
-			}
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeChannel {
-			opts[name] = opt.Snowflake().String()
-			channel := data.Channel(name)
-			resolved := map[string]any{
-				"id":          channel.ID.String(),
-				"name":        channel.Name,
-				"mention":     discord.ChannelMention(channel.ID),
-				"type":        channelTypeName(channel.Type),
-				"permissions": channel.Permissions.String(),
-				"created_at":  channel.ID.Time().UTC().Unix(),
-			}
-			if channel.ParentID != 0 {
-				resolved["parent_id"] = channel.ParentID.String()
-			}
-			opts["__resolved:"+name] = resolved
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeRole {
-			opts[name] = opt.Snowflake().String()
-			role := data.Role(name)
-			opts["__resolved:"+name] = map[string]any{
-				"id":          role.ID.String(),
-				"name":        role.Name,
-				"mention":     discord.RoleMention(role.ID),
-				"color":       role.Color,
-				"hoist":       role.Hoist,
-				"mentionable": role.Mentionable,
-				"managed":     role.Managed,
-				"position":    role.Position,
-				"permissions": role.Permissions.String(),
-				"created_at":  role.CreatedAt().UTC().Unix(),
-			}
-			continue
-		}
-		if opt.Type == discord.ApplicationCommandOptionTypeAttachment {
-			attachment := data.Attachment(name)
-			opts[name] = attachment.ID.String()
-			resolved := map[string]any{
-				"id":       attachment.ID.String(),
-				"filename": attachment.Filename,
-				"url":      strings.TrimSpace(attachment.URL),
-				"size":     attachment.Size,
-			}
-			if attachment.Width != nil {
-				resolved["width"] = *attachment.Width
-			}
-			if attachment.Height != nil {
-				resolved["height"] = *attachment.Height
-			}
-			if attachment.ContentType != nil && strings.TrimSpace(*attachment.ContentType) != "" {
-				resolved["content_type"] = strings.TrimSpace(*attachment.ContentType)
-			}
-			opts["__resolved:"+name] = resolved
-			continue
-		}
-	}
-
-	return opts
+	return contract.CommandInput{Kind: contract.CommandSlash, Path: path, Options: slashOptions(data)}
 }
-
-func PluginAutocompleteOptions(data discord.AutocompleteInteractionData) map[string]any {
-	opts := map[string]any{}
-
-	if data.SubCommandGroupName != nil {
-		name := strings.TrimSpace(*data.SubCommandGroupName)
-		if name != "" {
-			opts["__group"] = name
-		}
-	}
-	if data.SubCommandName != nil {
-		name := strings.TrimSpace(*data.SubCommandName)
-		if name != "" {
-			opts["__subcommand"] = name
-		}
-	}
-	opts["__command"] = strings.TrimSpace(data.CommandName)
-
-	for _, opt := range data.All() {
-		name := strings.TrimSpace(opt.Name)
-		if name == "" {
-			continue
-		}
-
-		value := autocompleteOptionValue(opt)
-		opts[name] = value
-		if opt.Focused {
-			opts["__option"] = name
-			opts["__value"] = value
-		}
-	}
-
-	return opts
+func UserCommandInput(data discord.UserCommandInteractionData) contract.CommandInput {
+	user := UserRef(data.TargetUser())
+	member := MemberRef(data.TargetMember(), SnowflakePtrToString(data.GuildID()))
+	return contract.CommandInput{Kind: contract.CommandUser, Path: []string{strings.TrimSpace(data.CommandName())}, TargetUser: &user, TargetMember: &member}
 }
-
-func autocompleteOptionValue(opt discord.AutocompleteOption) any {
-	switch opt.Type {
-	case discord.ApplicationCommandOptionTypeString:
-		return opt.String()
-	case discord.ApplicationCommandOptionTypeInt:
-		return opt.Int()
-	case discord.ApplicationCommandOptionTypeFloat:
-		return opt.Float()
-	case discord.ApplicationCommandOptionTypeBool:
-		return opt.Bool()
-	case discord.ApplicationCommandOptionTypeUser,
-		discord.ApplicationCommandOptionTypeChannel,
-		discord.ApplicationCommandOptionTypeRole,
-		discord.ApplicationCommandOptionTypeMentionable:
-		return opt.Snowflake().String()
-	default:
-		return nil
-	}
-}
-
-func PluginUserContextOptions(data discord.UserCommandInteractionData) map[string]any {
-	opts := map[string]any{}
-
-	user := data.TargetUser()
-	if user.ID != 0 {
-		opts["__target_user"] = map[string]any{
-			"id":           user.ID.String(),
-			"username":     strings.TrimSpace(user.Username),
-			"display_name": strings.TrimSpace(user.EffectiveName()),
-			"mention":      user.Mention(),
-			"bot":          user.Bot,
-			"system":       user.System,
-			"created_at":   user.CreatedAt().UTC().Unix(),
-		}
-	}
-
-	member := data.TargetMember()
-	if member.User.ID != 0 {
-		roleIDs := make([]any, 0, len(member.RoleIDs))
-		for _, roleID := range member.RoleIDs {
-			roleIDs = append(roleIDs, roleID.String())
-		}
-		target := map[string]any{
-			"user_id":  member.User.ID.String(),
-			"guild_id": SnowflakePtrToString(data.GuildID()),
-			"role_ids": roleIDs,
-		}
-		if member.JoinedAt != nil && !member.JoinedAt.IsZero() {
-			target["joined_at"] = member.JoinedAt.UTC().Unix()
-		}
-		if avatar := strings.TrimSpace(member.EffectiveAvatarURL()); avatar != "" {
-			target["avatar_url"] = avatar
-		}
-		if banner := strings.TrimSpace(member.EffectiveBannerURL()); banner != "" {
-			target["banner_url"] = banner
-		}
-		opts["__target_member"] = target
-	}
-
-	return opts
-}
-
-func PluginMessageContextOptions(data discord.MessageCommandInteractionData) map[string]any {
-	opts := map[string]any{}
-
+func MessageCommandInput(data discord.MessageCommandInteractionData) contract.CommandInput {
 	message := data.TargetMessage()
-	if message.ID != 0 {
-		target := map[string]any{
-			"id":         message.ID.String(),
-			"channel_id": message.ChannelID.String(),
-			"author_id":  message.Author.ID.String(),
-			"content":    message.Content,
-			"created_at": message.CreatedAt.UTC().Unix(),
-			"pinned":     message.Pinned,
-		}
-		if message.GuildID != nil {
-			target["guild_id"] = message.GuildID.String()
-		}
-		if message.EditedTimestamp != nil && !message.EditedTimestamp.IsZero() {
-			target["edited_at"] = message.EditedTimestamp.UTC().Unix()
-		}
-		opts["__target_message"] = target
+	target := contract.MessageRef{ID: message.ID.String(), ChannelID: message.ChannelID.String(), Author: UserRef(message.Author), Content: message.Content}
+	if message.GuildID != nil {
+		target.GuildID = message.GuildID.String()
 	}
-
-	return opts
+	return contract.CommandInput{Kind: contract.CommandMessage, Path: []string{strings.TrimSpace(data.CommandName())}, TargetMessage: &target}
 }
-
-func ComponentOptions(e *events.ComponentInteractionCreate) map[string]any {
-	opts := map[string]any{}
-
-	if e.Data.Type() == discord.ComponentTypeButton {
-		opts["type"] = "button"
-		return opts
+func AutocompleteInput(data discord.AutocompleteInteractionData) contract.AutocompleteInput {
+	path := []string{strings.TrimSpace(data.CommandName)}
+	if data.SubCommandGroupName != nil {
+		path = append(path, strings.TrimSpace(*data.SubCommandGroupName))
 	}
-	if e.Data.Type() == discord.ComponentTypeStringSelectMenu {
-		opts["type"] = "string_select"
-		data := e.StringSelectMenuInteractionData()
-		vals := make([]any, 0, len(data.Values))
-		for _, v := range data.Values {
-			vals = append(vals, v)
+	if data.SubCommandName != nil {
+		path = append(path, strings.TrimSpace(*data.SubCommandName))
+	}
+	all := make([]contract.OptionValue, 0, len(data.All()))
+	focused := contract.OptionValue{}
+	for _, option := range data.All() {
+		converted := autocompleteOption(option)
+		if option.Focused {
+			focused = converted
 		}
-		opts["values"] = vals
-		return opts
+		all = append(all, converted)
 	}
-	if e.Data.Type() == discord.ComponentTypeUserSelectMenu {
-		opts["type"] = "user_select"
-		data := e.UserSelectMenuInteractionData()
-		vals := make([]any, 0, len(data.Values))
-		for _, v := range data.Values {
-			vals = append(vals, v.String())
-		}
-		opts["values"] = vals
-		return opts
-	}
-	if e.Data.Type() == discord.ComponentTypeRoleSelectMenu {
-		opts["type"] = "role_select"
-		data := e.RoleSelectMenuInteractionData()
-		vals := make([]any, 0, len(data.Values))
-		for _, v := range data.Values {
-			vals = append(vals, v.String())
-		}
-		opts["values"] = vals
-		return opts
-	}
-	if e.Data.Type() == discord.ComponentTypeMentionableSelectMenu {
-		opts["type"] = "mentionable_select"
-		data := e.MentionableSelectMenuInteractionData()
-		vals := make([]any, 0, len(data.Values))
-		for _, v := range data.Values {
-			vals = append(vals, v.String())
-		}
-		opts["values"] = vals
-		return opts
-	}
-	if e.Data.Type() == discord.ComponentTypeChannelSelectMenu {
-		opts["type"] = "channel_select"
-		data := e.ChannelSelectMenuInteractionData()
-		vals := make([]any, 0, len(data.Values))
-		for _, v := range data.Values {
-			vals = append(vals, v.String())
-		}
-		opts["values"] = vals
-		return opts
-	}
-
-	return opts
+	return contract.AutocompleteInput{Path: path, Option: focused.Name, Focused: focused, Options: all}
 }
-
-func ModalOptions(e *events.ModalSubmitInteractionCreate, pluginID string) map[string]any {
-	opts := map[string]any{}
-
-	fields := map[string]any{}
-	for component := range e.Data.AllComponents() {
-		var customID, value string
-		switch ti := component.(type) {
-		case discord.TextInputComponent:
-			customID = ti.CustomID
-			value = ti.Value
-		case *discord.TextInputComponent:
-			if ti == nil {
-				continue
+func slashOptions(data discord.SlashCommandInteractionData) []contract.OptionValue {
+	out := make([]contract.OptionValue, 0, len(data.All()))
+	guildID := SnowflakePtrToString(data.GuildID())
+	for _, option := range data.All() {
+		value := contract.OptionValue{Name: strings.TrimSpace(option.Name)}
+		switch option.Type {
+		case discord.ApplicationCommandOptionTypeString:
+			value.Kind = contract.OptionString
+			value.String = option.String()
+		case discord.ApplicationCommandOptionTypeInt:
+			value.Kind = contract.OptionInteger
+			value.Integer = int64(option.Int())
+		case discord.ApplicationCommandOptionTypeBool:
+			value.Kind = contract.OptionBoolean
+			value.Boolean = option.Bool()
+		case discord.ApplicationCommandOptionTypeFloat:
+			value.Kind = contract.OptionNumber
+			value.Number = option.Float()
+		case discord.ApplicationCommandOptionTypeUser:
+			value.Kind = contract.OptionUser
+			user := UserRef(data.User(option.Name))
+			value.User = &user
+		case discord.ApplicationCommandOptionTypeChannel:
+			value.Kind = contract.OptionChannel
+			channel := ChannelRef(data.Channel(option.Name), guildID)
+			value.Channel = &channel
+		case discord.ApplicationCommandOptionTypeRole:
+			value.Kind = contract.OptionRole
+			role := RoleRef(data.Role(option.Name), guildID)
+			value.Role = &role
+		case discord.ApplicationCommandOptionTypeMentionable:
+			value.Kind = contract.OptionMentionable
+			id := option.Snowflake()
+			if user, ok := data.OptUser(option.Name); ok {
+				ref := UserRef(user)
+				value.Mentionable = &contract.MentionableRef{Kind: contract.MentionableUser, User: &ref}
+			} else if role, ok := data.OptRole(option.Name); ok {
+				ref := RoleRef(role, guildID)
+				value.Mentionable = &contract.MentionableRef{Kind: contract.MentionableRole, Role: &ref}
+			} else {
+				_ = id
 			}
-			customID = ti.CustomID
-			value = ti.Value
+		case discord.ApplicationCommandOptionTypeAttachment:
+			value.Kind = contract.OptionAttachment
+			attachment := data.Attachment(option.Name)
+			ref := AttachmentRef(attachment)
+			value.Attachment = &ref
 		default:
 			continue
 		}
-
-		cid := strings.TrimSpace(customID)
-		if cid == "" {
-			continue
-		}
-		pid, localID, ok := pluginhost.ParseCustomID(cid)
-		if !ok || pid != pluginID {
-			continue
-		}
-		fields[localID] = value
+		out = append(out, value)
 	}
-	opts["fields"] = fields
-	return opts
+	return out
 }
-
+func autocompleteOption(option discord.AutocompleteOption) contract.OptionValue {
+	value := contract.OptionValue{Name: strings.TrimSpace(option.Name)}
+	switch option.Type {
+	case discord.ApplicationCommandOptionTypeString:
+		value.Kind = contract.OptionString
+		value.String = option.String()
+	case discord.ApplicationCommandOptionTypeInt:
+		value.Kind = contract.OptionInteger
+		value.Integer = int64(option.Int())
+	case discord.ApplicationCommandOptionTypeFloat:
+		value.Kind = contract.OptionNumber
+		value.Number = option.Float()
+	case discord.ApplicationCommandOptionTypeBool:
+		value.Kind = contract.OptionBoolean
+		value.Boolean = option.Bool()
+	case discord.ApplicationCommandOptionTypeUser:
+		value.Kind = contract.OptionUser
+		value.User = &contract.UserRef{ID: option.Snowflake().String()}
+	case discord.ApplicationCommandOptionTypeChannel:
+		value.Kind = contract.OptionChannel
+		value.Channel = &contract.ChannelRef{ID: option.Snowflake().String(), Kind: contract.ChannelText}
+	case discord.ApplicationCommandOptionTypeRole:
+		value.Kind = contract.OptionRole
+		value.Role = &contract.RoleRef{ID: option.Snowflake().String()}
+	case discord.ApplicationCommandOptionTypeMentionable:
+		value.Kind = contract.OptionMentionable
+		value.Mentionable = &contract.MentionableRef{Kind: contract.MentionableUser, User: &contract.UserRef{ID: option.Snowflake().String()}}
+	}
+	return value
+}
+func ComponentInput(e *events.ComponentInteractionCreate, localID string) contract.ComponentInput {
+	input := contract.ComponentInput{ID: localID}
+	switch e.Data.Type() {
+	case discord.ComponentTypeButton:
+		input.Kind = contract.ComponentButton
+	case discord.ComponentTypeStringSelectMenu:
+		input.Kind = contract.ComponentStringSelect
+		for _, item := range e.StringSelectMenuInteractionData().Values {
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionString, String: item})
+		}
+	case discord.ComponentTypeUserSelectMenu:
+		input.Kind = contract.ComponentUserSelect
+		data := e.UserSelectMenuInteractionData()
+		for _, id := range data.Values {
+			user := UserRef(data.Resolved.Users[id])
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionUser, User: &user})
+		}
+	case discord.ComponentTypeRoleSelectMenu:
+		input.Kind = contract.ComponentRoleSelect
+		data := e.RoleSelectMenuInteractionData()
+		guildID := SnowflakePtrToString(e.GuildID())
+		for _, id := range data.Values {
+			role := RoleRef(data.Resolved.Roles[id], guildID)
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionRole, Role: &role})
+		}
+	case discord.ComponentTypeMentionableSelectMenu:
+		input.Kind = contract.ComponentMentionableSelect
+		data := e.MentionableSelectMenuInteractionData()
+		guildID := SnowflakePtrToString(e.GuildID())
+		for _, id := range data.Values {
+			if user, ok := data.Resolved.Users[id]; ok {
+				ref := UserRef(user)
+				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, Mentionable: &contract.MentionableRef{Kind: contract.MentionableUser, User: &ref}})
+			} else if role, ok := data.Resolved.Roles[id]; ok {
+				ref := RoleRef(role, guildID)
+				input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionMentionable, Mentionable: &contract.MentionableRef{Kind: contract.MentionableRole, Role: &ref}})
+			}
+		}
+	case discord.ComponentTypeChannelSelectMenu:
+		input.Kind = contract.ComponentChannelSelect
+		data := e.ChannelSelectMenuInteractionData()
+		guildID := SnowflakePtrToString(e.GuildID())
+		for _, id := range data.Values {
+			ref := ChannelRef(data.Resolved.Channels[id], guildID)
+			input.Values = append(input.Values, contract.OptionValue{Kind: contract.OptionChannel, Channel: &ref})
+		}
+	}
+	return input
+}
+func ModalInput(e *events.ModalSubmitInteractionCreate, pluginID, localID string) contract.ModalInput {
+	input := contract.ModalInput{ID: localID}
+	for component := range e.Data.AllComponents() {
+		var id, value string
+		switch field := component.(type) {
+		case discord.TextInputComponent:
+			id, value = field.CustomID, field.Value
+		case *discord.TextInputComponent:
+			if field != nil {
+				id, value = field.CustomID, field.Value
+			}
+		}
+		pid, fieldID, ok := pluginhost.ParseCustomID(id)
+		if ok && pid == pluginID {
+			input.Fields = append(input.Fields, contract.NamedString{Name: fieldID, Value: value})
+		}
+	}
+	return input
+}
+func UserRef(user discord.User) contract.UserRef {
+	return contract.UserRef{ID: user.ID.String(), Username: strings.TrimSpace(user.Username), Name: strings.TrimSpace(user.EffectiveName()), AvatarURL: strings.TrimSpace(user.EffectiveAvatarURL()), Bot: user.Bot, System: user.System}
+}
+func MemberRef(member discord.ResolvedMember, guildID string) contract.MemberRef {
+	roles := make([]string, len(member.RoleIDs))
+	for i, id := range member.RoleIDs {
+		roles[i] = id.String()
+	}
+	return contract.MemberRef{GuildID: guildID, User: UserRef(member.User), DisplayName: strings.TrimSpace(member.EffectiveName()), RoleIDs: roles, Permissions: ContractPermissions(member.Permissions)}
+}
+func GuildRef(guild discord.Guild) contract.GuildRef {
+	return contract.GuildRef{ID: guild.ID.String(), Name: strings.TrimSpace(guild.Name)}
+}
+func ChannelRef(channel discord.ResolvedChannel, guildID string) contract.ChannelRef {
+	return contract.ChannelRef{ID: channel.ID.String(), GuildID: guildID, Name: strings.TrimSpace(channel.Name), Kind: contractChannelKind(channel.Type), ParentID: channel.ParentID.String(), Mention: discord.ChannelMention(channel.ID), PermissionBits: uint64(channel.Permissions), CreatedAt: channel.ID.Time().UTC().Unix()}
+}
+func InteractionChannelRef(channel discord.InteractionChannel, guildID string) contract.ChannelRef {
+	return contract.ChannelRef{ID: channel.ID().String(), GuildID: guildID, Name: strings.TrimSpace(channel.Name()), Kind: contractChannelKind(channel.Type()), Mention: discord.ChannelMention(channel.ID()), PermissionBits: uint64(channel.Permissions), CreatedAt: channel.ID().Time().UTC().Unix()}
+}
+func RoleRef(role discord.Role, guildID string) contract.RoleRef {
+	return contract.RoleRef{ID: role.ID.String(), GuildID: guildID, Name: role.Name, Position: role.Position, Permissions: ContractPermissions(role.Permissions), Mention: discord.RoleMention(role.ID), Color: role.Color, Hoist: role.Hoist, Mentionable: role.Mentionable, Managed: role.Managed, PermissionBits: uint64(role.Permissions), CreatedAt: role.CreatedAt().UTC().Unix()}
+}
+func AttachmentRef(value discord.Attachment) contract.AttachmentRef {
+	contentType := ""
+	if value.ContentType != nil {
+		contentType = *value.ContentType
+	}
+	width, height := 0, 0
+	if value.Width != nil {
+		width = *value.Width
+	}
+	if value.Height != nil {
+		height = *value.Height
+	}
+	return contract.AttachmentRef{ID: value.ID.String(), Filename: value.Filename, ContentType: contentType, URL: value.URL, Size: int64(value.Size), Width: width, Height: height}
+}
+func ContractPermissions(value discord.Permissions) []contract.MemberPermission {
+	mapping := []struct {
+		bit   discord.Permissions
+		value contract.MemberPermission
+	}{{discord.PermissionAdministrator, contract.PermissionAdministrator}, {discord.PermissionManageGuild, contract.PermissionManageGuild}, {discord.PermissionManageRoles, contract.PermissionManageRoles}, {discord.PermissionManageGuildExpressions, contract.PermissionManageExpressions}, {discord.PermissionCreateGuildExpressions, contract.PermissionCreateExpressions}, {discord.PermissionManageMessages, contract.PermissionManageMessages}, {discord.PermissionManageNicknames, contract.PermissionManageNicknames}, {discord.PermissionManageChannels, contract.PermissionManageChannels}, {discord.PermissionKickMembers, contract.PermissionKickMembers}, {discord.PermissionBanMembers, contract.PermissionBanMembers}, {discord.PermissionModerateMembers, contract.PermissionModerateMembers}}
+	out := []contract.MemberPermission{}
+	for _, entry := range mapping {
+		if value.Has(entry.bit) {
+			out = append(out, entry.value)
+		}
+	}
+	return out
+}
+func contractChannelKind(value discord.ChannelType) contract.ChannelKind {
+	switch value {
+	case discord.ChannelTypeGuildVoice:
+		return contract.ChannelVoice
+	case discord.ChannelTypeGuildCategory:
+		return contract.ChannelCategory
+	case discord.ChannelTypeGuildNews:
+		return contract.ChannelAnnouncement
+	case discord.ChannelTypeGuildStageVoice:
+		return contract.ChannelStage
+	case discord.ChannelTypeGuildForum:
+		return contract.ChannelForum
+	case discord.ChannelTypeGuildMedia:
+		return contract.ChannelMedia
+	default:
+		return contract.ChannelText
+	}
+}
 func OptionalString(value *string) string {
 	if value == nil {
 		return ""
 	}
 	return strings.TrimSpace(*value)
-}
-
-func channelTypeName(t discord.ChannelType) string {
-	switch t {
-	case discord.ChannelTypeGuildText:
-		return "guild_text"
-	case discord.ChannelTypeDM:
-		return "dm"
-	case discord.ChannelTypeGuildVoice:
-		return "guild_voice"
-	case discord.ChannelTypeGroupDM:
-		return "group_dm"
-	case discord.ChannelTypeGuildCategory:
-		return "guild_category"
-	case discord.ChannelTypeGuildNews:
-		return "guild_news"
-	case discord.ChannelTypeGuildNewsThread:
-		return "guild_news_thread"
-	case discord.ChannelTypeGuildPublicThread:
-		return "guild_public_thread"
-	case discord.ChannelTypeGuildPrivateThread:
-		return "guild_private_thread"
-	case discord.ChannelTypeGuildStageVoice:
-		return "guild_stage_voice"
-	case discord.ChannelTypeGuildDirectory:
-		return "guild_directory"
-	case discord.ChannelTypeGuildForum:
-		return "guild_forum"
-	case discord.ChannelTypeGuildMedia:
-		return "guild_media"
-	default:
-		return "unknown"
-	}
 }

@@ -1,0 +1,340 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.json",
+	"title": "Mamacord Starlark plugin manifest",
+	"type": "object",
+	"additionalProperties": false,
+	"required": [
+		"$schema",
+		"id",
+		"name",
+		"version",
+		"entrypoint",
+		"permissions",
+		"locales",
+		"state_keys",
+		"assets"
+	],
+	"properties": {
+		"$schema": {
+			"const": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.json"
+		},
+		"id": {
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]{0,63}$"
+		},
+		"name": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 100,
+			"pattern": "^\\S(?:.*\\S)?$"
+		},
+		"version": {
+			"type": "string",
+			"pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+		},
+		"entrypoint": {
+			"const": "plugin.star"
+		},
+		"permissions": {
+			"$ref": "#/$defs/permissions"
+		},
+		"locales": {
+			"$ref": "#/$defs/locales"
+		},
+		"assets": {
+			"type": "array",
+			"maxItems": 100,
+			"uniqueItems": true,
+			"items": {
+				"type": "string",
+				"minLength": 1,
+				"pattern": "^(?![./])(?!.*/\\.)[^\\\\]+$",
+				"allOf": [
+					{
+						"not": {
+							"enum": ["plugin.json", "plugin.star", "signature.json"]
+						}
+					},
+					{
+						"not": {
+							"pattern": "^(?:locales/|.*\\.star$)"
+						}
+					}
+				]
+			}
+		},
+		"state_keys": {
+			"type": "array",
+			"maxItems": 25,
+			"uniqueItems": true,
+			"items": {
+				"type": "string",
+				"pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+			}
+		}
+	},
+	"$defs": {
+		"permissions": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["storage", "discord", "network", "resources", "automation"],
+			"properties": {
+				"storage": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"kv",
+						"user_settings",
+						"checkins",
+						"reminders",
+						"warnings",
+						"audit"
+					],
+					"properties": {
+						"kv": {
+							"type": "boolean"
+						},
+						"user_settings": {
+							"type": "boolean"
+						},
+						"checkins": {
+							"type": "boolean"
+						},
+						"reminders": {
+							"type": "boolean"
+						},
+						"warnings": {
+							"type": "boolean"
+						},
+						"audit": {
+							"type": "boolean"
+						}
+					}
+				},
+				"discord": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": [
+						"users",
+						"guilds",
+						"channels",
+						"messages",
+						"reactions",
+						"members",
+						"roles",
+						"threads",
+						"invites",
+						"webhooks",
+						"emojis",
+						"stickers"
+					],
+					"properties": {
+						"users": {
+							"type": "boolean"
+						},
+						"guilds": {
+							"type": "boolean"
+						},
+						"channels": {
+							"type": "boolean"
+						},
+						"messages": {
+							"type": "boolean"
+						},
+						"reactions": {
+							"const": false
+						},
+						"members": {
+							"type": "boolean"
+						},
+						"roles": {
+							"type": "boolean"
+						},
+						"threads": {
+							"const": false
+						},
+						"invites": {
+							"const": false
+						},
+						"webhooks": {
+							"const": false
+						},
+						"emojis": {
+							"type": "boolean"
+						},
+						"stickers": {
+							"type": "boolean"
+						}
+					}
+				},
+				"network": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["http", "hosts"],
+					"properties": {
+						"http": {
+							"type": "boolean"
+						},
+						"hosts": {
+							"type": "array",
+							"maxItems": 20,
+							"uniqueItems": true,
+							"items": {
+								"type": "string",
+								"pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$"
+							}
+						}
+					},
+					"allOf": [
+						{
+							"if": {
+								"properties": {
+									"http": {
+										"const": true
+									}
+								}
+							},
+							"then": {
+								"properties": {
+									"hosts": {
+										"minItems": 1
+									}
+								}
+							},
+							"else": {
+								"properties": {
+									"hosts": {
+										"maxItems": 0
+									}
+								}
+							}
+						}
+					]
+				},
+				"automation": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["jobs", "events"],
+					"properties": {
+						"jobs": {
+							"type": "boolean"
+						},
+						"events": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["member_join_leave", "moderation"],
+							"properties": {
+								"member_join_leave": {
+									"type": "boolean"
+								},
+								"moderation": {
+									"type": "boolean"
+								}
+							}
+						}
+					}
+				},
+				"resources": {
+					"type": "object",
+					"additionalProperties": false,
+					"required": ["read"],
+					"properties": {
+						"read": {
+							"type": "boolean"
+						}
+					}
+				}
+			}
+		},
+		"locales": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["default", "supported"],
+			"properties": {
+				"default": {
+					"type": "string",
+					"pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?$",
+					"description": "Must also appear in locales.supported; the runtime enforces this cross-field equality."
+				},
+				"supported": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 50,
+					"uniqueItems": true,
+					"items": {
+						"type": "string",
+						"pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?$"
+					},
+					"description": "Canonical sorted locale list. It must contain locales.default; the runtime enforces the data-dependent membership rule."
+				}
+			}
+		}
+	},
+	"allOf": [
+		{
+			"if": {
+				"properties": {
+					"assets": {
+						"minItems": 1
+					}
+				}
+			},
+			"then": {
+				"properties": {
+					"permissions": {
+						"properties": {
+							"resources": {
+								"properties": {
+									"read": {
+										"const": true
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"else": {
+				"properties": {
+					"permissions": {
+						"properties": {
+							"resources": {
+								"properties": {
+									"read": {
+										"const": false
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		{
+			"if": {
+				"properties": {
+					"state_keys": {
+						"minItems": 1
+					}
+				},
+				"required": ["state_keys"]
+			},
+			"then": {
+				"properties": {
+					"permissions": {
+						"properties": {
+							"storage": {
+								"properties": {
+									"kv": {
+										"const": true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	]
+}

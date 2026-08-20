@@ -161,7 +161,7 @@ func blockBuiltinHandle(
 		msg := discord.NewMessageCreate().WithEphemeral(true).WithContent(t.S("admin.not_owner", nil))
 		return interactions.SlashMessage{Create: msg}, nil
 	}
-	if s.Store == nil {
+	if s.Restrictions == nil {
 		return nil, errors.New("store not configured")
 	}
 
@@ -172,7 +172,7 @@ func blockBuiltinHandle(
 		return interactions.SlashMessage{Create: msg}, nil
 	}
 
-	restrictions := s.Store.Restrictions()
+	restrictions := s.Restrictions
 	switch *sub {
 	case "user":
 		return blockBuiltinUser(ctx, t, restrictions, actorID, data)
@@ -590,7 +590,7 @@ func unblockBuiltinHandle(
 			Create: discord.NewMessageCreate().WithEphemeral(true).WithContent(t.S("admin.not_owner", nil)),
 		}, nil
 	}
-	if s.Store == nil {
+	if s.Restrictions == nil {
 		return nil, errors.New("store not configured")
 	}
 
@@ -602,7 +602,7 @@ func unblockBuiltinHandle(
 		}, nil
 	}
 
-	restrictions := s.Store.Restrictions()
+	restrictions := s.Restrictions
 
 	switch *sub {
 	case "user":

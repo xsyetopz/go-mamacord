@@ -154,6 +154,17 @@ type PluginKVStore interface {
 	DeletePluginKV(ctx context.Context, guildID uint64, pluginID, key string) error
 }
 
+type PluginKVValue struct {
+	ValueJSON string
+	Version   uint64
+}
+type VersionedPluginKVStore interface {
+	PluginKVStore
+	GetPluginKVVersioned(ctx context.Context, guildID uint64, pluginID, key string) (PluginKVValue, bool, error)
+	CompareAndSwapPluginKV(ctx context.Context, guildID uint64, pluginID, key, valueJSON string, expectedVersion uint64) (uint64, bool, error)
+	DeletePluginKVVersion(ctx context.Context, guildID uint64, pluginID, key string, expectedVersion uint64) (bool, error)
+}
+
 type ModuleState struct {
 	ModuleID  string
 	Enabled   bool

@@ -1,6 +1,7 @@
 package pluginhost
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"errors"
@@ -9,11 +10,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
-	luaplugin "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
+	starlarkruntime "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/starlark"
+	"github.com/xsyetopz/go-mamacord/internal/scheduling"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type pluginLoadLocation struct {
@@ -27,20 +32,22 @@ func (m *Host) LoadAll(ctx context.Context) error {
 	if err != nil || pluginDirs == nil {
 		return err
 	}
-
 	policy, err := permissions.LoadPolicyFile(m.permissionsFile)
 	if err != nil {
 		return err
 	}
-
-	m.resetPluginLocales()
-
-	keys, err := LoadTrustedKeys(ctx, m.trustedKeysFile, m.store)
+	var trustedSigners store.TrustedSignerStore
+	if m.store != nil {
+		trustedSigners = m.store.TrustedSigners()
+	}
+	keys, err := LoadTrustedKeys(ctx, m.trustedKeysFile, trustedSigners)
 	if err != nil {
 		return err
 	}
-
-	nextPlugins, nextCommands := m.loadPluginsFromEntries(ctx, pluginDirs, keys, policy)
+	nextPlugins, nextCommands, err := m.loadPluginsFromEntries(ctx, pluginDirs, keys, policy)
+	if err != nil {
+		return err
+	}
 	nextEvents, nextJobs := buildSubscriptions(nextPlugins)
 	oldPlugins := m.swapState(nextPlugins, nextCommands, nextEvents, nextJobs, policy)
 	closePlugins(oldPlugins)
@@ -65,12 +72,7 @@ func (m *Host) readPluginDirEntries(ctx context.Context) ([]pluginLoadLocation, 
 			entryDir := entry.Dir
 			bundleDir, err := m.resolveDiscoveredBundleDir(ctx, entryDir, entry.Name)
 			if err != nil {
-				m.logger.Warn(
-					"invalid plugin bundle state, skipping plugin root",
-					slog.String("entry_dir", entryDir),
-					slog.String("err", err.Error()),
-				)
-				continue
+				return nil, fmt.Errorf("resolve plugin root %q: %w", entryDir, err)
 			}
 			pluginDirs = append(pluginDirs, pluginLoadLocation{
 				EntryDir:  entryDir,
@@ -126,103 +128,41 @@ func (m *Host) resolveDiscoveredBundleDir(
 	return inspection.LoadDir, nil
 }
 
-func (m *Host) resetPluginLocales() {
-	if m.i18n != nil {
-		m.i18n.ResetPluginLocales()
-	}
-}
-
-func (m *Host) loadPluginsFromEntries(
-	ctx context.Context,
-	pluginDirs []pluginLoadLocation,
-	keys map[string]ed25519.PublicKey,
-	policy permissions.Policy,
-) (map[string]*Plugin, map[string]PluginCommand) {
+func (m *Host) loadPluginsFromEntries(ctx context.Context, pluginDirs []pluginLoadLocation, keys map[string]ed25519.PublicKey, policy permissions.Policy) (map[string]*Plugin, map[string]PluginCommand, error) {
 	nextPlugins := map[string]*Plugin{}
 	nextCommands := map[string]PluginCommand{}
-
 	for _, location := range pluginDirs {
 		entryDir := strings.TrimSpace(location.EntryDir)
 		if entryDir == "" {
-			continue
+			closePlugins(nextPlugins)
+			return nil, nil, errors.New("plugin entry dir is empty")
 		}
-		pl, cmds, err := m.loadOne(ctx, location, keys, policy)
+		plugin, commands, err := m.loadOne(ctx, location, keys, policy)
 		if err != nil {
-			m.logger.WarnContext(
-				ctx,
-				"failed to load plugin",
-				slog.String("dir", entryDir),
-				slog.String("err", err.Error()),
-			)
-			continue
+			closePlugins(nextPlugins)
+			return nil, nil, fmt.Errorf("load plugin %q: %w", entryDir, err)
 		}
-		if pl == nil {
-			continue
+		if plugin == nil {
+			closePlugins(nextPlugins)
+			return nil, nil, fmt.Errorf("load plugin %q returned no plugin", entryDir)
 		}
-
-		if _, exists := nextPlugins[pl.ID]; exists {
-			m.logger.WarnContext(ctx, "duplicate plugin id, skipping", slog.String("plugin", pl.ID))
-			if pl.VM != nil {
-				pl.VM.Close()
+		if _, exists := nextPlugins[plugin.ID]; exists {
+			if plugin.Runtime != nil {
+				closeCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+				_ = plugin.Runtime.Close(closeCtx)
+				cancel()
 			}
-			continue
+			closePlugins(nextPlugins)
+			return nil, nil, fmt.Errorf("duplicate plugin id %q", plugin.ID)
 		}
-
-		nextPlugins[pl.ID] = pl
-		m.loadPluginLocales(ctx, pl.ID, pl.BundleDir)
-		addCommands(ctx, m.logger, nextCommands, pl.ID, cmds)
+		nextPlugins[plugin.ID] = plugin
+		addCommands(ctx, m.logger, nextCommands, plugin.ID, commands)
 	}
-
-	return nextPlugins, nextCommands
+	return nextPlugins, nextCommands, nil
 }
 
-func (m *Host) loadPluginLocales(ctx context.Context, pluginID string, pluginDir string) {
-	if m.i18n == nil {
-		return
-	}
-
-	localesDir := filepath.Join(pluginDir, "locales")
-	fi, statErr := os.Stat(localesDir)
-	if statErr != nil || !fi.IsDir() {
-		return
-	}
-
-	if entries, err := os.ReadDir(localesDir); err == nil {
-		for _, entry := range entries {
-			if !entry.IsDir() {
-				continue
-			}
-			locale := strings.TrimSpace(entry.Name())
-			if locale == "" || i18n.IsSupportedDiscordLocale(locale) {
-				continue
-			}
-
-			path := filepath.Join(localesDir, locale, "messages.json")
-			if _, msgFileErr := os.Stat(path); msgFileErr != nil {
-				continue
-			}
-
-			m.logger.WarnContext(
-				ctx,
-				"unknown plugin locale, ignoring",
-				slog.String("plugin", pluginID),
-				slog.String("locale", locale),
-				slog.String("path", path),
-			)
-		}
-	}
-
-	if err := m.i18n.LoadPluginLocales(pluginID, localesDir); err != nil {
-		m.logger.WarnContext(
-			ctx,
-			"failed to load plugin locales",
-			slog.String("plugin", pluginID),
-			slog.String("err", err.Error()),
-		)
-	}
-}
 func (m *Host) loadOne(
-	_ context.Context,
+	ctx context.Context,
 	location pluginLoadLocation,
 	keys map[string]ed25519.PublicKey,
 	policy permissions.Policy,
@@ -235,86 +175,139 @@ func (m *Host) loadOne(
 	if bundleDir == "" {
 		bundleDir = entryDir
 	}
-
-	manifestPath := filepath.Join(bundleDir, "plugin.json")
-	manifest, err := ReadManifest(manifestPath)
+	manifestBytes, err := os.ReadFile(filepath.Join(bundleDir, "plugin.json"))
+	if err != nil {
+		return nil, nil, fmt.Errorf("read manifest: %w", err)
+	}
+	manifest, err := ParseStarlarkManifest(manifestBytes)
 	if err != nil {
 		return nil, nil, err
 	}
-	if permErr := manifest.Permissions.Validate(); permErr != nil {
-		return nil, nil, fmt.Errorf("permissions: %w", permErr)
-	}
-
 	signaturePath := filepath.Join(bundleDir, "signature.json")
-	var sig *Signature
-	if s, sigErr := ReadSignature(signaturePath); sigErr == nil {
-		sig = &s
-	} else if !os.IsNotExist(sigErr) {
-		return nil, nil, sigErr
+	var signature *Signature
+	if value, readErr := ReadSignature(signaturePath); readErr == nil {
+		signature = &value
+	} else if !os.IsNotExist(readErr) {
+		return nil, nil, readErr
 	}
-
-	if m.prodMode && !m.allowUnsignedPlugins {
-		if sig == nil {
-			return nil, nil, errors.New("missing signature.json")
+	if signature != nil {
+		if err := VerifyDirSignature(bundleDir, *signature, keys); err != nil {
+			return nil, nil, err
 		}
-
-		if verifyErr := VerifyDirSignature(bundleDir, *sig, keys); verifyErr != nil {
-			return nil, nil, verifyErr
-		}
+	} else if m.prodMode && !m.allowUnsignedPlugins {
+		return nil, nil, errors.New("missing signature.json")
 	}
-
-	script := filepath.Join(bundleDir, "plugin.lua")
+	if err := validateStarlarkBundleAuthority(bundleDir, manifest); err != nil {
+		return nil, nil, err
+	}
+	bundleHashBefore, err := bundles.HashDir(bundleDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	resources, err := readBundleResources(bundleDir, manifest)
+	if err != nil {
+		return nil, nil, err
+	}
+	pluginI18n, err := i18n.NewPluginSnapshot(m.i18n, manifest.ID, filepath.Join(bundleDir, "locales"))
+	if err != nil {
+		return nil, nil, fmt.Errorf("load plugin locales: %w", err)
+	}
+	requested := manifest.RequestedPermissions()
 	granted := policy.Granted(manifest.ID)
-	effective := permissions.Effective(manifest.Permissions, granted)
-
-	vm, err := luaplugin.NewFromFile(script, luaplugin.Options{
-		Logger:      m.logger,
-		PluginID:    manifest.ID,
-		PluginDir:   bundleDir,
-		Permissions: effective,
-		Bridge:      luaplugin.Bridge{Discord: m.bridge.Discord},
-		I18n:        m.i18n,
-		Store:       m.store,
+	effective := permissions.Effective(requested, granted)
+	source, err := starlarkruntime.OpenDirBundle(bundleDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	generationID := contract.GenerationID(fmt.Sprintf("%s-%d", manifest.ID, m.generationCounter.Add(1)))
+	printFn := func(message string) {
+		m.logger.DebugContext(ctx, "plugin print", slog.String("plugin", manifest.ID), slog.String("message", message))
+	}
+	generation, err := (starlarkruntime.GenerationBuilder{Limits: starlarkruntime.DefaultLimits(), Print: printFn}).Build(ctx, source, generationID)
+	if err != nil {
+		return nil, nil, err
+	}
+	manager, err := starlarkruntime.NewGenerationManager(3*time.Second, func(retireErr error) {
+		m.logger.Warn("plugin generation retirement", slog.String("plugin", manifest.ID), slog.String("err", retireErr.Error()))
 	})
 	if err != nil {
 		return nil, nil, err
 	}
-
-	descriptor, hasDescriptor := vm.Definition()
-
-	commands := append([]Command(nil), manifest.Commands...)
-	events := append([]string(nil), manifest.Events...)
-	jobs := append([]Job(nil), manifest.Jobs...)
-	if hasDescriptor {
-		commands = commandsFromDefinition(descriptor)
-		events = append([]string(nil), descriptor.Events...)
-		jobs = jobsFromDefinition(descriptor)
+	if err := manager.Activate(generation); err != nil {
+		generation.BeginDrain()
+		_ = generation.Release()
+		return nil, nil, err
 	}
-
-	pl := &Plugin{
-		ID:        manifest.ID,
-		Dir:       entryDir,
-		BundleDir: bundleDir,
-		Bundled:   location.Bundled,
-		Manifest:  manifest,
-		Signature: sig,
-		Effective: effective,
-		Commands:  commands,
-		Events:    events,
-		Jobs:      jobs,
-		VM:        vm,
+	definition := generation.Definition()
+	if err := validateAutomationDefinitions(manifest, definition); err != nil {
+		closeCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		_ = manager.Close(closeCtx)
+		cancel()
+		return nil, nil, err
 	}
-
-	var cmds []PluginCommand
-	for _, cmd := range pl.Commands {
-		if cmd.Name == "" {
-			continue
+	commands, err := commandsFromContract(definition)
+	if err != nil {
+		closeCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		_ = manager.Close(closeCtx)
+		cancel()
+		return nil, nil, err
+	}
+	bundleHashAfter, err := bundles.HashDir(bundleDir)
+	if err != nil || !bytes.Equal(bundleHashBefore[:], bundleHashAfter[:]) {
+		closeCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		_ = manager.Close(closeCtx)
+		cancel()
+		if err != nil {
+			return nil, nil, err
 		}
-		cmds = append(cmds, PluginCommand{
-			PluginID: pl.ID,
-			Command:  cmd,
-		})
+		return nil, nil, errors.New("plugin bundle changed while loading")
 	}
+	if signature != nil {
+		if err := VerifyDirSignature(bundleDir, *signature, keys); err != nil {
+			closeCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			_ = manager.Close(closeCtx)
+			cancel()
+			return nil, nil, err
+		}
+	}
+	events, jobs := subscriptionsFromContract(manifest.ID, definition)
+	plugin := &Plugin{ID: manifest.ID, Dir: entryDir, BundleDir: bundleDir, Bundled: location.Bundled, Manifest: manifest, Signature: signature, Effective: effective, Capabilities: manifest.Capabilities(effective), Resources: resources, Commands: commands, Events: events, Jobs: jobs, Definition: definition, I18n: pluginI18n, Runtime: manager}
+	projected := make([]PluginCommand, 0, len(commands))
+	for _, command := range commands {
+		if command.Name != "" {
+			projected = append(projected, PluginCommand{PluginID: manifest.ID, Command: command})
+		}
+	}
+	return plugin, projected, nil
+}
 
-	return pl, cmds, nil
+func validateAutomationDefinitions(manifest StarlarkManifest, definition contract.Definition) error {
+	for _, cog := range definition.Cogs {
+		for _, listener := range cog.Listeners {
+			switch listener.Event {
+			case "guild_member_join", "guild_member_leave":
+				if !manifest.Permissions.Automation.Events.MemberJoinLeave {
+					return fmt.Errorf("listener %q requires automation.events.member_join_leave", listener.ID)
+				}
+			case "guild_ban", "guild_unban":
+				if !manifest.Permissions.Automation.Events.Moderation {
+					return fmt.Errorf("listener %q requires automation.events.moderation", listener.ID)
+				}
+			default:
+				return fmt.Errorf("listener %q uses unsupported event %q", listener.ID, listener.Event)
+			}
+		}
+		for _, task := range cog.Tasks {
+			if !manifest.Permissions.Automation.Jobs {
+				return fmt.Errorf("task %q requires automation.jobs", task.ID)
+			}
+			if task.Schedule != strings.TrimSpace(task.Schedule) {
+				return fmt.Errorf("task %q schedule is not canonical", task.ID)
+			}
+			if _, err := scheduling.ParseSchedule(task.Schedule); err != nil {
+				return fmt.Errorf("task %q schedule: %w", task.ID, err)
+			}
+		}
+	}
+	return nil
 }

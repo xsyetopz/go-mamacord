@@ -2,6 +2,7 @@ package pluginhost
 
 import (
 	"context"
+	"encoding/json"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -13,68 +14,9 @@ import (
 
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/permissions"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
-
-func TestHostGoDoesNotDeclareDiscordInterface(t *testing.T) {
-	t.Parallel()
-
-	bytes, err := os.ReadFile("host.go")
-	if err != nil {
-		t.Fatalf("read host.go: %v", err)
-	}
-	if strings.Contains(string(bytes), "type Discord interface") {
-		t.Fatal("host.go still declares a duplicate Discord interface")
-	}
-}
-
-func TestHostGoDoesNotExposeLooseDiscordOptionField(t *testing.T) {
-	t.Parallel()
-
-	bytes, err := os.ReadFile("host.go")
-	if err != nil {
-		t.Fatalf("read host.go: %v", err)
-	}
-	if strings.Contains(string(bytes), "Discord             luaplugin.Discord") {
-		t.Fatal("host.go still exposes a loose Discord option field instead of an explicit bridge dependency")
-	}
-}
-
-func TestHostGoDoesNotUseLuaBridgeType(t *testing.T) {
-	t.Parallel()
-
-	bytes, err := os.ReadFile("host.go")
-	if err != nil {
-		t.Fatalf("read host.go: %v", err)
-	}
-	if strings.Contains(string(bytes), "luaplugin.Bridge") {
-		t.Fatal("host.go still uses luaplugin.Bridge instead of the shared plugin bridge type")
-	}
-}
-
-func TestHostPayloadOptionsBoundaryIsTyped(t *testing.T) {
-	t.Parallel()
-
-	bytes, err := os.ReadFile("host.go")
-	if err != nil {
-		t.Fatalf("read host.go: %v", err)
-	}
-	if strings.Contains(string(bytes), "Options     map[string]any") {
-		t.Fatal("host.go still exposes plugin payload options as raw map[string]any at the host <-> lua boundary")
-	}
-}
-
-func TestHostLoadGoWrapsLuaBridgeAtLuaBoundary(t *testing.T) {
-	t.Parallel()
-
-	bytes, err := os.ReadFile("host_load.go")
-	if err != nil {
-		t.Fatalf("read host_load.go: %v", err)
-	}
-	if !strings.Contains(string(bytes), "Bridge:      luaplugin.Bridge{Discord: m.bridge.Discord}") {
-		t.Fatal("host_load.go should re-wrap the host bridge into luaplugin.Bridge only at the Lua VM boundary")
-	}
-}
 
 func TestCommandPermissions_ExpressionsAliases(t *testing.T) {
 	t.Parallel()
@@ -379,7 +321,7 @@ func TestLoadAllFallsBackWhenStoredBundleRelativeDirIsInvalid(t *testing.T) {
 	}
 }
 
-func TestLoadAllSkipsFlatPluginRootsWithoutBundleState(t *testing.T) {
+func TestLoadAllRejectsFlatPluginRootsWithoutBundleState(t *testing.T) {
 	t.Parallel()
 
 	tmp := t.TempDir()
@@ -394,12 +336,11 @@ func TestLoadAllSkipsFlatPluginRootsWithoutBundleState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewHost: %v", err)
 	}
-	if err := host.LoadAll(context.Background()); err != nil {
-		t.Fatalf("LoadAll: %v", err)
+	if err := host.LoadAll(context.Background()); err == nil {
+		t.Fatal("expected missing bundle-state rejection")
 	}
-
 	if len(host.plugins) != 0 {
-		t.Fatalf("expected flat plugin roots without bundle state to be skipped, got %d loaded plugins", len(host.plugins))
+		t.Fatalf("unexpected loaded plugins: %d", len(host.plugins))
 	}
 }
 
@@ -648,11 +589,27 @@ func writeTestPluginBundleVersion(t *testing.T, dir, pluginID, version string) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatalf("MkdirAll(%q): %v", dir, err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(`{"id":"`+pluginID+`","name":"`+pluginID+`","version":"`+version+`"}`), 0o644); err != nil {
+	manifest, err := json.Marshal(StarlarkManifest{Schema: StarlarkManifestSchema, ID: pluginID, Name: pluginID, Version: version, Entrypoint: StarlarkEntrypoint, Permissions: StarlarkManifestPermissions{Network: StarlarkManifestNetworkPermissions{Hosts: []string{}}}, Locales: StarlarkManifestLocales{Default: "en-US", Supported: []string{"en-US"}}, StateKeys: []string{}, Assets: []string{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "plugin.json"), manifest, 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	source := `load("@mamacord//api.star", "cog", "plugin", "reply", "slash_command")
+def run(ctx): return [reply(content="ok")]
+def setup(bot): bot.add_cog(cog(name="Test", commands=[slash_command(name="test", description="Test command", handler=run)]))
+PLUGIN = plugin(setup=setup)
+`
+	if err := os.WriteFile(filepath.Join(dir, "plugin.star"), []byte(source), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
+	}
+	localeDir := filepath.Join(dir, "locales", "en-US")
+	if err := os.MkdirAll(localeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(localeDir, "messages.json"), []byte("[]\n"), 0o644); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -662,13 +619,14 @@ func (ioDiscard) Write(p []byte) (int, error) { return len(p), nil }
 
 type hostStoreStub struct {
 	installs map[string]store.PluginInstall
+	kv       store.PluginKVStore
 }
 
 func (s hostStoreStub) TrustedSigners() store.TrustedSignerStore { return trustedSignerListStub{} }
 func (s hostStoreStub) PluginInstalls() store.PluginInstallStore {
 	return pluginInstallLookupStub{installs: s.installs}
 }
-func (s hostStoreStub) PluginKV() store.PluginKVStore         { return nil }
+func (s hostStoreStub) PluginKV() store.PluginKVStore         { return s.kv }
 func (s hostStoreStub) UserSettings() store.UserSettingsStore { return nil }
 func (s hostStoreStub) Reminders() store.ReminderStore        { return nil }
 func (s hostStoreStub) CheckIns() store.CheckInStore          { return nil }
@@ -698,3 +656,66 @@ func (s pluginInstallLookupStub) PutPluginInstall(context.Context, store.PluginI
 	return nil
 }
 func (s pluginInstallLookupStub) DeletePluginInstall(context.Context, string) error { return nil }
+
+func TestLoadAllPreservesActiveGenerationWhenReplacementFails(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	pluginRoot := filepath.Join(root, "stable")
+	writeTestPluginRoot(t, pluginRoot, "stable")
+	host, err := NewHost(Options{Dirs: []string{root}, AllowUnsignedPlugin: true, Logger: slog.New(slog.NewTextHandler(ioDiscard{}, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = host.LoadAll(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	original := host.plugins["stable"]
+	if original == nil {
+		t.Fatal("plugin not active")
+	}
+	bundleDir := filepath.Join(pluginRoot, "bundles", "test-v0.1.0")
+	if err = os.WriteFile(filepath.Join(bundleDir, "plugin.star"), []byte("this is not valid Starlark !!!\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err = host.LoadAll(context.Background()); err == nil {
+		t.Fatal("expected replacement failure")
+	}
+	if host.plugins["stable"] != original {
+		t.Fatal("failed reload replaced active plugin")
+	}
+	plan, err := host.PlanCommand("slash", "test", []string{"test"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	terminal, err := host.Run(context.Background(), "stable", contract.Invocation{Route: plan.Route, Kind: contract.InvocationCommand, ResponseState: contract.ResponseUnacknowledged, Author: &contract.UserRef{ID: "175928847299117063"}, Command: &contract.CommandInput{Kind: contract.CommandSlash, Path: []string{"test"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if message, ok := terminal.(*contract.MessageOperation); !ok || message.Message.Content != "ok" {
+		t.Fatalf("terminal=%#v", terminal)
+	}
+}
+
+func TestFindCommandDefinitionMatchesCommandKind(t *testing.T) {
+	definition := contract.Definition{Cogs: []contract.CogDefinition{{Name: "Test", Commands: []contract.CommandDefinition{{Kind: contract.CommandSlash, Name: "same", Route: "command:slash:same"}, {Kind: contract.CommandUser, Name: "same", Route: "command:user:same"}}}}}
+	found, ok := findCommandDefinition(definition, contract.CommandUser, []string{"same"})
+	if !ok || found.Route != "command:user:same" {
+		t.Fatalf("found=%#v ok=%v", found, ok)
+	}
+}
+
+func TestPlanEventsRetainsEveryListenerAndDeduplicatesPluginSubscription(t *testing.T) {
+	definition := contract.Definition{Cogs: []contract.CogDefinition{{Name: "Events", Listeners: []contract.ListenerDefinition{{ID: "one", Event: "guild_member_join", Route: "listener:one"}, {ID: "two", Event: "guild_member_join", Route: "listener:two"}}}}}
+	host := &Host{plugins: map[string]*Plugin{"events": {ID: "events", Definition: definition}}}
+	plans, err := host.PlanEvents("events", "guild_member_join")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(plans) != 2 || plans[0].Route != "listener:one" || plans[1].Route != "listener:two" {
+		t.Fatalf("plans=%#v", plans)
+	}
+	subscriptions, _ := buildSubscriptions(map[string]*Plugin{"events": {ID: "events", Events: []string{"guild_member_join", "guild_member_join"}}})
+	if got := subscriptions["guild_member_join"]; len(got) != 1 || got[0] != "events" {
+		t.Fatalf("subscriptions=%v", got)
+	}
+}

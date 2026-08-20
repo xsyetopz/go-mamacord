@@ -25,6 +25,7 @@ sort_by_loc=0
 search_dir="."
 exclude_dirs=()
 default_suite=0
+audit_failed=0
 
 run_audit() {
   local ext="$1"
@@ -40,6 +41,8 @@ run_audit() {
     "$exception"
     --glob
     "*.$ext"
+    --glob
+    "!**/.mamacord-bundle.json"
   )
   local -a files=()
   local file
@@ -60,6 +63,7 @@ run_audit() {
     return 0
   fi
 
+  audit_failed=1
   printf '%s\0' "${files[@]}" \
     | xargs -0 wc -l \
     | if [[ $sort_by_loc -eq 1 ]]; then
@@ -82,17 +86,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ $default_suite -eq 1 || $# -eq 0 ]]; then
-  if [[ ${#exclude_dirs[@]} -gt 0 ]]; then
-    run_audit "json" '"\$schema"' 'JSON files missing "$schema"' "$search_dir" \
-      "schemas" "locales" "plugins/*/locales" "examples/plugins/*/locales" "${exclude_dirs[@]}"
-    run_audit "json" '"\$id"' 'Schema files missing "$id"' "$search_dir/schemas" \
-      "${exclude_dirs[@]}"
-  else
-    run_audit "json" '"\$schema"' 'JSON files missing "$schema"' "$search_dir" \
-      "schemas" "locales" "plugins/*/locales" "examples/plugins/*/locales"
-    run_audit "json" '"\$id"' 'Schema files missing "$id"' "$search_dir/schemas"
-  fi
-  exit 0
+  run_audit "json" "\"\\\$schema\"" "Config files missing \"\$schema\"" "$search_dir/config" \
+    ${exclude_dirs[@]+"${exclude_dirs[@]}"}
+  run_audit "json" "\"\\\$schema\"" "Official plugin authority files missing \"\$schema\"" "$search_dir/plugins" \
+    "**/bundles/*/locales" ${exclude_dirs[@]+"${exclude_dirs[@]}"}
+  run_audit "json" "\"\\\$schema\"" "Example plugin authority files missing \"\$schema\"" "$search_dir/examples/plugins" \
+    "**/bundles/*/locales" ${exclude_dirs[@]+"${exclude_dirs[@]}"}
+  run_audit "json" "\"\\\$id\"" "Schema files missing \"\$id\"" "$search_dir/schemas" \
+    ${exclude_dirs[@]+"${exclude_dirs[@]}"}
+  exit "$audit_failed"
 fi
 
 if [[ $# -lt 2 ]]; then
@@ -118,7 +120,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#exclude_dirs[@]} -gt 0 ]]; then
-  run_audit "$ext" "$exception" "Files missing /$exception/" "$search_dir" "${exclude_dirs[@]}"
+  run_audit "$ext" "$exception" "Files missing /$exception/" "$search_dir" ${exclude_dirs[@]+"${exclude_dirs[@]}"}
 else
   run_audit "$ext" "$exception" "Files missing /$exception/" "$search_dir"
 fi
+
+exit "$audit_failed"

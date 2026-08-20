@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -23,8 +24,8 @@ func (s *Service) ScaffoldPlugin(req PluginScaffoldRequest) (PluginScaffoldRespo
 	responseMessage := strings.TrimSpace(req.ResponseMessage)
 
 	switch {
-	case !pluginIDPattern.MatchString(id):
-		return PluginScaffoldResponse{}, errors.New("plugin id must match ^[a-z][a-z0-9_]{1,31}$")
+	case !regexp.MustCompile(`^[a-z][a-z0-9-]{0,63}$`).MatchString(id):
+		return PluginScaffoldResponse{}, errors.New("plugin id must match ^[a-z][a-z0-9-]{0,63}$")
 	case name == "":
 		return PluginScaffoldResponse{}, errors.New("plugin name is required")
 	case version == "":
@@ -58,46 +59,49 @@ func (s *Service) ScaffoldPlugin(req PluginScaffoldRequest) (PluginScaffoldRespo
 	descID := "cmd." + commandName + ".desc"
 	messageID := id + ".hello"
 
-	manifest := pluginhost.Manifest{
-		ID:          id,
-		Name:        name,
-		Version:     version,
-		Permissions: req.Permissions,
+	manifest := pluginhost.StarlarkManifest{
+		Schema: pluginhost.StarlarkManifestSchema, ID: id, Name: name, Version: version, Entrypoint: pluginhost.StarlarkEntrypoint,
+		Permissions: pluginhost.StarlarkManifestPermissions{Storage: req.Permissions.Storage, Discord: req.Permissions.Discord, Network: pluginhost.StarlarkManifestNetworkPermissions{HTTP: req.Permissions.Network.HTTP, Hosts: append([]string{}, req.NetworkHosts...)}, Automation: req.Permissions.Automation},
+		Locales:     pluginhost.StarlarkManifestLocales{Default: locale, Supported: []string{locale}}, StateKeys: []string{}, Assets: []string{},
 	}
-	manifestBytes, err := json.MarshalIndent(map[string]any{
-		"$schema":     "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
-		"id":          manifest.ID,
-		"name":        manifest.Name,
-		"version":     manifest.Version,
-		"permissions": manifest.Permissions,
-	}, "", "  ")
+	manifestBytes, err := json.MarshalIndent(manifest, "", "  ")
 	if err != nil {
 		return PluginScaffoldResponse{}, err
 	}
+	if _, err := pluginhost.ParseStarlarkManifest(manifestBytes); err != nil {
+		return PluginScaffoldResponse{}, err
+	}
+	pluginStar := fmt.Sprintf(`load("@mamacord//api.star", "cog", "plugin")
+load("//commands:hello.star", "HELLO_COMMAND")
 
-	pluginLua := fmt.Sprintf(`local hello = bot.require("commands/hello.lua")
 
-return bot.plugin({
-  commands = {
-    bot.command("%s", {
-      description_id = "%s",
-      ephemeral = true,
-      run = hello
-    })
-  }
-})
-`, commandName, descID)
+def setup(bot):
+    bot.add_cog(cog(
+        name=%q,
+        commands=[HELLO_COMMAND],
+    ))
 
-	commandLua := fmt.Sprintf(`local i18n = bot.i18n
-local ui = bot.ui
 
-return function(_ctx)
-  return ui.reply({
-    content = i18n.t("%s", nil, nil),
-    ephemeral = true
-  })
-end
-`, messageID)
+PLUGIN = plugin(setup=setup)
+`, name)
+	commandStar := fmt.Sprintf(`load("@mamacord//api.star", "reply", "slash_command")
+
+
+def hello(ctx):
+    return [reply(
+        content=ctx.t(%q),
+        ephemeral=True,
+    )]
+
+
+HELLO_COMMAND = slash_command(
+    name=%q,
+    description=%q,
+    description_id=%q,
+    handler=hello,
+    ephemeral=True,
+)
+`, messageID, commandName, commandDescription, descID)
 
 	localeBytes, err := json.MarshalIndent([]map[string]string{
 		{"id": descID, "translation": commandDescription},
@@ -112,8 +116,8 @@ end
 		data []byte
 	}{
 		{rel: "plugin.json", data: append(manifestBytes, '\n')},
-		{rel: "plugin.lua", data: []byte(pluginLua)},
-		{rel: filepath.Join("commands", "hello.lua"), data: []byte(commandLua)},
+		{rel: pluginhost.StarlarkEntrypoint, data: []byte(pluginStar)},
+		{rel: filepath.Join("commands", "hello.star"), data: []byte(commandStar)},
 		{rel: filepath.Join("locales", locale, "messages.json"), data: append(localeBytes, '\n')},
 	}
 

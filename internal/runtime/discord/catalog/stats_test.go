@@ -19,12 +19,12 @@ func TestRuntimeStatsCountsBuiltinAndPluginModules(t *testing.T) {
 			},
 			"fun": {
 				ID:      "fun",
-				Runtime: moduleapi.RuntimeLua,
+				Runtime: moduleapi.RuntimeStarlark,
 				Enabled: true,
 			},
 			"info": {
 				ID:      "info",
-				Runtime: moduleapi.RuntimeLua,
+				Runtime: moduleapi.RuntimeStarlark,
 				Enabled: false,
 			},
 		},

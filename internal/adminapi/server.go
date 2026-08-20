@@ -35,7 +35,7 @@ type OAuthClient interface {
 type Options struct {
 	Addr          string
 	Logger        *slog.Logger
-	Service       Service
+	Service       *Service
 	SessionSecret string
 	ClientID      string
 	ClientSecret  string
@@ -97,11 +97,14 @@ func New(opts Options) (*Server, error) {
 		sessionStore = newMemorySessionStore()
 	}
 	svc := opts.Service
+	if svc == nil {
+		svc = &Service{}
+	}
 	svc.init()
 	return &Server{
 		logger:       opts.Logger.With(slog.String("component", "admin_api")),
 		addr:         strings.TrimSpace(opts.Addr),
-		svc:          &svc,
+		svc:          svc,
 		clientID:     strings.TrimSpace(opts.ClientID),
 		clientSecret: strings.TrimSpace(opts.ClientSecret),
 		ownerStatus:  opts.OwnerStatus,

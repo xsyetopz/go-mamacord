@@ -161,23 +161,23 @@ func (s *Service) GuildDashboard(ctx context.Context, accessToken string, guildI
 	}
 	installURL := fmt.Sprintf("/api/install/start?guild_id=%d", guildID)
 
-	managerCfg, err := guildconfig.Load(ctx, s.Store, guildID, "manager")
+	managerCfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "manager")
 	if err != nil {
 		return GuildDashboardResponse{}, err
 	}
-	moderationCfg, err := guildconfig.Load(ctx, s.Store, guildID, "moderation")
+	moderationCfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "moderation")
 	if err != nil {
 		return GuildDashboardResponse{}, err
 	}
-	funCfg, err := guildconfig.Load(ctx, s.Store, guildID, "fun")
+	funCfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "fun")
 	if err != nil {
 		return GuildDashboardResponse{}, err
 	}
-	infoCfg, err := guildconfig.Load(ctx, s.Store, guildID, "info")
+	infoCfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "info")
 	if err != nil {
 		return GuildDashboardResponse{}, err
 	}
-	wellnessCfg, err := guildconfig.Load(ctx, s.Store, guildID, "wellness")
+	wellnessCfg, err := guildconfig.Load(ctx, s.PluginKV, guildID, "wellness")
 	if err != nil {
 		return GuildDashboardResponse{}, err
 	}

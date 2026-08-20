@@ -22,7 +22,7 @@ import (
 type Runtime struct {
 	Logger        *slog.Logger
 	Registry      i18n.Registry
-	Store         commandruntime.Store
+	Restrictions  store.RestrictionStore
 	ProdMode      bool
 	SlashCommands map[string]slashcmd.Command
 	HelpNames     func(locale string) []string
@@ -39,14 +39,14 @@ func (r Runtime) Services(locale discord.Locale) commandruntime.Services {
 		helpNames = r.fallbackHelpNames
 	}
 	return commandruntime.Services{
-		Logger:      r.Logger,
-		Store:       r.Store,
-		ProdMode:    r.ProdMode,
-		IsOwner:     r.IsOwner,
-		Plugins:     r.Plugins,
-		Marketplace: r.Marketplace,
-		Modules:     r.Modules,
-		HelpNames:   helpNames,
+		Logger:       r.Logger,
+		Restrictions: r.Restrictions,
+		ProdMode:     r.ProdMode,
+		IsOwner:      r.IsOwner,
+		Plugins:      r.Plugins,
+		Marketplace:  r.Marketplace,
+		Modules:      r.Modules,
+		HelpNames:    helpNames,
 	}
 }
 
@@ -56,7 +56,7 @@ func (r Runtime) CheckRestrictions(
 	t commandtext.Translator,
 	build buildinfo.Info,
 ) (bool, error) {
-	restrictions := r.Store.Restrictions()
+	restrictions := r.Restrictions
 
 	msgID := "err.restricted"
 	var msgData map[string]any

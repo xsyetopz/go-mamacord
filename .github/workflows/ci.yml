@@ -6,19 +6,33 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
 
+      - name: Check module files
+        run: go mod tidy -diff
+
       - name: Run tests
         run: go test ./...
+
+      - name: Run static analysis
+        run: go vet ./...
+
+      - name: Check reachable Go vulnerabilities
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...
 
       - name: Build bot
         run: |
@@ -44,15 +58,15 @@ jobs:
           grep -q "runtime_roles: scheduler" /tmp/mamacord-doctor-scheduler.txt
           grep -q "admin_api_enabled: false" /tmp/mamacord-doctor-scheduler.txt
 
-          DISCORD_TOKEN=test-token MAMACORD_STORAGE_BACKEND=postgres MAMACORD_POSTGRES_DSN=postgres://bot:secret@db:5432/mamacord?sslmode=disable ./mamacord doctor >/tmp/mamacord-doctor-postgres.txt
+          DISCORD_TOKEN=test-token MAMACORD_STORAGE_BACKEND=postgres MAMACORD_POSTGRES_DSN='postgres://bot:secret@db:5432/mamacord?sslmode=disable' ./mamacord doctor >/tmp/mamacord-doctor-postgres.txt
           grep -q "storage_backend: postgres" /tmp/mamacord-doctor-postgres.txt
           grep -q "migrations_dir: ./migrations/postgres" /tmp/mamacord-doctor-postgres.txt
 
       - name: Build Docker image
         run: |
           docker build \
-            --build-arg BUILD_VERSION=${GITHUB_SHA} \
-            --build-arg BUILD_REPOSITORY=https://github.com/${GITHUB_REPOSITORY} \
+            --build-arg "BUILD_VERSION=${GITHUB_SHA}" \
+            --build-arg "BUILD_REPOSITORY=https://github.com/${GITHUB_REPOSITORY}" \
             -t go-mamacord:ci \
             .
 
@@ -60,7 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:18-bookworm
+        image: postgres:18-bookworm@sha256:7d2695c3aa88e792e8b3b233e7e4adb296a20412c6c0ca361e3edaaacfada108
         env:
           POSTGRES_DB: mamacord
           POSTGRES_USER: mamacord
@@ -73,9 +87,11 @@ jobs:
           --health-timeout=5s
           --health-retries=12
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
           cache: true
@@ -90,20 +106,23 @@ jobs:
             ./internal/app \
             ./internal/adminapi \
             ./internal/marketplace \
-            ./internal/runtime/plugins/lua \
+            ./internal/runtime/plugins/starlark \
+            ./internal/runtime/plugins/httpjson \
+            ./internal/runtime/plugins/contract \
+\
             -count=1 -v
 
   web:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          bun-version: latest
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
 
       - name: Install workspace deps
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build dashboard
         run: bun run --cwd apps/dashboard build

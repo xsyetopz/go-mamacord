@@ -51,7 +51,7 @@ func TestHandleMeRequiresSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       Service{},
+		Service:       &Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",
@@ -90,7 +90,7 @@ func TestHandleModulesWithSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:   "127.0.0.1:0",
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: Service{
+		Service: &Service{
 			Config: config.Config{},
 			BuildInfo: func() buildinfo.Info {
 				return buildinfo.Info{Version: "test"}
@@ -168,7 +168,7 @@ func TestHandleLoginReturns503WhenAuthNotConfigured(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       Service{},
+		Service:       &Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "",
 		ClientSecret:  "",
@@ -195,7 +195,7 @@ func TestHandleSetupWithoutSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:   "127.0.0.1:0",
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: Service{
+		Service: &Service{
 			Config: config.Config{
 				AdminAddr:               "127.0.0.1:8081",
 				DashboardClientID:       "client-id",
@@ -265,7 +265,7 @@ func TestHandleGuildChannelsReturns503WhenDiscordRuntimeUnavailable(t *testing.T
 	server, err := New(Options{
 		Addr:   "127.0.0.1:0",
 		Logger: slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service: Service{
+		Service: &Service{
 			OAuth: fakeOAuthClient{},
 		},
 		SessionSecret: strings.Repeat("x", 32),
@@ -323,7 +323,7 @@ func TestAdminOwnerRoutesRequireSession(t *testing.T) {
 	server, err := New(Options{
 		Addr:          "127.0.0.1:0",
 		Logger:        slog.New(slog.NewTextHandler(io.Discard, nil)),
-		Service:       Service{},
+		Service:       &Service{},
 		SessionSecret: strings.Repeat("x", 32),
 		ClientID:      "cid",
 		ClientSecret:  "secret",

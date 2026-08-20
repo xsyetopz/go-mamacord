@@ -13,11 +13,11 @@ import (
 )
 
 func (b *Bot) loadModuleStates(ctx context.Context) (map[string]store.ModuleState, error) {
-	if b.store == nil {
+	if b.moduleStates == nil {
 		return nil, errors.New("store not configured")
 	}
 
-	states, err := b.store.ModuleStates().ListModuleStates(ctx)
+	states, err := b.moduleStates.ListModuleStates(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -33,8 +33,9 @@ func (b *Bot) loadModuleStates(ctx context.Context) (map[string]store.ModuleStat
 }
 
 func (b *Bot) moduleInfos() []moduleapi.Info {
-	out := make([]moduleapi.Info, 0, len(b.modules))
-	for _, info := range b.modules {
+	modules := b.catalogSnapshot().modules
+	out := make([]moduleapi.Info, 0, len(modules))
+	for _, info := range modules {
 		info.Commands = append([]string(nil), info.Commands...)
 		out = append(out, info)
 	}
@@ -43,7 +44,7 @@ func (b *Bot) moduleInfos() []moduleapi.Info {
 }
 
 func (b *Bot) moduleInfo(moduleID string) (moduleapi.Info, bool) {
-	info, ok := b.modules[strings.TrimSpace(moduleID)]
+	info, ok := b.catalogSnapshot().modules[strings.TrimSpace(moduleID)]
 	return info, ok
 }
 
@@ -74,7 +75,7 @@ func (b *Bot) setModuleEnabled(ctx context.Context, moduleID string, enabled boo
 	if actorID != 0 {
 		state.UpdatedBy = &actorID
 	}
-	if err := b.store.ModuleStates().PutModuleState(ctx, state); err != nil {
+	if err := b.moduleStates.PutModuleState(ctx, state); err != nil {
 		return err
 	}
 	return b.reloadModules(ctx)
@@ -94,7 +95,7 @@ func (b *Bot) resetModule(ctx context.Context, moduleID string) error {
 		return fmt.Errorf("module %q is required and cannot be reset", moduleID)
 	}
 
-	if err := b.store.ModuleStates().DeleteModuleState(ctx, moduleID); err != nil {
+	if err := b.moduleStates.DeleteModuleState(ctx, moduleID); err != nil {
 		return err
 	}
 	return b.reloadModules(ctx)

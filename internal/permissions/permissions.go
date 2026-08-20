@@ -8,15 +8,18 @@ import (
 	"strings"
 )
 
+const SchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.json"
+
 // Permissions are host-enforced capabilities.
 //
 // Security model: a plugin can only do what it both (1) requests in plugin.json
 // and (2) is granted in the host permissions policy. Everything is denied by
 // default.
 type Permissions struct {
-	Storage StoragePermissions `json:"storage"`
-	Discord DiscordPermissions `json:"discord"`
-	Network NetworkPermissions `json:"network"`
+	Storage   StoragePermissions  `json:"storage"`
+	Discord   DiscordPermissions  `json:"discord"`
+	Network   NetworkPermissions  `json:"network"`
+	Resources ResourcePermissions `json:"resources"`
 
 	// Automation covers non-interaction triggers: scheduled jobs and gateway events.
 	Automation AutomationPermissions `json:"automation"`
@@ -49,6 +52,9 @@ type DiscordPermissions struct {
 type NetworkPermissions struct {
 	HTTP bool `json:"http"`
 }
+type ResourcePermissions struct {
+	Read bool `json:"read"`
+}
 
 type AutomationPermissions struct {
 	// Jobs allows scheduled triggers declared by a plugin manifest.
@@ -67,9 +73,9 @@ type AutomationEventPermissions struct {
 
 // Policy is a Claude-style central permissions file: defaults + per-plugin overrides.
 type Policy struct {
+	Schema   string                 `json:"$schema"`
 	Defaults Permissions            `json:"defaults"`
 	Plugins  map[string]Permissions `json:"plugins"`
-	Version  string                 `json:"version,omitempty"`
 }
 
 func LoadPolicyFile(path string) (Policy, error) {
@@ -90,6 +96,9 @@ func LoadPolicyFile(path string) (Policy, error) {
 	if unmarshalErr := json.Unmarshal(b, &p); unmarshalErr != nil {
 		return Policy{}, fmt.Errorf("parse permissions policy %q: %w", path, unmarshalErr)
 	}
+	if p.Schema != SchemaURL {
+		return Policy{}, fmt.Errorf("permissions policy $schema must be %q", SchemaURL)
+	}
 	if p.Plugins == nil {
 		p.Plugins = map[string]Permissions{}
 	}
@@ -101,6 +110,7 @@ func WritePolicyFile(path string, policy Policy) error {
 	if path == "" {
 		return fmt.Errorf("permissions policy path is required")
 	}
+	policy.Schema = SchemaURL
 	if policy.Plugins == nil {
 		policy.Plugins = map[string]Permissions{}
 	}
@@ -156,9 +166,8 @@ func Effective(requested, granted Permissions) Permissions {
 			Emojis:    requested.Discord.Emojis && granted.Discord.Emojis,
 			Stickers:  requested.Discord.Stickers && granted.Discord.Stickers,
 		},
-		Network: NetworkPermissions{
-			HTTP: requested.Network.HTTP && granted.Network.HTTP,
-		},
+		Network:   NetworkPermissions{HTTP: requested.Network.HTTP && granted.Network.HTTP},
+		Resources: ResourcePermissions{Read: requested.Resources.Read && granted.Resources.Read},
 		Automation: AutomationPermissions{
 			Jobs: requested.Automation.Jobs && granted.Automation.Jobs,
 			Events: AutomationEventPermissions{
@@ -192,6 +201,7 @@ func merge(base, override Permissions) Permissions {
 	out.Discord.Emojis = out.Discord.Emojis || override.Discord.Emojis
 	out.Discord.Stickers = out.Discord.Stickers || override.Discord.Stickers
 	out.Network.HTTP = out.Network.HTTP || override.Network.HTTP
+	out.Resources.Read = out.Resources.Read || override.Resources.Read
 	out.Automation.Jobs = out.Automation.Jobs || override.Automation.Jobs
 	out.Automation.Events.MemberJoinLeave = out.Automation.Events.MemberJoinLeave ||
 		override.Automation.Events.MemberJoinLeave

@@ -2,6 +2,7 @@ package marketplace_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
@@ -67,7 +69,7 @@ func TestManagerInstallAndForceUpdate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveBundleDir: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(targetDir, "plugin.lua"), []byte(`return { changed = true }`), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(targetDir, "plugin.star"), []byte(`return { changed = true }`), 0o644); err != nil {
 		t.Fatalf("WriteFile(local change): %v", err)
 	}
 	if pluginRoot == "" {
@@ -319,19 +321,30 @@ func newTestManager(t *testing.T, prod bool, bundleRepo ...bundles.Repository) (
 	return manager, storage, userDir
 }
 
-func writePlugin(t *testing.T, repoRoot, pluginID, name, version, pluginLua string) {
+func writePlugin(t *testing.T, repoRoot, pluginID, name, version, sourceMarker string) {
 	t.Helper()
 
 	dir := filepath.Join(repoRoot, pluginID)
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatalf("MkdirAll: %v", err)
 	}
-	manifest := fmt.Sprintf(`{"id":"%s","name":"%s","version":"%s"}`, pluginID, name, version)
-	if err := os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(manifest), 0o644); err != nil {
+	manifestBytes, err := json.Marshal(pluginhost.StarlarkManifest{Schema: pluginhost.StarlarkManifestSchema, ID: pluginID, Name: name, Version: version, Entrypoint: pluginhost.StarlarkEntrypoint, Permissions: pluginhost.StarlarkManifestPermissions{Network: pluginhost.StarlarkManifestNetworkPermissions{Hosts: []string{}}}, Locales: pluginhost.StarlarkManifestLocales{Default: "en-US", Supported: []string{"en-US"}}, StateKeys: []string{}, Assets: []string{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "plugin.json"), manifestBytes, 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "plugin.lua"), []byte(pluginLua), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	source := fmt.Sprintf("# %s\nload(\"@mamacord//api.star\", \"plugin\")\ndef setup(bot): pass\nPLUGIN = plugin(setup=setup)\n", sourceMarker)
+	localeDir := filepath.Join(dir, "locales", "en-US")
+	if err := os.MkdirAll(localeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(localeDir, "messages.json"), []byte("[]\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "plugin.star"), []byte(source), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 }
 

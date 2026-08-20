@@ -8,8 +8,10 @@ import (
 	"strings"
 )
 
+const ModulesSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/modules.schema.json"
+
 type ModulesFile struct {
-	Version  string                 `json:"version,omitempty"`
+	Schema   string                 `json:"$schema"`
 	Defaults ModuleDefaults         `json:"defaults,omitempty"`
 	Modules  map[string]ModuleEntry `json:"modules,omitempty"`
 }
@@ -42,6 +44,9 @@ func LoadModulesFile(path string) (ModulesFile, error) {
 	if err := json.Unmarshal(b, &file); err != nil {
 		return ModulesFile{}, fmt.Errorf("parse modules file %q: %w", path, err)
 	}
+	if file.Schema != ModulesSchemaURL {
+		return ModulesFile{}, fmt.Errorf("modules file $schema must be %q", ModulesSchemaURL)
+	}
 	if file.Modules == nil {
 		file.Modules = map[string]ModuleEntry{}
 	}
@@ -53,9 +58,7 @@ func WriteModulesFile(path string, file ModulesFile) error {
 	if path == "" {
 		return fmt.Errorf("modules file path is required")
 	}
-	if file.Version == "" {
-		file.Version = "1"
-	}
+	file.Schema = ModulesSchemaURL
 	if file.Modules == nil {
 		file.Modules = map[string]ModuleEntry{}
 	}

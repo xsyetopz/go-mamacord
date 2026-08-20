@@ -17,14 +17,15 @@ import (
 
 func (b *Bot) services(_ discord.Locale) commandruntime.Services {
 	s := commandruntime.Services{
-		Logger:   b.logger,
-		Store:    b.store,
-		ProdMode: b.prodMode,
-		IsOwner:  b.isOwner,
+		Logger:       b.logger,
+		Restrictions: b.restrictions,
+		ProdMode:     b.prodMode,
+		IsOwner:      b.isOwner,
 		HelpNames: func(locale string) []string {
 			t := commandtext.Translator{Registry: b.i18n, Locale: locale}
-			out := make([]string, 0, len(b.order)+len(b.pluginCommands))
-			for _, cmd := range b.order {
+			snapshot := b.catalogSnapshot()
+			out := make([]string, 0, len(snapshot.order)+len(snapshot.pluginCommands))
+			for _, cmd := range snapshot.order {
 				name := strings.TrimSpace(cmd.Name)
 				if strings.TrimSpace(cmd.NameID) != "" {
 					name = t.S(cmd.NameID, nil)
@@ -33,7 +34,7 @@ func (b *Bot) services(_ discord.Locale) commandruntime.Services {
 					out = append(out, name)
 				}
 			}
-			for name := range b.pluginCommands {
+			for name := range snapshot.pluginCommands {
 				out = append(out, name)
 			}
 			sort.Strings(out)
@@ -54,7 +55,7 @@ func (b *Bot) checkRestrictions(
 	e *events.ApplicationCommandInteractionCreate,
 	t commandtext.Translator,
 ) (bool, error) {
-	restrictions := b.store.Restrictions()
+	restrictions := b.restrictions
 
 	msgID := "err.restricted"
 	var msgData map[string]any

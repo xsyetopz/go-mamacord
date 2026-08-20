@@ -32,6 +32,9 @@ func (b *Bot) Start(ctx context.Context) error {
 
 func (b *Bot) Close(ctx context.Context) {
 	b.ready.Store(false)
+	if b.pluginHost != nil {
+		_ = b.pluginHost.Close(ctx)
+	}
 	if b.client != nil {
 		b.client.Close(ctx)
 	}

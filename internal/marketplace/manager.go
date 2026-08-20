@@ -550,11 +550,11 @@ func (m *Manager) scanSourceCandidates(ctx context.Context, source Source) ([]Pl
 			return nil
 		}
 		manifestPath := filepath.Join(path, "plugin.json")
-		luaPath := filepath.Join(path, "plugin.lua")
-		if !fileExists(manifestPath) || !fileExists(luaPath) {
+		entrypointPath := filepath.Join(path, pluginhost.StarlarkEntrypoint)
+		if !fileExists(manifestPath) || !fileExists(entrypointPath) {
 			return nil
 		}
-		manifest, err := pluginhost.ReadManifest(manifestPath)
+		manifest, err := pluginhost.ReadStarlarkManifest(manifestPath)
 		if err != nil {
 			return nil
 		}
@@ -562,7 +562,7 @@ func (m *Manager) scanSourceCandidates(ctx context.Context, source Source) ([]Pl
 			return fmt.Errorf("source %q contains duplicate plugin id %q in %s and %s", source.SourceID, manifest.ID, previous, path)
 		}
 		seen[manifest.ID] = path
-		state, signerKeyID := SignatureStateForDir(ctx, path, m.trustedKeysFile, m.store)
+		state, signerKeyID := SignatureStateForDir(ctx, path, m.trustedKeysFile, m.store.TrustedSigners())
 		out = append(out, PluginCandidate{
 			SourceID:       source.SourceID,
 			PluginID:       manifest.ID,
@@ -570,7 +570,7 @@ func (m *Manager) scanSourceCandidates(ctx context.Context, source Source) ([]Pl
 			Version:        manifest.Version,
 			SourcePath:     path,
 			GitRevision:    revision,
-			Commands:       manifestCommandNames(manifest.Commands),
+			Commands:       nil,
 			SignatureState: state,
 			SignerKeyID:    signerKeyID,
 			SyncError:      source.LastError,
@@ -807,7 +807,7 @@ func manifestCommandNames(cmds []pluginhost.Command) []string {
 	return out
 }
 
-func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, src pluginhost.TrustedSignerSource) (SignatureState, string) {
+func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, signers store.TrustedSignerStore) (SignatureState, string) {
 	sigPath := filepath.Join(dir, "signature.json")
 	if !fileExists(sigPath) {
 		return SignatureStateUnsigned, ""
@@ -816,7 +816,7 @@ func SignatureStateForDir(ctx context.Context, dir, trustedKeysFile string, src 
 	if err != nil {
 		return SignatureStateInvalid, ""
 	}
-	keys, err := pluginhost.LoadTrustedKeys(ctx, trustedKeysFile, src)
+	keys, err := pluginhost.LoadTrustedKeys(ctx, trustedKeysFile, signers)
 	if err != nil {
 		return SignatureStateInvalid, sig.KeyID
 	}

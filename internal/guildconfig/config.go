@@ -6,10 +6,10 @@ import (
 	"errors"
 	"sort"
 
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
-const KVKey = "__guild_config"
+const KVKey = "guild_config"
 
 type PluginConfig struct {
 	Enabled                  bool            `json:"enabled"`
@@ -68,16 +68,16 @@ func Default(pluginID string) PluginConfig {
 	return cfg
 }
 
-func Load(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string) (PluginConfig, error) {
+func Load(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string) (PluginConfig, error) {
 	cfg := Default(pluginID)
 	if guildID == 0 || pluginID == "" {
 		return cfg, nil
 	}
-	if store == nil || store.PluginKV() == nil {
+	if pluginKV == nil {
 		return cfg, errors.New("plugin kv store unavailable")
 	}
 
-	raw, ok, err := store.PluginKV().GetPluginKV(ctx, guildID, pluginID, KVKey)
+	raw, ok, err := pluginKV.GetPluginKV(ctx, guildID, pluginID, KVKey)
 	if err != nil {
 		return PluginConfig{}, err
 	}
@@ -120,11 +120,11 @@ func Load(ctx context.Context, store commandruntime.Store, guildID uint64, plugi
 	return Normalize(pluginID, cfg), nil
 }
 
-func Save(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
+func Save(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string, cfg PluginConfig) (PluginConfig, error) {
 	if guildID == 0 || pluginID == "" {
 		return PluginConfig{}, errors.New("invalid guild plugin config target")
 	}
-	if store == nil || store.PluginKV() == nil {
+	if pluginKV == nil {
 		return PluginConfig{}, errors.New("plugin kv store unavailable")
 	}
 
@@ -133,22 +133,22 @@ func Save(ctx context.Context, store commandruntime.Store, guildID uint64, plugi
 	if err != nil {
 		return PluginConfig{}, err
 	}
-	if err := store.PluginKV().PutPluginKV(ctx, guildID, pluginID, KVKey, string(body)); err != nil {
+	if err := pluginKV.PutPluginKV(ctx, guildID, pluginID, KVKey, string(body)); err != nil {
 		return PluginConfig{}, err
 	}
 	return cfg, nil
 }
 
-func PluginEnabled(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID string) (bool, error) {
-	cfg, err := Load(ctx, store, guildID, pluginID)
+func PluginEnabled(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID string) (bool, error) {
+	cfg, err := Load(ctx, pluginKV, guildID, pluginID)
 	if err != nil {
 		return false, err
 	}
 	return cfg.Enabled, nil
 }
 
-func CommandEnabled(ctx context.Context, store commandruntime.Store, guildID uint64, pluginID, commandName string) (bool, error) {
-	cfg, err := Load(ctx, store, guildID, pluginID)
+func CommandEnabled(ctx context.Context, pluginKV store.PluginKVStore, guildID uint64, pluginID, commandName string) (bool, error) {
+	cfg, err := Load(ctx, pluginKV, guildID, pluginID)
 	if err != nil {
 		return false, err
 	}

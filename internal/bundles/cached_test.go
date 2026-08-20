@@ -28,8 +28,8 @@ func TestCachedRepositoryMaterializeBundleStoresArtifactAndResolvesActiveCache(t
 	if err := os.WriteFile(filepath.Join(srcDir, "plugin.json"), []byte(`{"id":"sample","name":"Sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(srcDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	rootDir := filepath.Join(tmp, "plugins", "sample")
@@ -88,8 +88,8 @@ func TestCachedRepositoryResolveActiveDirUsesRootBundleAsSource(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.json"), []byte(`{"id":"sample","name":"Sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 	if err := repo.WriteState(rootDir, bundles.State{
 		ActiveRelativeDir: bundleRel,

@@ -8,28 +8,31 @@ import (
 	"github.com/disgoorg/disgo/events"
 
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/appcmd"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
 )
 
 func (b *Bot) commandRegistrar() appcmd.Registrar {
+	snapshot := b.catalogSnapshot()
 	return appcmd.Registrar{
 		Client:           b.client,
-		Builtins:         b.order,
+		Builtins:         snapshot.order,
 		PluginHost:       b.pluginHost,
-		EnabledPluginIDs: b.enabledPluginIDsForHost(b.pluginHost),
+		EnabledPluginIDs: enabledPluginIDsForHost(snapshot, b.pluginHost),
 		I18n:             b.i18n,
 	}
 }
 
 func (b *Bot) commandDispatcher() appcmd.Dispatcher {
+	snapshot := b.catalogSnapshot()
 	return appcmd.Dispatcher{
 		Logger:                b.logger,
 		I18n:                  b.i18n,
 		ProdMode:              b.prodMode,
-		Commands:              b.commands,
-		PluginCommands:        b.pluginCommands,
-		PluginUserCommands:    b.pluginUserCommands,
-		PluginMessageCommands: b.pluginMessageCommands,
+		Commands:              snapshot.commands,
+		PluginCommands:        snapshot.pluginCommands,
+		PluginUserCommands:    snapshot.pluginUserCommands,
+		PluginMessageCommands: snapshot.pluginMessageCommands,
 		Services:              b.services,
 		CheckRestrictions:     b.checkRestrictions,
 		TakeSlashCooldown:     b.takeSlashCooldown,
@@ -41,11 +44,13 @@ func (b *Bot) commandDispatcher() appcmd.Dispatcher {
 }
 
 func (b *Bot) onCommand(e *events.ApplicationCommandInteractionCreate) {
-	b.commandDispatcher().OnCommand(e)
+	b.launchInteraction("command", func() { b.commandDispatcher().OnCommand(e) }, func() {
+		_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindWarning, "", "Mamacord is busy. Try again in a moment.", true))
+	})
 }
 
 func (b *Bot) onAutocomplete(e *events.AutocompleteInteractionCreate) {
-	b.commandDispatcher().OnAutocomplete(e)
+	b.launchInteraction("autocomplete", func() { b.commandDispatcher().OnAutocomplete(e) }, func() { _ = e.AutocompleteResult(nil) })
 }
 
 func (b *Bot) commandCreates(_ []string) []discord.ApplicationCommandCreate {

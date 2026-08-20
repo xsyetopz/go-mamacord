@@ -1,18 +1,84 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
-  "id": "manager",
-  "name": "Manager",
-  "version": "0.1.0",
-  "permissions": {
-    "storage": {
-      "kv": true
-    },
-    "discord": {
-      "channels": true,
-      "messages": true,
-      "roles": true,
-      "emojis": true,
-      "stickers": true
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.json",
+	"id": "manager",
+	"name": "Manager",
+	"version": "0.1.0",
+	"entrypoint": "plugin.star",
+	"permissions": {
+		"storage": {
+			"kv": false,
+			"user_settings": false,
+			"checkins": false,
+			"reminders": false,
+			"warnings": false,
+			"audit": false
+		},
+		"discord": {
+			"users": false,
+			"guilds": false,
+			"channels": true,
+			"messages": true,
+			"reactions": false,
+			"members": true,
+			"roles": true,
+			"threads": false,
+			"invites": false,
+			"webhooks": false,
+			"emojis": true,
+			"stickers": true
+		},
+		"network": {
+			"http": false,
+			"hosts": []
+		},
+		"resources": {
+			"read": false
+		},
+		"automation": {
+			"jobs": false,
+			"events": {
+				"member_join_leave": false,
+				"moderation": false
+			}
+		}
+	},
+	"locales": {
+		"default": "en-US",
+		"supported": [
+			"bg",
+			"cs",
+			"da",
+			"de",
+			"el",
+			"en-GB",
+			"en-US",
+			"es-419",
+			"es-ES",
+			"fi",
+			"fr",
+			"hi",
+			"hr",
+			"hu",
+			"id",
+			"it",
+			"ja",
+			"ko",
+			"lt",
+			"nl",
+			"no",
+			"pl",
+			"pt-BR",
+			"ro",
+			"ru",
+			"sv-SE",
+			"th",
+			"tr",
+			"uk",
+			"vi",
+			"zh-CN",
+			"zh-TW"
+		]
+	},
+	"assets": [],
+	"state_keys": []
 }

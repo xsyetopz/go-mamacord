@@ -35,7 +35,7 @@ func RuntimeStats(
 		if info.Enabled {
 			stats.EnabledModuleCount++
 		}
-		if info.Runtime != moduleapi.RuntimeLua {
+		if info.Runtime != moduleapi.RuntimeStarlark {
 			continue
 		}
 		stats.PluginCount++

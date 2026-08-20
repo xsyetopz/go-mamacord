@@ -3,17 +3,16 @@ package postgresstore_test
 import (
 	"context"
 	"database/sql"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
-
-var _ commandruntime.Store = (*postgresstore.Store)(nil)
 
 func mustNoErr(t *testing.T, err error, msg string) {
 	t.Helper()
@@ -455,5 +454,63 @@ func TestPostgresRuntimePersistenceParity(t *testing.T) {
 	mustNoErr(t, err, "CountPluginOAuthGrants(after delete)")
 	if grantCount != 1 {
 		t.Fatalf("unexpected plugin oauth grant count after delete: %d", grantCount)
+	}
+}
+
+func TestCanonicalPluginConfigMigrationAndVersionedCAS(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	db := postgrestest.OpenMigratedDB(t)
+	t.Cleanup(func() { _ = db.Close() })
+	if _, err := db.ExecContext(ctx, `INSERT INTO plugin_kv(guild_id,plugin_id,key,value_json,updated_at) VALUES(991,'moderation','__guild_config','{"enabled":false}',1)`); err != nil {
+		t.Fatal(err)
+	}
+	migration, err := os.ReadFile(filepath.Join("..", "..", "..", "migrations", "postgres", "009_canonical_plugin_config_key.up.sql"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = db.ExecContext(ctx, string(migration)); err != nil {
+		t.Fatal(err)
+	}
+	var value string
+	var version uint64
+	if err = db.QueryRowContext(ctx, `SELECT value_json,version FROM plugin_kv WHERE guild_id=991 AND plugin_id='moderation' AND key='guild_config'`).Scan(&value, &version); err != nil {
+		t.Fatal(err)
+	}
+	if value != "{\"enabled\":false}" || version != 1 {
+		t.Fatalf("value=%q version=%d", value, version)
+	}
+	var oldCount int
+	if err = db.QueryRowContext(ctx, `SELECT count(*) FROM plugin_kv WHERE guild_id=991 AND plugin_id='moderation' AND key='__guild_config'`).Scan(&oldCount); err != nil || oldCount != 0 {
+		t.Fatalf("old rows=%d err=%v", oldCount, err)
+	}
+	storage, err := postgresstore.New(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	kv := storage.PluginKV().(store.VersionedPluginKVStore)
+	next, swapped, err := kv.CompareAndSwapPluginKV(ctx, 992, "example", "counter", "1", 0)
+	if err != nil || !swapped || next != 1 {
+		t.Fatalf("initial CAS next=%d swapped=%v err=%v", next, swapped, err)
+	}
+	if _, swapped, err = kv.CompareAndSwapPluginKV(ctx, 992, "example", "counter", "2", 0); err != nil || swapped {
+		t.Fatalf("stale insert swapped=%v err=%v", swapped, err)
+	}
+	next, swapped, err = kv.CompareAndSwapPluginKV(ctx, 992, "example", "counter", "2", 1)
+	if err != nil || !swapped || next != 2 {
+		t.Fatalf("update CAS next=%d swapped=%v err=%v", next, swapped, err)
+	}
+	if err = kv.PutPluginKV(ctx, 992, "example", "counter", "3"); err != nil {
+		t.Fatal(err)
+	}
+	got, ok, err := kv.GetPluginKVVersioned(ctx, 992, "example", "counter")
+	if err != nil || !ok || got.ValueJSON != "3" || got.Version != 3 {
+		t.Fatalf("get=%#v ok=%v err=%v", got, ok, err)
+	}
+	if deleted, err := kv.DeletePluginKVVersion(ctx, 992, "example", "counter", 2); err != nil || deleted {
+		t.Fatalf("stale delete=%v err=%v", deleted, err)
+	}
+	if deleted, err := kv.DeletePluginKVVersion(ctx, 992, "example", "counter", 3); err != nil || !deleted {
+		t.Fatalf("delete=%v err=%v", deleted, err)
 	}
 }

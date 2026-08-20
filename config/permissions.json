@@ -1,6 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.v1.json",
-	"version": "1",
+	"$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/permissions.schema.json",
 	"defaults": {
 		"storage": {
 			"kv": false,
@@ -27,6 +26,9 @@
 		"network": {
 			"http": false
 		},
+		"resources": {
+			"read": false
+		},
 		"automation": {
 			"jobs": false,
 			"events": {
@@ -43,7 +45,7 @@
 		},
 		"fun": {
 			"storage": {
-				"kv": true
+				"kv": false
 			},
 			"network": {
 				"http": true
@@ -70,7 +72,7 @@
 		},
 		"info": {
 			"storage": {
-				"kv": true
+				"kv": false
 			},
 			"discord": {
 				"users": true,
@@ -80,14 +82,15 @@
 		},
 		"manager": {
 			"storage": {
-				"kv": true
+				"kv": false
 			},
 			"discord": {
 				"channels": true,
 				"messages": true,
 				"roles": true,
 				"emojis": true,
-				"stickers": true
+				"stickers": true,
+				"members": true
 			}
 		}
 	}

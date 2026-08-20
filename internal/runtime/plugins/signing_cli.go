@@ -15,8 +15,8 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 )
 
-const SignatureSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.v1.json"
-const TrustedKeysSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/trusted_keys.schema.v1.json"
+const SignatureSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.json"
+const TrustedKeysSchemaURL = "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/trusted_keys.schema.json"
 
 func GenerateEd25519Key() (ed25519.PublicKey, ed25519.PrivateKey, error) {
 	return ed25519.GenerateKey(rand.Reader)
@@ -74,15 +74,20 @@ func WriteEd25519PrivateKeyFile(path string, privateKey ed25519.PrivateKey) erro
 }
 
 func UpsertTrustedKeyFile(path string, key TrustedKey) error {
-	if strings.TrimSpace(key.KeyID) == "" {
-		return errors.New("trusted key id is required")
+	key.KeyID = strings.TrimSpace(key.KeyID)
+	key.PublicKeyB64 = strings.TrimSpace(key.PublicKeyB64)
+	if !signerKeyIDPattern.MatchString(key.KeyID) {
+		return errors.New("trusted key id is invalid")
 	}
-	if strings.TrimSpace(key.PublicKeyB64) == "" {
-		return errors.New("trusted public key is required")
+	if _, err := decodeEd25519PublicKey(key.PublicKeyB64); err != nil {
+		return fmt.Errorf("trusted public key is invalid: %w", err)
 	}
 
-	payload := TrustedKeys{Keys: []TrustedKey{}}
+	payload := TrustedKeys{Schema: TrustedKeysSchemaURL, Keys: []TrustedKey{}}
 	if bytes, err := os.ReadFile(path); err == nil {
+		if _, validationErr := ReadTrustedKeysFile(path); validationErr != nil {
+			return validationErr
+		}
 		if unmarshalErr := json.Unmarshal(bytes, &payload); unmarshalErr != nil {
 			return fmt.Errorf("parse trusted keys file: %w", unmarshalErr)
 		}
@@ -107,7 +112,6 @@ func UpsertTrustedKeyFile(path string, key TrustedKey) error {
 
 	bytes, err := json.MarshalIndent(map[string]any{
 		"$schema": TrustedKeysSchemaURL,
-		"version": "1",
 		"keys":    payload.Keys,
 	}, "", "  ")
 	if err != nil {
@@ -137,6 +141,7 @@ func SignDir(dir string, keyID string, privateKey ed25519.PrivateKey) (Signature
 	}
 
 	sig := Signature{
+		Schema:       SignatureSchemaURL,
 		KeyID:        strings.TrimSpace(keyID),
 		HashB64:      base64.StdEncoding.EncodeToString(hash[:]),
 		SignatureB64: base64.StdEncoding.EncodeToString(ed25519.Sign(privateKey, hash[:])),

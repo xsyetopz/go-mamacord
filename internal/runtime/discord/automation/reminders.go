@@ -10,7 +10,6 @@ import (
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/snowflake/v2"
 
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
@@ -32,21 +31,22 @@ type DMEnsurer interface {
 }
 
 type Reminders struct {
-	Logger     *slog.Logger
-	I18n       i18n.Registry
-	Store      commandruntime.Store
-	Client     *bot.Client
-	DMChannels DMEnsurer
-	IncFailure func()
+	Logger        *slog.Logger
+	I18n          i18n.Registry
+	ReminderStore store.ReminderStore
+	UserSettings  store.UserSettingsStore
+	Client        *bot.Client
+	DMChannels    DMEnsurer
+	IncFailure    func()
 }
 
 func (r Reminders) PollDue(ctx context.Context, leaseID string) {
-	if r.Client == nil || r.Store == nil {
+	if r.Client == nil || r.ReminderStore == nil {
 		return
 	}
 
 	now := time.Now().UTC()
-	reminders, err := r.Store.Reminders().ClaimDueReminders(
+	reminders, err := r.ReminderStore.ClaimDueReminders(
 		ctx,
 		now,
 		leaseID,
@@ -129,17 +129,17 @@ func (r Reminders) finish(
 	failureCount int,
 	enabled bool,
 ) error {
-	if r.Store == nil {
+	if r.ReminderStore == nil {
 		return errors.New("store not configured")
 	}
-	return r.Store.Reminders().FinishReminderRun(ctx, reminder.ID, leaseID, lastRunAt, nextRunAt, failureCount, enabled)
+	return r.ReminderStore.FinishReminderRun(ctx, reminder.ID, leaseID, lastRunAt, nextRunAt, failureCount, enabled)
 }
 
 func (r Reminders) userLocation(ctx context.Context, userID uint64) *time.Location {
-	if r.Store == nil {
+	if r.UserSettings == nil {
 		return time.UTC
 	}
-	settings, ok, err := r.Store.UserSettings().GetUserSettings(ctx, userID)
+	settings, ok, err := r.UserSettings.GetUserSettings(ctx, userID)
 	if err == nil && ok && strings.TrimSpace(settings.Timezone) != "" {
 		if loc, _, loadErr := timezone.LoadLocation(settings.Timezone); loadErr == nil {
 			return loc

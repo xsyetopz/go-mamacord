@@ -7,17 +7,20 @@ import (
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 )
 
-func (b *Bot) enabledPluginIDsForHost(host *pluginhost.Host) map[string]struct{} {
+func enabledPluginIDsForHost(snapshot *runtimeCatalog, host *pluginhost.Host) map[string]struct{} {
 	if host == nil {
 		return nil
 	}
 
 	out := map[string]struct{}{}
-	for moduleID, route := range b.pluginRoutes {
+	if snapshot == nil {
+		return out
+	}
+	for moduleID, route := range snapshot.pluginRoutes {
 		if route.Host != host {
 			continue
 		}
-		info, ok := b.modules[moduleID]
+		info, ok := snapshot.modules[moduleID]
 		if !ok || !info.Enabled {
 			continue
 		}
@@ -27,7 +30,7 @@ func (b *Bot) enabledPluginIDsForHost(host *pluginhost.Host) map[string]struct{}
 }
 
 func (b *Bot) pluginRoute(pluginID string) (discordpluginbridge.Route, bool) {
-	route, ok := b.pluginRoutes[strings.TrimSpace(pluginID)]
+	route, ok := b.catalogSnapshot().pluginRoutes[strings.TrimSpace(pluginID)]
 	return route, ok
 }
 

@@ -11,11 +11,9 @@ import (
 	"testing"
 	"time"
 
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
-	store "github.com/xsyetopz/go-mamacord/internal/storage"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
@@ -111,20 +109,15 @@ func TestStartControlOnlyUsesLivePostgres(t *testing.T) {
 		errCh <- app.Start(ctx)
 	}()
 
-	deadline := time.Now().Add(5 * time.Second)
-	for app.store == nil || app.migrationVersion == 0 {
-		if time.Now().After(deadline) {
-			t.Fatalf("app did not finish Postgres startup before deadline: store=%v version=%d", app.store != nil, app.migrationVersion)
-		}
-		select {
-		case err := <-errCh:
-			t.Fatalf("Start returned before startup completed: %v", err)
-		default:
-			time.Sleep(10 * time.Millisecond)
-		}
+	select {
+	case <-app.startupComplete:
+	case err := <-errCh:
+		t.Fatalf("Start returned before startup completed: %v", err)
+	case <-time.After(5 * time.Second):
+		t.Fatal("app did not finish Postgres startup before deadline")
 	}
 
-	if app.migrationVersion != 8 {
+	if app.migrationVersion != 9 {
 		t.Fatalf("unexpected migration version: %d", app.migrationVersion)
 	}
 
@@ -555,7 +548,7 @@ func TestAppCloseClosesAbstractStore(t *testing.T) {
 
 	var closed atomic.Bool
 	app := &App{
-		store: fakeAppStore{
+		storeCloser: fakeAppStore{
 			closeFn: func() error {
 				closed.Store(true)
 				return nil
@@ -599,24 +592,3 @@ func (f fakeAppStore) Close() error {
 	}
 	return nil
 }
-
-func (fakeAppStore) Restrictions() store.RestrictionStore                     { return nil }
-func (fakeAppStore) Warnings() store.WarningStore                             { return nil }
-func (fakeAppStore) Audit() store.AuditStore                                  { return nil }
-func (fakeAppStore) TrustedSigners() store.TrustedSignerStore                 { return nil }
-func (fakeAppStore) MarketplaceSources() store.MarketplaceSourceStore         { return nil }
-func (fakeAppStore) MarketplaceSourceSyncs() store.MarketplaceSourceSyncStore { return nil }
-func (fakeAppStore) PluginInstalls() store.PluginInstallStore                 { return nil }
-func (fakeAppStore) TrustedVendors() store.TrustedVendorStore                 { return nil }
-func (fakeAppStore) TrustedVendorKeys() store.TrustedVendorKeyStore           { return nil }
-func (fakeAppStore) AdminSessions() store.AdminSessionStore                   { return nil }
-func (fakeAppStore) PluginKV() store.PluginKVStore                            { return nil }
-func (fakeAppStore) ModuleStates() store.ModuleStateStore                     { return nil }
-func (fakeAppStore) Users() store.UserStore                                   { return nil }
-func (fakeAppStore) Guilds() store.GuildStore                                 { return nil }
-func (fakeAppStore) GuildMembers() store.GuildMemberStore                     { return nil }
-func (fakeAppStore) UserSettings() store.UserSettingsStore                    { return nil }
-func (fakeAppStore) Reminders() store.ReminderStore                           { return nil }
-func (fakeAppStore) CheckIns() store.CheckInStore                             { return nil }
-
-var _ commandruntime.Store = fakeAppStore{}

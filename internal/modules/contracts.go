@@ -12,8 +12,8 @@ const (
 type Runtime string
 
 const (
-	RuntimeGo  Runtime = "go"
-	RuntimeLua Runtime = "lua"
+	RuntimeGo       Runtime = "go"
+	RuntimeStarlark Runtime = "starlark"
 )
 
 type Info struct {

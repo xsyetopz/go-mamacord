@@ -70,3 +70,13 @@ func TestDiscordCDNFetcher_EnforcesSizeLimit(t *testing.T) {
 type roundTripperFunc func(*http.Request) (*http.Response, error)
 
 func (f roundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+func TestDiscordCDNFetcherRejectsNoncanonicalAuthority(t *testing.T) {
+	t.Parallel()
+	fetcher := cdn.NewDiscordCDNFetcher()
+	for _, raw := range []string{"https://user@cdn.discordapp.com/x", "https://cdn.discordapp.com:444/x", "https://cdn.discordapp.com/x#fragment"} {
+		if _, err := fetcher.Fetch(context.Background(), raw, 10); err == nil {
+			t.Errorf("accepted %q", raw)
+		}
+	}
+}

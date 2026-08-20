@@ -1,0 +1,29 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.json",
+	"title": "mamacord plugin signature",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"const": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/signature.schema.json"
+		},
+		"key_id": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+		},
+		"hash_b64": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9+/]{43}=$"
+		},
+		"signature_b64": {
+			"type": "string",
+			"pattern": "^[A-Za-z0-9+/]{86}==$"
+		},
+		"algorithm": {
+			"type": "string",
+			"enum": ["ed25519-sha256"]
+		}
+	},
+	"required": ["$schema", "key_id", "hash_b64", "signature_b64", "algorithm"]
+}

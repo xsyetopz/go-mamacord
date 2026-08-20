@@ -226,8 +226,8 @@ func TestRunSignPluginCommand_ResolvesActiveBundleDir(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.json"), []byte(`{"id":"sample","name":"sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(bundleDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 	if err := bundles.NewLocalRepository().WriteState(pluginRoot, bundles.State{
 		ActiveRelativeDir: bundleRel,
@@ -286,8 +286,8 @@ func TestRunSignPluginCommand_RejectsFlatPluginRoot(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(pluginRoot, "plugin.json"), []byte(`{"id":"flat","name":"flat","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(pluginRoot, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(pluginRoot, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	_, privateKey, err := pluginhost.GenerateEd25519Key()
@@ -335,8 +335,8 @@ func TestRunSignPluginCommand_UsesConfiguredCachedBundleRepositoryArtifactDir(t 
 	if err := os.WriteFile(filepath.Join(srcDir, "plugin.json"), []byte(`{"id":"sample","name":"sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(srcDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	pluginRoot := filepath.Join(dir, "plugins", "sample")
@@ -411,8 +411,8 @@ func TestRunSignPluginCommand_UsesConfiguredObjectStoreBundleRepositoryArtifactD
 	if err := os.WriteFile(filepath.Join(srcDir, "plugin.json"), []byte(`{"id":"sample","name":"sample","version":"0.1.0"}`), 0o644); err != nil {
 		t.Fatalf("WriteFile(plugin.json): %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "plugin.lua"), []byte(`return {}`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(srcDir, "plugin.star"), []byte(`return {}`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	pluginRoot := filepath.Join(dir, "plugins", "sample")

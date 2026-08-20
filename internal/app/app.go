@@ -13,13 +13,13 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/adminapi"
 	"github.com/xsyetopz/go-mamacord/internal/buildinfo"
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/marketplace"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	discordplatform "github.com/xsyetopz/go-mamacord/internal/runtime/discord"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 	"github.com/xsyetopz/go-mamacord/internal/storagebootstrap"
 )
 
@@ -33,11 +33,6 @@ var (
 	}
 )
 
-type appStore interface {
-	commandruntime.Store
-	Close() error
-}
-
 type Dependencies struct {
 	Logger *slog.Logger
 	Config config.Config
@@ -47,7 +42,8 @@ type App struct {
 	logger *slog.Logger
 	cfg    config.Config
 
-	store       appStore
+	store       *postgresstore.Store
+	storeCloser interface{ Close() error }
 	bundleRepo  bundles.Repository
 	marketplace *marketplace.Manager
 	i18n        i18n.Registry
@@ -60,6 +56,7 @@ type App struct {
 	migrationVersion int
 
 	discordStartErr atomic.Pointer[string]
+	startupComplete chan struct{}
 }
 
 type startupSequence struct {
@@ -88,9 +85,10 @@ func New(deps Dependencies) (*App, error) {
 	}
 
 	return &App{
-		logger:  deps.Logger,
-		cfg:     deps.Config,
-		metrics: ops.NewMetrics(),
+		logger:          deps.Logger,
+		cfg:             deps.Config,
+		metrics:         ops.NewMetrics(),
+		startupComplete: make(chan struct{}),
 	}, nil
 }
 
@@ -140,6 +138,9 @@ func (a *App) Start(ctx context.Context) error {
 			return a.keepControlPlaneRunning(ctx, phase, err)
 		}
 		return err
+	}
+	if a.startupComplete != nil {
+		close(a.startupComplete)
 	}
 
 	<-ctx.Done()
@@ -234,8 +235,8 @@ func (a *App) Close() error {
 	if a.bot != nil {
 		a.bot.Close(context.Background())
 	}
-	if a.store != nil {
-		return a.store.Close()
+	if a.storeCloser != nil {
+		return a.storeCloser.Close()
 	}
 	return nil
 }
@@ -249,6 +250,7 @@ func (a *App) initStorage(ctx context.Context) error {
 		return err
 	}
 	a.store = store
+	a.storeCloser = store
 	a.migrationVersion = version
 	return nil
 }
@@ -363,7 +365,7 @@ func (a *App) initDiscordBot() error {
 }
 
 func (a *App) discordBotDependencies() discordplatform.Dependencies {
-	return discordplatform.Dependencies{
+	deps := discordplatform.Dependencies{
 		Logger: a.logger,
 		Token:  a.cfg.DiscordToken,
 
@@ -390,10 +392,21 @@ func (a *App) discordBotDependencies() discordplatform.Dependencies {
 		SlashCooldownOverrides: a.cfg.SlashCooldownOverrides,
 
 		I18n:        a.i18n,
-		Store:       a.store,
 		Metrics:     a.metrics,
 		Marketplace: a.marketplace,
 	}
+	if a.store != nil {
+		deps.Restrictions = a.store.Restrictions()
+		deps.PluginKV = a.store.PluginKV()
+		deps.ModuleStates = a.store.ModuleStates()
+		deps.UserSettings = a.store.UserSettings()
+		deps.Reminders = a.store.Reminders()
+		deps.Guilds = a.store.Guilds()
+		deps.Users = a.store.Users()
+		deps.GuildMembers = a.store.GuildMembers()
+		deps.PluginStore = a.store
+	}
+	return deps
 }
 
 func (a *App) initOpsServer() error {
@@ -429,7 +442,7 @@ func (a *App) initAdminServer() error {
 		ClientSecret:  a.cfg.DashboardClientSecret,
 		OAuthClient:   oauthClient,
 		SessionStore:  a.store.AdminSessions(),
-		Service: adminapi.Service{
+		Service: &adminapi.Service{
 			Logger:              a.logger,
 			Config:              a.cfg,
 			Bundles:             a.bundleRepo,
@@ -437,7 +450,11 @@ func (a *App) initAdminServer() error {
 			ModuleAdmin:         adminModuleAdmin{app: a},
 			PluginAdmin:         adminPluginAdmin{app: a},
 			Marketplace:         a.marketplace,
-			Store:               a.store,
+			PluginKV:            a.store.PluginKV(),
+			Warnings:            a.store.Warnings(),
+			Audit:               a.store.Audit(),
+			TrustedSigners:      a.store.TrustedSigners(),
+			PluginInstalls:      a.store.PluginInstalls(),
 			BuildInfo:           buildinfo.Current,
 			OAuth:               oauthClient,
 			OwnerStatus:         a.ownerStatus,

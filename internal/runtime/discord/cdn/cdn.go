@@ -88,7 +88,7 @@ func isAllowedDiscordCDNURL(u *url.URL) bool {
 	if u == nil {
 		return false
 	}
-	if strings.ToLower(strings.TrimSpace(u.Scheme)) != "https" {
+	if strings.ToLower(strings.TrimSpace(u.Scheme)) != "https" || u.User != nil || u.Fragment != "" || u.Port() != "" && u.Port() != "443" {
 		return false
 	}
 	host := strings.ToLower(strings.TrimSpace(u.Hostname()))

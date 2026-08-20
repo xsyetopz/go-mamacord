@@ -4,19 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	migrate "github.com/xsyetopz/go-mamacord/internal/migration"
 	"github.com/xsyetopz/go-mamacord/internal/postgres"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
 
-type RuntimeStore interface {
-	commandruntime.Store
-	Close() error
-}
-
-func OpenRuntimeStore(ctx context.Context, cfg config.Config) (RuntimeStore, int, error) {
+func OpenRuntimeStore(ctx context.Context, cfg config.Config) (*postgresstore.Store, int, error) {
 	switch cfg.StorageBackend {
 	case "", config.StorageBackendPostgres:
 		return openPostgresRuntimeStore(ctx, cfg)
@@ -67,7 +61,7 @@ func MigrateUp(ctx context.Context, cfg config.Config) (migrate.Status, error) {
 	}
 }
 
-func openPostgresRuntimeStore(ctx context.Context, cfg config.Config) (RuntimeStore, int, error) {
+func openPostgresRuntimeStore(ctx context.Context, cfg config.Config) (*postgresstore.Store, int, error) {
 	db, err := postgres.Open(ctx, postgres.Options{DSN: cfg.PostgresDSN})
 	if err != nil {
 		return nil, 0, err

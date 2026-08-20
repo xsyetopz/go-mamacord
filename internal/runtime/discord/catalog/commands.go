@@ -31,11 +31,10 @@ func CommandCreates(opts CommandCreateOptions) []discord.ApplicationCommandCreat
 	return append(
 		creates,
 		opts.PluginHost.CommandCreatesFiltered(opts.EnabledPluginIDs, opts.Locales, func(pluginID, locale, messageID string) (string, bool) {
-			return opts.I18n.TryLocalize(i18n.Config{
-				Locale:    locale,
-				PluginID:  pluginID,
-				MessageID: messageID,
-			})
+			if localized, ok := opts.PluginHost.TryLocalize(pluginID, locale, messageID); ok {
+				return localized, true
+			}
+			return opts.I18n.TryLocalize(i18n.Config{Locale: locale, PluginID: pluginID, MessageID: messageID})
 		})...,
 	)
 }

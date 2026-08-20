@@ -3,7 +3,6 @@ package buildinfo
 import "testing"
 
 func TestCurrentNormalizesUnknownValues(t *testing.T) {
-	t.Parallel()
 
 	prevVersion := Version
 	prevRepository := Repository
@@ -51,7 +50,6 @@ func TestCurrentNormalizesUnknownValues(t *testing.T) {
 }
 
 func TestCurrentUsesBase64DescriptionOverride(t *testing.T) {
-	t.Parallel()
 
 	prevDescription := Description
 	prevDescriptionBase64 := DescriptionBase64
@@ -70,7 +68,6 @@ func TestCurrentUsesBase64DescriptionOverride(t *testing.T) {
 }
 
 func TestCurrentFallsBackWhenBase64DescriptionInvalid(t *testing.T) {
-	t.Parallel()
 
 	prevDescription := Description
 	prevDescriptionBase64 := DescriptionBase64

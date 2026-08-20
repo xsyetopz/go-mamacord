@@ -1,11 +1,51 @@
 {
-  "$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.v1.json",
-  "id": "example",
-  "name": "Example",
-  "version": "0.1.0",
-  "permissions": {
-    "storage": {
-      "kv": true
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/xsyetopz/go-mamacord/refs/heads/main/schemas/plugin.schema.json",
+	"id": "example",
+	"name": "Example",
+	"version": "0.1.0",
+	"entrypoint": "plugin.star",
+	"permissions": {
+		"storage": {
+			"kv": true,
+			"user_settings": false,
+			"checkins": false,
+			"reminders": false,
+			"warnings": false,
+			"audit": false
+		},
+		"discord": {
+			"users": false,
+			"guilds": false,
+			"channels": false,
+			"messages": false,
+			"reactions": false,
+			"members": false,
+			"roles": false,
+			"threads": false,
+			"invites": false,
+			"webhooks": false,
+			"emojis": false,
+			"stickers": false
+		},
+		"network": {
+			"http": false,
+			"hosts": []
+		},
+		"resources": {
+			"read": false
+		},
+		"automation": {
+			"jobs": false,
+			"events": {
+				"member_join_leave": false,
+				"moderation": false
+			}
+		}
+	},
+	"locales": {
+		"default": "en-US",
+		"supported": ["en-GB", "en-US"]
+	},
+	"assets": [],
+	"state_keys": ["counter"]
 }

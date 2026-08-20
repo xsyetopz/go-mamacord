@@ -14,12 +14,13 @@ func (b *Bot) pollReminders(ctx context.Context, leaseID string) {
 
 func (b *Bot) reminders() discordautomation.Reminders {
 	return discordautomation.Reminders{
-		Logger:     b.logger,
-		I18n:       b.i18n,
-		Store:      b.store,
-		Client:     b.client,
-		DMChannels: b,
-		IncFailure: b.incReminderFailure,
+		Logger:        b.logger,
+		I18n:          b.i18n,
+		ReminderStore: b.reminderStore,
+		UserSettings:  b.userSettings,
+		Client:        b.client,
+		DMChannels:    b,
+		IncFailure:    b.incReminderFailure,
 	}
 }
 
@@ -28,7 +29,7 @@ func (b *Bot) EnsureDMChannel(ctx context.Context, userID uint64) (uint64, error
 }
 
 func (b *Bot) ensureDMChannel(ctx context.Context, userID uint64) (uint64, error) {
-	settingsStore := b.store.UserSettings()
+	settingsStore := b.userSettings
 	setting, ok, err := settingsStore.GetUserSettings(ctx, userID)
 	if err != nil {
 		return 0, err

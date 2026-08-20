@@ -8,8 +8,8 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/adminapi"
 	commandruntime "github.com/xsyetopz/go-mamacord/internal/commandruntime"
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
+	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
-	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
 )
 
 type adminModuleAdmin struct{ app *App }
@@ -249,16 +249,16 @@ func (a *App) timeoutMember(ctx context.Context, guildID, userID uint64, untilUn
 	return a.bot.TimeoutMember(ctx, guildID, userID, untilUnix)
 }
 
-func (a *App) createRole(ctx context.Context, spec pluginhostlua.RoleCreateSpec) (pluginhostlua.RoleResult, error) {
+func (a *App) createRole(ctx context.Context, spec discordcontrol.RoleCreateSpec) (discordcontrol.RoleResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.RoleResult{}, liveDiscordUnavailable("role control")
+		return discordcontrol.RoleResult{}, liveDiscordUnavailable("role control")
 	}
 	return a.bot.CreateRole(ctx, spec)
 }
 
-func (a *App) editRole(ctx context.Context, spec pluginhostlua.RoleEditSpec) (pluginhostlua.RoleResult, error) {
+func (a *App) editRole(ctx context.Context, spec discordcontrol.RoleEditSpec) (discordcontrol.RoleResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.RoleResult{}, liveDiscordUnavailable("role control")
+		return discordcontrol.RoleResult{}, liveDiscordUnavailable("role control")
 	}
 	return a.bot.EditRole(ctx, spec)
 }
@@ -270,63 +270,63 @@ func (a *App) deleteRole(ctx context.Context, guildID, roleID uint64) error {
 	return a.bot.DeleteRole(ctx, guildID, roleID)
 }
 
-func (a *App) addRole(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error {
+func (a *App) addRole(ctx context.Context, spec discordcontrol.RoleMemberSpec) error {
 	if a == nil || a.bot == nil {
 		return liveDiscordUnavailable("role control")
 	}
 	return a.bot.AddRole(ctx, spec)
 }
 
-func (a *App) removeRole(ctx context.Context, spec pluginhostlua.RoleMemberSpec) error {
+func (a *App) removeRole(ctx context.Context, spec discordcontrol.RoleMemberSpec) error {
 	if a == nil || a.bot == nil {
 		return liveDiscordUnavailable("role control")
 	}
 	return a.bot.RemoveRole(ctx, spec)
 }
 
-func (a *App) purgeMessages(ctx context.Context, spec pluginhostlua.PurgeSpec) (int, error) {
+func (a *App) purgeMessages(ctx context.Context, spec discordcontrol.PurgeSpec) (int, error) {
 	if a == nil || a.bot == nil {
 		return 0, liveDiscordUnavailable("message purge")
 	}
 	return a.bot.PurgeMessages(ctx, spec)
 }
 
-func (a *App) createEmojiUpload(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (pluginhostlua.EmojiResult, error) {
+func (a *App) createEmojiUpload(ctx context.Context, guildID uint64, name, filename string, body []byte, width, height int) (discordcontrol.EmojiResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.EmojiResult{}, liveDiscordUnavailable("emoji control")
+		return discordcontrol.EmojiResult{}, liveDiscordUnavailable("emoji control")
 	}
 	return a.bot.CreateEmojiUpload(ctx, guildID, name, filename, body, width, height)
 }
 
-func (a *App) editEmoji(ctx context.Context, spec pluginhostlua.EmojiEditSpec) (pluginhostlua.EmojiResult, error) {
+func (a *App) editEmoji(ctx context.Context, spec discordcontrol.EmojiEditSpec) (discordcontrol.EmojiResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.EmojiResult{}, liveDiscordUnavailable("emoji control")
+		return discordcontrol.EmojiResult{}, liveDiscordUnavailable("emoji control")
 	}
 	return a.bot.EditEmoji(ctx, spec)
 }
 
-func (a *App) deleteEmoji(ctx context.Context, spec pluginhostlua.EmojiDeleteSpec) error {
+func (a *App) deleteEmoji(ctx context.Context, spec discordcontrol.EmojiDeleteSpec) error {
 	if a == nil || a.bot == nil {
 		return liveDiscordUnavailable("emoji control")
 	}
 	return a.bot.DeleteEmoji(ctx, spec)
 }
 
-func (a *App) createStickerUpload(ctx context.Context, guildID uint64, name, description, emojiTag, filename string, body []byte, width, height int) (pluginhostlua.StickerResult, error) {
+func (a *App) createStickerUpload(ctx context.Context, guildID uint64, name, description, emojiTag, filename string, body []byte, width, height int) (discordcontrol.StickerResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.StickerResult{}, liveDiscordUnavailable("sticker control")
+		return discordcontrol.StickerResult{}, liveDiscordUnavailable("sticker control")
 	}
 	return a.bot.CreateStickerUpload(ctx, guildID, name, description, emojiTag, filename, body, width, height)
 }
 
-func (a *App) editSticker(ctx context.Context, spec pluginhostlua.StickerEditSpec) (pluginhostlua.StickerResult, error) {
+func (a *App) editSticker(ctx context.Context, spec discordcontrol.StickerEditSpec) (discordcontrol.StickerResult, error) {
 	if a == nil || a.bot == nil {
-		return pluginhostlua.StickerResult{}, liveDiscordUnavailable("sticker control")
+		return discordcontrol.StickerResult{}, liveDiscordUnavailable("sticker control")
 	}
 	return a.bot.EditSticker(ctx, spec)
 }
 
-func (a *App) deleteSticker(ctx context.Context, spec pluginhostlua.StickerDeleteSpec) error {
+func (a *App) deleteSticker(ctx context.Context, spec discordcontrol.StickerDeleteSpec) error {
 	if a == nil || a.bot == nil {
 		return liveDiscordUnavailable("sticker control")
 	}

@@ -15,8 +15,8 @@ import (
 	moduleapi "github.com/xsyetopz/go-mamacord/internal/modules"
 	"github.com/xsyetopz/go-mamacord/internal/ops"
 	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
-	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
 	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
 type Dependencies struct {
@@ -40,10 +40,18 @@ type Dependencies struct {
 	AllowUnsignedPlugins bool
 	TrustedKeysFile      string
 
-	I18n        i18n.Registry
-	Store       commandruntime.Store
-	Metrics     *ops.Metrics
-	Marketplace commandruntime.MarketplaceAdmin
+	I18n         i18n.Registry
+	Restrictions store.RestrictionStore
+	PluginKV     store.PluginKVStore
+	ModuleStates store.ModuleStateStore
+	UserSettings store.UserSettingsStore
+	Reminders    store.ReminderStore
+	Guilds       store.GuildStore
+	Users        store.UserStore
+	GuildMembers store.GuildMemberStore
+	PluginStore  pluginhost.Store
+	Metrics      *ops.Metrics
+	Marketplace  commandruntime.MarketplaceAdmin
 
 	SlashCooldown          time.Duration
 	ComponentCooldown      time.Duration
@@ -53,11 +61,18 @@ type Dependencies struct {
 }
 
 type Bot struct {
-	logger      *slog.Logger
-	i18n        i18n.Registry
-	store       commandruntime.Store
-	metrics     *ops.Metrics
-	marketplace commandruntime.MarketplaceAdmin
+	logger        *slog.Logger
+	i18n          i18n.Registry
+	restrictions  store.RestrictionStore
+	pluginKV      store.PluginKVStore
+	moduleStates  store.ModuleStateStore
+	userSettings  store.UserSettingsStore
+	reminderStore store.ReminderStore
+	guilds        store.GuildStore
+	users         store.UserStore
+	guildMembers  store.GuildMemberStore
+	metrics       *ops.Metrics
+	marketplace   commandruntime.MarketplaceAdmin
 
 	prodMode bool
 
@@ -78,22 +93,19 @@ type Bot struct {
 	enableGateway            bool
 	enableScheduler          bool
 
-	client   *bot.Client
-	commands map[string]slashcmd.Command
-	order    []slashcmd.Command
+	client *bot.Client
 
-	moduleSeed config.ModulesFile
-	modules    map[string]moduleapi.Info
+	moduleSeed     config.ModulesFile
+	runtimeCatalog atomic.Pointer[runtimeCatalog]
 
-	pluginHost            *pluginhost.Host
-	pluginCommands        map[string]discordpluginbridge.Route
-	pluginUserCommands    map[string]discordpluginbridge.Route
-	pluginMessageCommands map[string]discordpluginbridge.Route
-	pluginRoutes          map[string]discordpluginbridge.Route
-	pluginAuto            *discordpluginbridge.Automation
-	scheduler             *schedulerRuntime
-	ready                 atomic.Bool
-	stats                 atomic.Value
+	pluginHost             *pluginhost.Host
+	pluginAuto             *discordpluginbridge.Automation
+	scheduler              *schedulerRuntime
+	ready                  atomic.Bool
+	stats                  atomic.Value
+	interactionSlots       chan struct{}
+	interactionRejectSlots chan struct{}
+	interactionRejectQueue chan interactionRejection
 }
 
 func New(deps Dependencies) (*Bot, error) {
@@ -113,15 +125,22 @@ func New(deps Dependencies) (*Bot, error) {
 	}
 
 	b := &Bot{
-		logger:      deps.Logger.With(slog.String("component", "discord")),
-		i18n:        deps.I18n,
-		store:       deps.Store,
-		metrics:     deps.Metrics,
-		marketplace: deps.Marketplace,
-		prodMode:    deps.ProdMode,
-		devGuildID:  cloneOptionalUint64(deps.DevGuildID),
-		owner:       newOwnerState(deps.OwnerUserID),
-		cooldowns:   newCooldownTracker(),
+		logger:        deps.Logger.With(slog.String("component", "discord")),
+		i18n:          deps.I18n,
+		restrictions:  deps.Restrictions,
+		pluginKV:      deps.PluginKV,
+		moduleStates:  deps.ModuleStates,
+		userSettings:  deps.UserSettings,
+		reminderStore: deps.Reminders,
+		guilds:        deps.Guilds,
+		users:         deps.Users,
+		guildMembers:  deps.GuildMembers,
+		metrics:       deps.Metrics,
+		marketplace:   deps.Marketplace,
+		prodMode:      deps.ProdMode,
+		devGuildID:    cloneOptionalUint64(deps.DevGuildID),
+		owner:         newOwnerState(deps.OwnerUserID),
+		cooldowns:     newCooldownTracker(),
 
 		commandRegistrationMode:  commandRegistrationMode,
 		commandGuildIDs:          append([]uint64(nil), deps.CommandGuildIDs...),
@@ -129,11 +148,9 @@ func New(deps Dependencies) (*Bot, error) {
 		enableGateway:            deps.EnableGateway,
 		enableScheduler:          deps.EnableScheduler,
 		moduleSeed:               moduleSeed,
-		modules:                  map[string]moduleapi.Info{},
-		pluginCommands:           map[string]discordpluginbridge.Route{},
-		pluginUserCommands:       map[string]discordpluginbridge.Route{},
-		pluginMessageCommands:    map[string]discordpluginbridge.Route{},
-		pluginRoutes:             map[string]discordpluginbridge.Route{},
+		interactionSlots:         make(chan struct{}, maximumConcurrentInteractions),
+		interactionRejectSlots:   make(chan struct{}, maximumConcurrentInteractionRejections),
+		interactionRejectQueue:   make(chan interactionRejection, maximumPendingInteractionRejections),
 	}
 	b.slashCooldown = deps.SlashCooldown
 	b.componentCooldownDur = deps.ComponentCooldown

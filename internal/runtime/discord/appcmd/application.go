@@ -2,6 +2,8 @@ package appcmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -14,11 +16,10 @@ import (
 	commandtext "github.com/xsyetopz/go-mamacord/internal/commandtext"
 	"github.com/xsyetopz/go-mamacord/internal/i18n"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/interactions"
-	discordplugin "github.com/xsyetopz/go-mamacord/internal/runtime/discord/plugin"
 	discordpluginbridge "github.com/xsyetopz/go-mamacord/internal/runtime/discord/pluginbridge"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/router"
 	"github.com/xsyetopz/go-mamacord/internal/runtime/discord/slashcmd"
-	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
+	"github.com/xsyetopz/go-mamacord/internal/runtime/plugins/contract"
 )
 
 type RestrictionCheck func(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator) (bool, error)
@@ -45,7 +46,8 @@ type Dispatcher struct {
 }
 
 func (d Dispatcher) OnCommand(e *events.ApplicationCommandInteractionCreate) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	d.incInteraction()
 
 	locale := e.Locale()
@@ -96,9 +98,9 @@ func (d Dispatcher) OnCommand(e *events.ApplicationCommandInteractionCreate) {
 }
 
 func (d Dispatcher) OnAutocomplete(e *events.AutocompleteInteractionCreate) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	d.incInteraction()
-
 	data := e.Data
 	cmdName := data.CommandName
 	route, ok := d.PluginCommands[cmdName]
@@ -106,46 +108,58 @@ func (d Dispatcher) OnAutocomplete(e *events.AutocompleteInteractionCreate) {
 		_ = e.AutocompleteResult(nil)
 		return
 	}
-	if disabled, err := d.commandDisabled(ctx, e.GuildID(), route.PluginID, cmdName); err != nil {
-		d.incInteractionFailure()
-		d.logger().ErrorContext(ctx, "plugin autocomplete permission check failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		_ = e.AutocompleteResult(nil)
-		return
-	} else if disabled {
+	if disabled, err := d.commandDisabled(ctx, e.GuildID(), route.PluginID, cmdName); err != nil || disabled {
+		if err != nil {
+			d.incInteractionFailure()
+			d.logger().ErrorContext(ctx, "plugin autocomplete permission check failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
+		}
 		_ = e.AutocompleteResult(nil)
 		return
 	}
-
 	isOwner := false
 	if services := d.Services(e.Locale()); services.IsOwner != nil {
 		isOwner = services.IsOwner(uint64(e.User().ID))
 	}
-
-	res, pluginID, err := route.Host.HandleAutocomplete(ctx, cmdName, router.OptionalString(data.SubCommandGroupName), router.OptionalString(data.SubCommandName), strings.TrimSpace(data.Focused().Name), pluginhost.Payload{
-		GuildID:   router.SnowflakePtrToString(e.GuildID()),
-		ChannelID: e.Channel().ID().String(),
-		UserID:    e.User().ID.String(),
-		Locale:    e.Locale().Code(),
-		IsOwner:   isOwner,
-		Options:   pluginhost.PayloadOptionsFromMap(router.PluginAutocompleteOptions(data)),
-	})
+	input := router.AutocompleteInput(data)
+	plan, err := route.Host.PlanAutocomplete("slash", cmdName, input.Path, input.Option)
 	if err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin autocomplete failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		_ = e.AutocompleteResult(nil)
+		d.pluginAutocompleteError(ctx, e, cmdName, err)
 		return
 	}
-
-	choices, parseErr := router.ParsePluginAutocompleteChoices(pluginID, res)
-	if parseErr != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin autocomplete parse failed", slog.String("cmd", cmdName), slog.String("err", parseErr.Error()))
-		_ = e.AutocompleteResult(nil)
+	invocation := pluginInteractionInvocation(e.User(), e.Member(), e.GuildID(), e.Channel(), e.Guild, e.Client().Caches.SelfUser, e.Locale().Code(), isOwner)
+	invocation.Route = plan.Route
+	invocation.Kind = contract.InvocationAutocomplete
+	invocation.Autocomplete = &input
+	admission, denial, err := route.Host.Admit(ctx, route.PluginID, invocation)
+	if err != nil {
+		d.pluginAutocompleteError(ctx, e, cmdName, err)
 		return
 	}
-	_ = e.AutocompleteResult(choices)
+	terminal := denial
+	if admission != nil {
+		terminal, err = admission.Run(ctx, contract.ResponseUnacknowledged)
+		if err != nil {
+			d.pluginAutocompleteError(ctx, e, cmdName, err)
+			return
+		}
+	}
+	choices, ok := terminal.(*contract.AutocompleteChoicesOperation)
+	if !ok {
+		d.pluginAutocompleteError(ctx, e, cmdName, errors.New("autocomplete did not return choices"))
+		return
+	}
+	converted, err := discordpluginbridge.ContractAutocompleteChoices(choices.Choices)
+	if err != nil {
+		d.pluginAutocompleteError(ctx, e, cmdName, err)
+		return
+	}
+	_ = e.AutocompleteResult(converted)
+}
+func (d Dispatcher) pluginAutocompleteError(ctx context.Context, e *events.AutocompleteInteractionCreate, cmdName string, err error) {
+	d.incInteractionFailure()
+	d.incPluginFailure()
+	d.logger().ErrorContext(ctx, "plugin autocomplete failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
+	_ = e.AutocompleteResult(nil)
 }
 
 func (d Dispatcher) preflightSlash(
@@ -224,206 +238,158 @@ func (d Dispatcher) handleRegisteredSlash(
 	return true
 }
 
-func (d Dispatcher) handlePluginSlash(
-	ctx context.Context,
-	e *events.ApplicationCommandInteractionCreate,
-	t commandtext.Translator,
-	locale discord.Locale,
-	cmdName string,
-	isOwner bool,
-	data discord.SlashCommandInteractionData,
-) {
+func (d Dispatcher) handlePluginSlash(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator, locale discord.Locale, cmdName string, isOwner bool, data discord.SlashCommandInteractionData) {
 	route, ok := d.PluginCommands[cmdName]
 	if !ok {
 		_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true))
 		return
 	}
-	interaction := discordpluginbridge.NewSlashInteraction(e)
-	if disabled, err := d.commandDisabled(ctx, e.GuildID(), route.PluginID, cmdName); err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin command permission check failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	} else if disabled {
-		d.respondCommandDisabled(e)
-		return
-	}
-
-	res, defaultEphemeral, pluginID, err := route.Host.HandleSlash(ctx, cmdName, pluginhost.Payload{
-		GuildID:     router.SnowflakePtrToString(e.GuildID()),
-		ChannelID:   e.Channel().ID().String(),
-		UserID:      e.User().ID.String(),
-		Locale:      locale.Code(),
-		IsOwner:     isOwner,
-		Options:     pluginhost.PayloadOptionsFromMap(router.PluginOptions(data)),
-		Interaction: interaction,
-	})
-	if err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin command failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	}
-
-	action, parseErr := discordplugin.ParseAction(pluginID, res, defaultEphemeral, discordplugin.ResponseSlash)
-	if parseErr != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin response parse failed", slog.String("cmd", cmdName), slog.String("err", parseErr.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	}
-
-	d.executePluginActionFromSlash(e, t, action)
+	input := router.CommandInput(data)
+	d.runPluginCommand(ctx, e, t, locale, cmdName, isOwner, route, input)
 }
-
-func (d Dispatcher) handlePluginUserCommand(
-	ctx context.Context,
-	e *events.ApplicationCommandInteractionCreate,
-	t commandtext.Translator,
-	locale discord.Locale,
-	cmdName string,
-	isOwner bool,
-	data discord.UserCommandInteractionData,
-) {
+func (d Dispatcher) handlePluginUserCommand(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator, locale discord.Locale, cmdName string, isOwner bool, data discord.UserCommandInteractionData) {
 	route, ok := d.PluginUserCommands[cmdName]
 	if !ok {
 		_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true))
 		return
 	}
-	interaction := discordpluginbridge.NewSlashInteraction(e)
-	if disabled, err := d.commandDisabled(ctx, e.GuildID(), route.PluginID, cmdName); err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin user command permission check failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	} else if disabled {
-		d.respondCommandDisabled(e)
-		return
-	}
-
-	res, defaultEphemeral, pluginID, err := route.Host.HandleUserCommand(ctx, cmdName, pluginhost.Payload{
-		GuildID:     router.SnowflakePtrToString(e.GuildID()),
-		ChannelID:   e.Channel().ID().String(),
-		UserID:      e.User().ID.String(),
-		Locale:      locale.Code(),
-		IsOwner:     isOwner,
-		Options:     pluginhost.PayloadOptionsFromMap(router.PluginUserContextOptions(data)),
-		Interaction: interaction,
-	})
-	if err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin user command failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	}
-
-	action, parseErr := discordplugin.ParseAction(pluginID, res, defaultEphemeral, discordplugin.ResponseSlash)
-	if parseErr != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin user command response parse failed", slog.String("cmd", cmdName), slog.String("err", parseErr.Error()))
-		d.respondPluginSlashError(e, t, interaction)
-		return
-	}
-
-	d.executePluginActionFromSlash(e, t, action)
+	input := router.UserCommandInput(data)
+	d.runPluginCommand(ctx, e, t, locale, cmdName, isOwner, route, input)
 }
-
-func (d Dispatcher) handlePluginMessageCommand(
-	ctx context.Context,
-	e *events.ApplicationCommandInteractionCreate,
-	t commandtext.Translator,
-	locale discord.Locale,
-	cmdName string,
-	isOwner bool,
-	data discord.MessageCommandInteractionData,
-) {
+func (d Dispatcher) handlePluginMessageCommand(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator, locale discord.Locale, cmdName string, isOwner bool, data discord.MessageCommandInteractionData) {
 	route, ok := d.PluginMessageCommands[cmdName]
 	if !ok {
 		_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true))
 		return
 	}
-	interaction := discordpluginbridge.NewSlashInteraction(e)
+	input := router.MessageCommandInput(data)
+	d.runPluginCommand(ctx, e, t, locale, cmdName, isOwner, route, input)
+}
+func (d Dispatcher) runPluginCommand(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator, locale discord.Locale, cmdName string, isOwner bool, route discordpluginbridge.Route, input contract.CommandInput) {
 	if disabled, err := d.commandDisabled(ctx, e.GuildID(), route.PluginID, cmdName); err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin message command permission check failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
+		d.pluginCommandError(ctx, e, t, cmdName, false, err)
 		return
 	} else if disabled {
 		d.respondCommandDisabled(e)
 		return
 	}
-
-	res, defaultEphemeral, pluginID, err := route.Host.HandleMessageCommand(ctx, cmdName, pluginhost.Payload{
-		GuildID:     router.SnowflakePtrToString(e.GuildID()),
-		ChannelID:   e.Channel().ID().String(),
-		UserID:      e.User().ID.String(),
-		Locale:      locale.Code(),
-		IsOwner:     isOwner,
-		Options:     pluginhost.PayloadOptionsFromMap(router.PluginMessageContextOptions(data)),
-		Interaction: interaction,
-	})
+	plan, err := route.Host.PlanCommand(string(input.Kind), cmdName, input.Path)
 	if err != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin message command failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
-		d.respondPluginSlashError(e, t, interaction)
+		d.pluginCommandError(ctx, e, t, cmdName, false, err)
 		return
 	}
-
-	action, parseErr := discordplugin.ParseAction(pluginID, res, defaultEphemeral, discordplugin.ResponseSlash)
-	if parseErr != nil {
-		d.incInteractionFailure()
-		d.incPluginFailure()
-		d.logger().ErrorContext(ctx, "plugin message command response parse failed", slog.String("cmd", cmdName), slog.String("err", parseErr.Error()))
-		d.respondPluginSlashError(e, t, interaction)
+	invocation := pluginInteractionInvocation(e.User(), e.Member(), e.GuildID(), e.Channel(), e.Guild, e.Client().Caches.SelfUser, locale.Code(), isOwner)
+	invocation.Route = plan.Route
+	invocation.Kind = contract.InvocationCommand
+	invocation.Command = &input
+	invocation.ResponseState = contract.ResponseUnacknowledged
+	admission, denial, err := route.Host.Admit(ctx, route.PluginID, invocation)
+	if err != nil {
+		d.pluginCommandError(ctx, e, t, cmdName, false, err)
 		return
 	}
-
-	d.executePluginActionFromSlash(e, t, action)
+	if admission == nil {
+		if err = d.respondPluginCommand(e, route.PluginID, denial, contract.ResponseUnacknowledged); err != nil {
+			d.pluginCommandError(ctx, e, t, cmdName, false, err)
+		}
+		return
+	}
+	state := contract.ResponseUnacknowledged
+	deferred := false
+	switch plan.Defer {
+	case contract.DeferCreate:
+		if err = e.DeferCreateMessage(plan.Ephemeral); err == nil {
+			state = contract.ResponseDeferredCreate
+			deferred = true
+		}
+	case contract.DeferUpdate:
+		err = errors.New("commands cannot defer a message update")
+	}
+	if err != nil {
+		d.pluginCommandError(ctx, e, t, cmdName, false, err)
+		return
+	}
+	terminal, err := admission.Run(ctx, state)
+	if err != nil {
+		d.pluginCommandError(ctx, e, t, cmdName, deferred, err)
+		return
+	}
+	if err = d.respondPluginCommand(e, route.PluginID, terminal, state); err != nil {
+		d.pluginCommandError(ctx, e, t, cmdName, deferred, err)
+	}
 }
-
-func (d Dispatcher) respondPluginSlashError(
-	e *events.ApplicationCommandInteractionCreate,
-	t commandtext.Translator,
-	interaction *discordpluginbridge.SlashInteraction,
-) {
-	if interaction != nil && interaction.Deferred() {
+func (d Dispatcher) respondPluginCommand(e *events.ApplicationCommandInteractionCreate, pluginID string, terminal contract.Operation, state contract.ResponseState) error {
+	if terminal == nil {
+		if state == contract.ResponseUnacknowledged {
+			return e.Acknowledge()
+		}
+		if state == contract.ResponseDeferredCreate {
+			return e.Client().Rest.DeleteInteractionResponse(e.ApplicationID(), e.Token())
+		}
+		return nil
+	}
+	switch value := terminal.(type) {
+	case *contract.MessageOperation:
+		message, err := discordpluginbridge.ContractMessageCreate(pluginID, *value)
+		if err != nil {
+			return err
+		}
+		if state == contract.ResponseDeferredCreate {
+			update := discord.MessageUpdate{Content: &message.Content, Embeds: &message.Embeds, Components: &message.Components, AllowedMentions: &discord.AllowedMentions{}}
+			return interactions.SlashUpdateInteractionResponse{Update: update}.Execute(e)
+		}
+		return e.CreateMessage(message)
+	case *contract.EditResponseOperation:
+		update, err := discordpluginbridge.ContractMessageUpdate(pluginID, value.Patch)
+		if err != nil {
+			return err
+		}
+		return interactions.SlashUpdateInteractionResponse{Update: update}.Execute(e)
+	case *contract.UpdateOperation:
+		return errors.New("command cannot update a source message")
+	case *contract.ModalOperation:
+		if state != contract.ResponseUnacknowledged {
+			return errors.New("cannot open modal after deferral")
+		}
+		modal, err := discordpluginbridge.ContractModal(pluginID, value.Modal)
+		if err != nil {
+			return err
+		}
+		return e.Modal(modal)
+	default:
+		return fmt.Errorf("unsupported command terminal operation %T", terminal)
+	}
+}
+func (d Dispatcher) pluginCommandError(ctx context.Context, e *events.ApplicationCommandInteractionCreate, t commandtext.Translator, cmdName string, deferred bool, err error) {
+	d.incInteractionFailure()
+	d.incPluginFailure()
+	d.logger().ErrorContext(ctx, "plugin command failed", slog.String("cmd", cmdName), slog.String("err", err.Error()))
+	if deferred {
 		content := t.S("err.generic", nil)
-		_ = interactions.SlashUpdateInteractionResponse{Update: discord.MessageUpdate{
-			Content:         &content,
-			AllowedMentions: &discord.AllowedMentions{},
-			Embeds:          &[]discord.Embed{},
-		}}.Execute(e)
+		_ = interactions.SlashUpdateInteractionResponse{Update: discord.MessageUpdate{Content: &content, AllowedMentions: &discord.AllowedMentions{}, Embeds: &[]discord.Embed{}}}.Execute(e)
 		return
 	}
-
 	_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true))
 }
-
-func (d Dispatcher) executePluginActionFromSlash(
-	e *events.ApplicationCommandInteractionCreate,
-	t commandtext.Translator,
-	action discordplugin.Action,
-) {
-	switch action.Kind {
-	case discordplugin.ActionNone:
-		_ = e.Acknowledge()
-	case discordplugin.ActionModal:
-		_ = e.Modal(action.Modal)
-	case discordplugin.ActionUpdate:
-		_ = interactions.SlashUpdateInteractionResponse{Update: action.Update}.Execute(e)
-	case discordplugin.ActionMessage:
-		_ = e.CreateMessage(action.Create)
-	default:
-		_ = e.CreateMessage(interactions.NoticeMessage(interactions.KindError, "", t.S("err.generic", nil), true))
+func pluginInteractionInvocation(user discord.User, member *discord.ResolvedMember, guildID *snowflake.ID, channel discord.InteractionChannel, guild func() (discord.Guild, bool), self func() (discord.OAuth2User, bool), locale string, isOwner bool) contract.Invocation {
+	author := router.UserRef(user)
+	channelRef := router.InteractionChannelRef(channel, router.SnowflakePtrToString(guildID))
+	invocation := contract.Invocation{Author: &author, Channel: &channelRef, Locale: locale, IsOwner: isOwner, ResponseState: contract.ResponseUnacknowledged}
+	if member != nil {
+		value := router.MemberRef(*member, router.SnowflakePtrToString(guildID))
+		invocation.Member = &value
 	}
+	if value, ok := guild(); ok {
+		ref := router.GuildRef(value)
+		invocation.Guild = &ref
+	} else if guildID != nil {
+		invocation.Guild = &contract.GuildRef{ID: guildID.String()}
+	}
+	if value, ok := self(); ok {
+		ref := router.UserRef(value.User)
+		invocation.BotUser = &ref
+	}
+	return invocation
 }
 
 func (d Dispatcher) commandDisabled(

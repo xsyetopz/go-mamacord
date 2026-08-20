@@ -377,15 +377,15 @@ func TestShippedSchemaURLs(t *testing.T) {
 		key  string
 		want string
 	}{
-		{path: "config/trusted_keys.json", key: "$schema", want: schemaBaseURL + "trusted_keys.schema.v1.json"},
-		{path: "config/permissions.json", key: "$schema", want: schemaBaseURL + "permissions.schema.v1.json"},
-		{path: "config/modules.json", key: "$schema", want: schemaBaseURL + "modules.schema.v1.json"},
-		{path: "schemas/messages.schema.v1.json", key: "$id", want: schemaBaseURL + "messages.schema.v1.json"},
-		{path: "schemas/modules.schema.v1.json", key: "$id", want: schemaBaseURL + "modules.schema.v1.json"},
-		{path: "schemas/permissions.schema.v1.json", key: "$id", want: schemaBaseURL + "permissions.schema.v1.json"},
-		{path: "schemas/plugin.schema.v1.json", key: "$id", want: schemaBaseURL + "plugin.schema.v1.json"},
-		{path: "schemas/signature.schema.v1.json", key: "$id", want: schemaBaseURL + "signature.schema.v1.json"},
-		{path: "schemas/trusted_keys.schema.v1.json", key: "$id", want: schemaBaseURL + "trusted_keys.schema.v1.json"},
+		{path: "config/trusted_keys.json", key: "$schema", want: schemaBaseURL + "trusted_keys.schema.json"},
+		{path: "config/permissions.json", key: "$schema", want: schemaBaseURL + "permissions.schema.json"},
+		{path: "config/modules.json", key: "$schema", want: schemaBaseURL + "modules.schema.json"},
+		{path: "schemas/messages.schema.json", key: "$id", want: schemaBaseURL + "messages.schema.json"},
+		{path: "schemas/modules.schema.json", key: "$id", want: schemaBaseURL + "modules.schema.json"},
+		{path: "schemas/permissions.schema.json", key: "$id", want: schemaBaseURL + "permissions.schema.json"},
+		{path: "schemas/plugin.schema.json", key: "$id", want: schemaBaseURL + "plugin.schema.json"},
+		{path: "schemas/signature.schema.json", key: "$id", want: schemaBaseURL + "signature.schema.json"},
+		{path: "schemas/trusted_keys.schema.json", key: "$id", want: schemaBaseURL + "trusted_keys.schema.json"},
 	}
 
 	exampleBundleDir := examplePluginDir(t, repoRoot)
@@ -396,7 +396,7 @@ func TestShippedSchemaURLs(t *testing.T) {
 	}{
 		path: repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.json")),
 		key:  "$schema",
-		want: schemaBaseURL + "plugin.schema.v1.json",
+		want: schemaBaseURL + "plugin.schema.json",
 	})
 
 	for _, pluginID := range bundledFirstPartyPluginIDs() {
@@ -409,7 +409,7 @@ func TestShippedSchemaURLs(t *testing.T) {
 			}{
 				path: repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.json")),
 				key:  "$schema",
-				want: schemaBaseURL + "plugin.schema.v1.json",
+				want: schemaBaseURL + "plugin.schema.json",
 			},
 			struct {
 				path string
@@ -418,7 +418,7 @@ func TestShippedSchemaURLs(t *testing.T) {
 			}{
 				path: repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "signature.json")),
 				key:  "$schema",
-				want: schemaBaseURL + "signature.schema.v1.json",
+				want: schemaBaseURL + "signature.schema.json",
 			},
 		)
 	}
@@ -456,45 +456,11 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 	repoRoot := filepath.Clean(filepath.Join("..", ".."))
 	exampleBundleDir := examplePluginDir(t, repoRoot)
 
-	luarcPath := filepath.Join(repoRoot, ".luarc.json")
-	luarcBytes, err := os.ReadFile(luarcPath)
-	if err != nil {
-		t.Fatalf("ReadFile(%q): %v", luarcPath, err)
-	}
-
-	var luarc map[string]any
-	if err := json.Unmarshal(luarcBytes, &luarc); err != nil {
-		t.Fatalf("json.Unmarshal(%q): %v", luarcPath, err)
-	}
-
-	libraryEntries, ok := luarc["workspace.library"].([]any)
-	if !ok {
-		t.Fatalf("workspace.library missing or invalid in %s", luarcPath)
-	}
-
-	var hasBotAPI bool
-	for _, entry := range libraryEntries {
-		pathValue, ok := entry.(string)
-		if !ok || pathValue != "./sdk/lua/bot_api.lua" {
-			continue
-		}
-		hasBotAPI = true
-
-		fullPath := filepath.Join(repoRoot, pathValue)
-		if _, err := os.Stat(fullPath); err != nil {
-			t.Fatalf("Stat(%q): %v", fullPath, err)
-		}
-	}
-	if !hasBotAPI {
-		t.Fatalf("workspace.library does not include ./sdk/lua/bot_api.lua")
-	}
-
 	paths := []string{
 		"config/trusted_keys.json",
 		filepath.Join("examples", "plugins", "example", bundles.StateFileName),
 		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.json")),
-		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.lua")),
-		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "lib", "counter.lua")),
+		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "plugin.star")),
 		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "locales", "en-US", "messages.json")),
 		repoRelativePath(t, repoRoot, filepath.Join(exampleBundleDir, "locales", "en-GB", "messages.json")),
 	}
@@ -503,7 +469,7 @@ func TestAuthoringAssetsLayout(t *testing.T) {
 		paths = append(paths,
 			filepath.Join("plugins", pluginID, bundles.StateFileName),
 			repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.json")),
-			repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.lua")),
+			repoRelativePath(t, repoRoot, filepath.Join(bundleDir, "plugin.star")),
 		)
 	}
 	for _, relPath := range paths {

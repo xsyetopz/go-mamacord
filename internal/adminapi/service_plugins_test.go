@@ -2,6 +2,7 @@ package adminapi
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	"github.com/xsyetopz/go-mamacord/internal/bundles"
 	"github.com/xsyetopz/go-mamacord/internal/config"
 	"github.com/xsyetopz/go-mamacord/internal/postgrestest"
+	pluginhost "github.com/xsyetopz/go-mamacord/internal/runtime/plugins"
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 	postgresstore "github.com/xsyetopz/go-mamacord/internal/storage/postgres"
 )
@@ -83,7 +85,8 @@ func TestPluginsUsesStoredBundleRelativeDirForMarketplacePlugin(t *testing.T) {
 		Config: config.Config{
 			UserPluginsDir: userRoot,
 		},
-		Store: storage,
+		PluginInstalls: storage.PluginInstalls(),
+		TrustedSigners: storage.TrustedSigners(),
 	}
 
 	plugins, err := svc.Plugins()
@@ -140,7 +143,8 @@ func TestPluginsFallsBackToActiveBundleWhenStoredBundleRelativeDirIsInvalid(t *t
 		Config: config.Config{
 			UserPluginsDir: userRoot,
 		},
-		Store: storage,
+		PluginInstalls: storage.PluginInstalls(),
+		TrustedSigners: storage.TrustedSigners(),
 	}
 
 	plugins, err := svc.Plugins()
@@ -198,16 +202,17 @@ func TestPluginsUsesRepositoryBundleModifiedForObjectStorePlugin(t *testing.T) {
 	}); err != nil {
 		t.Fatalf("PutPluginInstall: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(tmp, "object-store", "bundleme", bundle.BundleRelativeDir, "plugin.lua"), []byte(`return { changed = true }`), 0o644); err != nil {
-		t.Fatalf("WriteFile(plugin.lua): %v", err)
+	if err := os.WriteFile(filepath.Join(tmp, "object-store", "bundleme", bundle.BundleRelativeDir, "plugin.star"), []byte(`return { changed = true }`), 0o644); err != nil {
+		t.Fatalf("WriteFile(plugin.star): %v", err)
 	}
 
 	svc := &Service{
 		Config: config.Config{
 			UserPluginsDir: userRoot,
 		},
-		Bundles: repo,
-		Store:   storage,
+		Bundles:        repo,
+		PluginInstalls: storage.PluginInstalls(),
+		TrustedSigners: storage.TrustedSigners(),
 	}
 
 	plugins, err := svc.Plugins()
@@ -225,8 +230,13 @@ func TestPluginsUsesRepositoryBundleModifiedForObjectStorePlugin(t *testing.T) {
 func writeServicePluginBundle(t *testing.T, dir, pluginID string) {
 	t.Helper()
 
-	writeTestFile(t, filepath.Join(dir, "plugin.json"), `{"id":"`+pluginID+`","name":"`+pluginID+`","version":"0.1.0"}`)
-	writeTestFile(t, filepath.Join(dir, "plugin.lua"), `return {}`)
+	manifest := pluginhost.StarlarkManifest{Schema: pluginhost.StarlarkManifestSchema, ID: pluginID, Name: pluginID, Version: "0.1.0", Entrypoint: pluginhost.StarlarkEntrypoint, Permissions: pluginhost.StarlarkManifestPermissions{Network: pluginhost.StarlarkManifestNetworkPermissions{Hosts: []string{}}}, Locales: pluginhost.StarlarkManifestLocales{Default: "en-US", Supported: []string{"en-US"}}, StateKeys: []string{}, Assets: []string{}}
+	payload, err := json.Marshal(manifest)
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeTestFile(t, filepath.Join(dir, "plugin.json"), string(payload))
+	writeTestFile(t, filepath.Join(dir, "plugin.star"), `PLUGIN = None`)
 }
 
 func writeTestFile(t *testing.T, path, contents string) {

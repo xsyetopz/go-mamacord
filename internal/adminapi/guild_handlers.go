@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/xsyetopz/go-mamacord/internal/guildconfig"
-	pluginhostlua "github.com/xsyetopz/go-mamacord/internal/runtime/plugins/lua"
+	discordcontrol "github.com/xsyetopz/go-mamacord/internal/runtime/discord/control"
 )
 
 func (s *Server) handleGuildConfig(w http.ResponseWriter, r *http.Request, sess session) {
@@ -261,7 +261,7 @@ func (s *Server) handleGuildRoleCreate(w http.ResponseWriter, r *http.Request, s
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	role, err := s.svc.ManagerCreateRole(r.Context(), sess.AccessToken, pluginhostlua.RoleCreateSpec{
+	role, err := s.svc.ManagerCreateRole(r.Context(), sess.AccessToken, discordcontrol.RoleCreateSpec{
 		GuildID:     uint64(req.GuildID),
 		Name:        req.Name,
 		Color:       req.Color,
@@ -292,7 +292,7 @@ func (s *Server) handleGuildRoleEdit(w http.ResponseWriter, r *http.Request, ses
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	role, err := s.svc.ManagerEditRole(r.Context(), sess.AccessToken, pluginhostlua.RoleEditSpec{
+	role, err := s.svc.ManagerEditRole(r.Context(), sess.AccessToken, discordcontrol.RoleEditSpec{
 		GuildID:     uint64(req.GuildID),
 		RoleID:      uint64(req.RoleID),
 		Name:        req.Name,
@@ -342,7 +342,7 @@ func (s *Server) handleGuildRoleMember(w http.ResponseWriter, r *http.Request, s
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := s.svc.ManagerMemberRole(r.Context(), sess.AccessToken, req.Add, pluginhostlua.RoleMemberSpec{
+	if err := s.svc.ManagerMemberRole(r.Context(), sess.AccessToken, req.Add, discordcontrol.RoleMemberSpec{
 		GuildID: uint64(req.GuildID),
 		UserID:  uint64(req.UserID),
 		RoleID:  uint64(req.RoleID),
@@ -369,7 +369,7 @@ func (s *Server) handleGuildPurge(w http.ResponseWriter, r *http.Request, sess s
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	deleted, err := s.svc.ManagerPurge(r.Context(), sess.AccessToken, uint64(req.GuildID), pluginhostlua.PurgeSpec{
+	deleted, err := s.svc.ManagerPurge(r.Context(), sess.AccessToken, uint64(req.GuildID), discordcontrol.PurgeSpec{
 		ChannelID: uint64(req.ChannelID),
 		Mode:      req.Mode,
 		AnchorRaw: req.AnchorRaw,
@@ -421,7 +421,7 @@ func (s *Server) handleGuildEmojiEdit(w http.ResponseWriter, r *http.Request, se
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	emoji, err := s.svc.ManagerEditEmoji(r.Context(), sess.AccessToken, pluginhostlua.EmojiEditSpec{
+	emoji, err := s.svc.ManagerEditEmoji(r.Context(), sess.AccessToken, discordcontrol.EmojiEditSpec{
 		GuildID:  uint64(req.GuildID),
 		RawEmoji: req.RawEmoji,
 		Name:     req.Name,
@@ -446,7 +446,7 @@ func (s *Server) handleGuildEmojiDelete(w http.ResponseWriter, r *http.Request, 
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := s.svc.ManagerDeleteEmoji(r.Context(), sess.AccessToken, pluginhostlua.EmojiDeleteSpec{
+	if err := s.svc.ManagerDeleteEmoji(r.Context(), sess.AccessToken, discordcontrol.EmojiDeleteSpec{
 		GuildID:  uint64(req.GuildID),
 		RawEmoji: req.RawEmoji,
 	}); err != nil {
@@ -498,7 +498,7 @@ func (s *Server) handleGuildStickerEdit(w http.ResponseWriter, r *http.Request, 
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	sticker, err := s.svc.ManagerEditSticker(r.Context(), sess.AccessToken, pluginhostlua.StickerEditSpec{
+	sticker, err := s.svc.ManagerEditSticker(r.Context(), sess.AccessToken, discordcontrol.StickerEditSpec{
 		GuildID:     uint64(req.GuildID),
 		RawID:       req.RawID,
 		Name:        req.Name,
@@ -524,7 +524,7 @@ func (s *Server) handleGuildStickerDelete(w http.ResponseWriter, r *http.Request
 		writeServiceError(w, http.StatusBadRequest, err)
 		return
 	}
-	if err := s.svc.ManagerDeleteSticker(r.Context(), sess.AccessToken, pluginhostlua.StickerDeleteSpec{
+	if err := s.svc.ManagerDeleteSticker(r.Context(), sess.AccessToken, discordcontrol.StickerDeleteSpec{
 		GuildID: uint64(req.GuildID),
 		RawID:   req.RawID,
 	}); err != nil {

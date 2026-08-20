@@ -14,6 +14,30 @@ import (
 	store "github.com/xsyetopz/go-mamacord/internal/storage"
 )
 
+type runtimeCatalog struct {
+	modules               map[string]moduleapi.Info
+	commands              map[string]slashcmd.Command
+	order                 []slashcmd.Command
+	pluginCommands        map[string]discordpluginbridge.Route
+	pluginUserCommands    map[string]discordpluginbridge.Route
+	pluginMessageCommands map[string]discordpluginbridge.Route
+	pluginRoutes          map[string]discordpluginbridge.Route
+}
+
+func (b *Bot) catalogSnapshot() *runtimeCatalog {
+	if snapshot := b.runtimeCatalog.Load(); snapshot != nil {
+		return snapshot
+	}
+	return &runtimeCatalog{
+		modules:               map[string]moduleapi.Info{},
+		commands:              map[string]slashcmd.Command{},
+		pluginCommands:        map[string]discordpluginbridge.Route{},
+		pluginUserCommands:    map[string]discordpluginbridge.Route{},
+		pluginMessageCommands: map[string]discordpluginbridge.Route{},
+		pluginRoutes:          map[string]discordpluginbridge.Route{},
+	}
+}
+
 func (b *Bot) refreshRuntimeCatalog(ctx context.Context) error {
 	states, err := b.loadModuleStates(ctx)
 	if err != nil {
@@ -73,13 +97,16 @@ func (b *Bot) refreshRuntimeCatalog(ctx context.Context) error {
 		states,
 	)
 
-	b.modules = modules
-	b.commands = builtinCommands
-	b.order = order
-	b.pluginCommands = pluginCommands
-	b.pluginUserCommands = pluginUserCommands
-	b.pluginMessageCommands = pluginMessageCommands
-	b.pluginRoutes = pluginRoutes
+	snapshot := &runtimeCatalog{
+		modules:               modules,
+		commands:              builtinCommands,
+		order:                 order,
+		pluginCommands:        pluginCommands,
+		pluginUserCommands:    pluginUserCommands,
+		pluginMessageCommands: pluginMessageCommands,
+		pluginRoutes:          pluginRoutes,
+	}
+	b.runtimeCatalog.Store(snapshot)
 	b.stats.Store(catalog.RuntimeStats(modules, order, len(pluginCommands), len(pluginUserCommands), len(pluginMessageCommands)))
 	return nil
 }
@@ -113,7 +140,7 @@ func (b *Bot) appendPluginModules(
 			ID:             info.ID,
 			Name:           strings.TrimSpace(info.Name),
 			Kind:           kind,
-			Runtime:        moduleapi.RuntimeLua,
+			Runtime:        moduleapi.RuntimeStarlark,
 			Enabled:        enabled,
 			DefaultEnabled: defaultEnabled,
 			Toggleable:     true,
